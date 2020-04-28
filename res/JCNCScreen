@@ -1,0 +1,4 @@
+#!/bin/bash
+cd ~/test/UI4LinuxCNC
+java -Djava.library.path=.:./lc/lib -jar UI4LinuxCNC.jar -base ./exHdr
+

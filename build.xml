@@ -1,0 +1,95 @@
+<?xml version = "1.0"?>
+<project name = "UI for LinuxCNC" default = "info">
+    <property name = "app.main" value = "de.schwarzrot.app.LinuxCNCClient"/>
+    <property name = "src.dir" value = "src"/>
+    <property name = "res.dir" value = "res"/>
+    <property name = "lib.dir" value = "lib"/>
+    <property name = "msg.dir" value = "messages"/>
+    <property name = "build.dir" value = "build"/>
+    <property name = "dist.dir" location = "runtime"/>
+    <property name = "native.dir" value = "native"/>
+    <property name = "handler.version" value = "0.13"/>
+    <property name = "runtime.option" value = "-Djava.library.path=./native:./native/lc/lib"/>
+    <property name = "name" value = "JCNCScreen"/>
+
+    <path id = "master-classpath">
+        <fileset dir = "${lib.dir}">
+            <include name = "*.jar"/>
+        </fileset>
+        <pathelement path = "${build.dir}"/>
+    </path>
+    <pathconvert property = "test.classpath" refid = "master-classpath" pathsep=":"/>
+    <pathconvert property = "jar.classpath" refid = "master-classpath" pathsep = " "/>
+
+
+    <target name = "info">
+        <echo>build UI-application for LinuxCNC</echo>
+        <echo>src-dir: ${src.dir}</echo>
+        <echo>res-dir: ${res.dir}</echo>
+        <echo>msg-dir: ${msg.dir}</echo>
+        <echo>name: ${name}</echo>
+        <echo>classpath: ${test.classpath}</echo>
+        <echo>valid targets: clean, build, dist, info, run-info</echo>
+    </target>
+
+    <target name = "build" description = "compile source tree java files">
+        <mkdir dir = "${build.dir}"/>
+        <mkdir dir = "${dist.dir}"/>
+
+        <javac destdir = "${build.dir}" source = "1.8" target = "1.8" debug = "false"
+               deprecation = "false" optimize = "true" failonerror = "true">
+            <src path = "${src.dir}"/>
+            <classpath refid = "master-classpath"/>
+        </javac>
+        <exec dir = "${native.dir}" executable = "./build.it"/>
+        <mkdir dir = "${build.dir}/images"/>
+        <copy todir="${build.dir}">
+            <fileset dir="${res.dir}"/>
+            <fileset dir="${msg.dir}"/>
+        </copy>
+    </target>
+
+    <target name = "clean" description = "clean output directories">
+        <mkdir dir = "${build.dir}"/>
+        <delete>
+            <fileset dir = "${build.dir}">
+                <include name = "**/*"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name = "dist" depends="clean,build">
+        <mkdir dir = "${dist.dir}"/>
+        <mkdir dir = "${dist.dir}/misc"/>
+        <jar destfile = "${dist.dir}/${name}.jar"
+             basedir = "${build.dir}"
+             includes = "**">
+            <manifest>
+                <attribute name = "Main-Class" value="${app.main}"/>
+                <attribute name = "Class-Path" value="lib ${jar.classpath}"/>
+                <attribute name = "Implementation-Title" value="UI-application for linuxcnc"/>
+                <attribute name = "Implementation-Version" value="${handler.version}"/>
+                <attribute name = "Implementation-Vendor" value="Django Reinhard"/>
+                <attribute name = "Implementation-Type" value="UI Application"/>
+            </manifest>
+        </jar>
+        <copy todir="${dist.dir}">
+            <fileset file="${native.dir}/libLinuxCNC.so"/>
+            <fileset file="COPYING"/>
+        </copy>
+        <symlink link = "${dist.dir}/exHdr" resource = "../exHdr" overwrite = "true"/>
+        <symlink link = "${dist.dir}/lib"   resource = "../lib" overwrite = "true"/>
+        <echo file = "${dist.dir}/misc/${name}">
+#!/bin/bash
+cd ${dist.dir}
+java -Djava.library.path=.:./lc/lib -jar ${name}.jar -base ./exHdr
+        </echo>
+        <zip destfile="${name}-bin.zip"
+             basedir="${dist.dir}"
+             update="true"/>
+    </target>
+
+    <target name = "run-info">
+        <echo> java -Djava.library.path=.:./lc/lib -jar ${name}.jar -base ./exHdr</echo>
+    </target>
+</project>

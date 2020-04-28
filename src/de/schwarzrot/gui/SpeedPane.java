@@ -1,0 +1,207 @@
+package de.schwarzrot.gui;
+/* 
+ * **************************************************************************
+ * 
+ *  file:       SpeedPane.java
+ *  project:    GUI for linuxcnc
+ *  subproject: graphical application frontend
+ *  purpose:    create a smart application, that assists in managing
+ *              control of cnc-machines                           
+ *  created:    25.9.2019 by Django Reinhard
+ *  copyright:  all rights reserved
+ * 
+ *  This program is free software: you can redistribute it and/or modify 
+ *  it under the terms of the GNU General Public License as published by 
+ *  the Free Software Foundation, either version 2 of the License, or 
+ *  (at your option) any later version. 
+ *   
+ *  This program is distributed in the hope that it will be useful, 
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ *  GNU General Public License for more details. 
+ *   
+ *  You should have received a copy of the GNU General Public License 
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * **************************************************************************
+ */
+
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.text.NumberFormat;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import de.schwarzrot.bean.AppSetup;
+import de.schwarzrot.bean.LCStatus;
+import de.schwarzrot.bean.themes.UITheme;
+import de.schwarzrot.util.BindUtils;
+import de.schwarzrot.widgets.DRO;
+import de.schwarzrot.widgets.ProgressBar;
+
+
+public class SpeedPane extends JPanel {
+   public SpeedPane() {
+      setLayout(new GridBagLayout());
+      setOpaque(true);
+      setBackground(UITheme.getColor("Speed:grid.color"));
+      addComponents2Pane();
+   }
+
+
+   // TODO: externalize font and colors
+   protected void addComponents2Pane() {
+      GridBagConstraints c     = new GridBagConstraints();
+      AppSetup           setup = LCStatus.getStatus().getSetup();
+      NumberFormat       nf    = UITheme.getFormat("DRO:speed.format");
+      Color              cf    = UITheme.getColor("DRO:speed.foreground");
+      Color              cb    = UITheme.getColor("DRO:speed.background");
+      Font               f     = UITheme.getFont("DRO:speed.font");
+      DRO                dro;
+
+      c.fill       = GridBagConstraints.BOTH;
+      c.weightx    = 0;
+      c.weighty    = 0.3;
+      c.gridx      = 0;
+      c.gridy      = 0;
+      c.gridheight = 2;
+      c.gridwidth  = 1;
+      add(createLabel(" F", true), c);
+
+      c.gridx      = 1;
+      c.gridheight = 1;
+      c.weightx    = 0.4;
+      dro          = createDRO(nf, cf, cb, f);
+      BindUtils.bind("nominalFeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      add(dro, c);
+
+      c.gridx      = 2;
+      c.gridheight = 1;
+      c.weightx    = 0.6;
+      dro          = createDRO(nf, cf, cb, f);
+      BindUtils.bind("curFeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      add(dro, c);
+
+      c.gridx     = 1;
+      c.gridy     = 1;
+      c.gridwidth = 2;
+      c.weighty   = 0;
+      c.weightx   = 1;
+      double lim = 1.0;
+
+      try {
+         lim = Double.parseDouble(setup.findProperty("MAX_FEED_OVERRIDE"));
+      } catch (Throwable t) {
+      }
+      ProgressBar pg = new ProgressBar(0, Double.valueOf(lim * 100).intValue());
+      BindUtils.bind("feedFactor", LCStatus.getStatus().getSpeedInfo(), pg);
+      add(pg, c);
+
+      c.gridx      = 0;
+      c.gridy      = 2;
+      c.gridheight = 2;
+      c.gridwidth  = 1;
+      c.weightx    = 0;
+      c.weighty    = 0.3;
+      add(createLabel(" FF", true), c);
+
+      c.gridx      = 1;
+      c.weightx    = 1;
+      c.gridheight = 1;
+      c.gridwidth  = 2;
+      dro          = createDRO(nf, cf, cb, f);
+      BindUtils.bind("maxSpeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      add(dro, c);
+
+      c.gridx     = 1;
+      c.gridy     = 3;
+      c.gridwidth = 2;
+      c.weighty   = 0;
+      pg          = new ProgressBar(0, 100);
+      BindUtils.bind("rapidFactor", LCStatus.getStatus().getSpeedInfo(), pg);
+      add(pg, c);
+
+      c.gridx      = 0;
+      c.gridy      = 4;
+      c.gridheight = 2;
+      c.gridwidth  = 1;
+      c.weightx    = 0;
+      c.weighty    = 0.3;
+      add(createLabel(" S", true), c);
+      Dimension size;
+
+      c.gridx      = 1;
+      c.gridheight = 1;
+      c.weightx    = 0.4;
+      dro          = createDRO(nf, cf, cb, f);
+      size         = dro.calcMinSize(23000);
+      dro.setMinimumSize(size);
+      dro.setPreferredSize(size);
+      BindUtils.bind("spindleNominalSpeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      add(dro, c);
+
+      c.gridx   = 2;
+      c.weightx = 0.6;
+      dro       = createDRO(nf, cf, cb, f);
+      dro.setMinimumSize(size);
+      dro.setPreferredSize(size);
+      BindUtils.bind("spindleCurSpeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      add(dro, c);
+
+      c.gridx     = 1;
+      c.gridy     = 5;
+      c.gridwidth = 2;
+      c.weighty   = 0;
+      lim         = 1.0;
+
+      try {
+         lim = Double.parseDouble(setup.findProperty("MAX_SPINDLE_OVERRIDE"));
+      } catch (Throwable t) {
+      }
+      pg = new ProgressBar(0, Double.valueOf(lim * 100).intValue());
+      BindUtils.bind("spindleFactor", LCStatus.getStatus().getSpeedInfo(), pg);
+      add(pg, c);
+   }
+
+
+   protected DRO createDRO(NumberFormat nf, Color cf, Color cb, Font f) {
+      DRO dro = new DRO();
+
+      dro.setFormat(nf);
+      dro.setFont(f);
+      dro.setForeground(cf);
+      dro.setBackground(cb);
+
+      return dro;
+   }
+
+
+   private JLabel createLabel(String labelText, boolean isHeader) {
+      JLabel label = new JLabel(labelText);
+
+      label.setOpaque(true);
+      label.setFont(UITheme.getFont("DRO:speed.header.font"));
+      FontMetrics fm = this.getFontMetrics(label.getFont());
+      Dimension   s  = new Dimension(SwingUtilities.computeStringWidth(fm, "T99"), fm.getHeight());
+
+      label.setMinimumSize(s);
+      label.setPreferredSize(s);
+      if (isHeader) {
+         label.setForeground(UITheme.getColor("DRO:speed.header.foreground"));
+         label.setBackground(UITheme.getColor("DRO:speed.header.background"));
+      } else
+         label.setHorizontalAlignment(JLabel.RIGHT);
+
+      return label;
+   }
+
+
+   private static final long serialVersionUID = 1L;
+}

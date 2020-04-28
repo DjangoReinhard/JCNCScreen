@@ -1,0 +1,6 @@
+#!/bin/bash
+cd ../src
+javac -h ../native/ -cp .:../lib/glazedlists-1.11.0.jar:../../LCExportHandler/bin de/schwarzrot/system/CommandWriter.java
+javac -h ../native/ -cp .:../lib/glazedlists-1.11.0.jar:../../LCExportHandler/bin de/schwarzrot/system/ErrorReader.java
+javac -h ../native/ -cp .:../lib/glazedlists-1.11.0.jar:../../LCExportHandler/bin de/schwarzrot/system/StatusReader.java
+cd ../native
