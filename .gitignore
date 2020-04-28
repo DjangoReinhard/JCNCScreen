@@ -2,12 +2,16 @@
 *.class
 *.d
 *.o
+*.log
 *~
+backup*
 build/*
 exHdr/*
 runtime/*
 test/*
+lc
 unused*
 bin*
+native/libLinuxCNC.so
 lib/LCExportHandler.jar
 JCNCScreen-bin.zip

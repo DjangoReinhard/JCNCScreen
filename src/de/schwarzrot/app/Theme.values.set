@@ -1,0 +1,108 @@
+public class TradingProjectTreeRenderer extends DefaultTreeCellRenderer {
+  private static final String SPAN_FORMAT = "<span style='color:%s;'>%s</span>";
+  private final ImageIcon employeeIcon;
+
+  public TradingProjectTreeRenderer() {
+      employeeIcon = new ImageIcon(TradingProjectTreeRenderer.class.getResource("/images/employee.png"));
+  }
+
+  @Override
+  public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
+                                                boolean leaf, int row, boolean hasFocus) {
+      super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+      Object userObject = node.getUserObject();
+      
+      if (userObject instanceof ProjectParticipant) {
+          ProjectParticipant pp = (ProjectParticipant) userObject;
+          String text = String.format(SPAN_FORMAT, "blue", pp.getName());
+          text += " [" + String.format(SPAN_FORMAT, "orange", pp.getRole()) + "]";
+          this.setText("<html>" + text + "</html>");
+          this.setIcon(employeeIcon);
+      } else if (userObject instanceof Project) {
+          Project project = (Project) userObject;
+          String text = String.format(SPAN_FORMAT, "green", project.getName());
+          this.setText("<html>" + text + "</html>");
+      } else {
+          String text = String.format(SPAN_FORMAT, "red", userObject);
+          this.setText("<html>" + text + "</html>");
+      }
+      return this;
+  }
+}
+
+
+Fixture:header.font  => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=0]
+MDI:background => java.awt.Color[r=253,g=255,b=219]
+Fixture:grid.color   => java.awt.Color[r=0,g=0,b=0]
+Tool:info.background => java.awt.Color[r=217,g=229,b=241]
+ToolTable:foreground => java.awt.Color[r=0,g=0,b=0]
+MessageLOG:message.row.height => 22
+Info:grid.color   => java.awt.Color[r=0,g=255,b=0]
+GCode:filename.font  => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=0]
+Tool:desc.background => java.awt.Color[r=217,g=229,b=241]
+GCode:filename.background  => java.awt.Color[r=253,g=255,b=219]
+FileManager:foreground  => java.awt.Color[r=0,g=0,b=0]
+GCode:line.background   => java.awt.Color[r=253,g=255,b=219]
+Axis:font   => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=1]
+Tool:info.foreground => java.awt.Color[r=0,g=0,b=0]
+DRO:abs.foreground   => java.awt.Color[r=1,g=143,b=5]
+FileManager:background  => java.awt.Color[r=217,g=229,b=241]
+Main:grid.color   => java.awt.Color[r=255,g=255,b=255]
+ToolTable:background => java.awt.Color[r=204,g=254,b=203]
+Tool:info.font => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=1]
+DRO:abs.font   => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=1]
+ToolTable:row.height => 34
+LED:off.color  => java.awt.Color[r=255,g=0,b=0]
+MessageLOG:grid.color   => java.awt.Color[r=0,g=0,b=0]
+Axis:background   => java.awt.Color[r=255,g=255,b=255]
+GCode:line.selected.foreground   => java.awt.Color[r=0,g=0,b=0]
+Tool:desc.font => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=1]
+GCode:basedir  => linuxcnc/nc_files
+ToolTable:header.font   => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=0]
+DRO:grid.color => java.awt.Color[r=255,g=255,b=255]
+DRO:speed.foreground => java.awt.Color[r=0,g=0,b=0]
+ActiveCode:foreground   => java.awt.Color[r=255,g=255,b=0]
+DRO:dtg.background   => java.awt.Color[r=255,g=204,b=204]
+Tool:number.foreground  => java.awt.Color[r=0,g=0,b=255]
+Fixture:table.font   => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=0]
+DRO:speed.header.background   => java.awt.Color[r=255,g=255,b=255]
+Fixture:foreground   => java.awt.Color[r=0,g=255,b=255]
+GCode:grid.color  => java.awt.Color[r=0,g=0,b=0]
+FileManager:font  => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=1]
+GCode:line.altbackground   => java.awt.Color[r=254,g=255,b=236]
+DRO:dtg.font   => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=2]
+GCode:styles   => de.schwarzrot.bean.GCodeStyles@6c0d7c83
+DRO:rel.background   => java.awt.Color[r=217,g=229,b=241]
+ActiveCode:background   => java.awt.Color[r=0,g=0,b=255]
+Speed:grid.color  => java.awt.Color[r=255,g=255,b=255]
+Axis:foreground   => java.awt.Color[r=0,g=0,b=0]
+DRO:speed.header.foreground   => java.awt.Color[r=0,g=0,b=0]
+Fixture:background   => java.awt.Color[r=253,g=255,b=219]
+ToolTable:grid.color => java.awt.Color[r=0,g=0,b=0]
+GCode:line.font   => java.awt.Font[family=Dialog,name=Monospace,style=plain,size=0]
+DRO:abs.background   => java.awt.Color[r=204,g=254,b=203]
+DRO:speed.background => java.awt.Color[r=238,g=238,b=238]
+DRO:speed.font => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=2]
+GCode:line.foreground   => java.awt.Color[r=0,g=0,b=0]
+GCode:line.selected.background   => java.awt.Color[r=217,g=229,b=241]
+LED:on.color   => java.awt.Color[r=0,g=255,b=0]
+DRO:pos.format => java.text.DecimalFormat@674dc
+Tool:number.font  => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=1]
+MessageLOG:message.font => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=0]
+GCode:row.height  => 20
+DRO:rel.font   => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=1]
+ToolTable:table.font => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=0]
+ActiveCode:font   => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=1]
+DRO:speed.format  => java.text.DecimalFormat@674dc
+Tool:desc.foreground => java.awt.Color[r=0,g=0,b=255]
+DRO:dtg.foreground   => java.awt.Color[r=255,g=0,b=0]
+MDI:foreground => java.awt.Color[r=0,g=0,b=0]
+DRO:speed.header.font   => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=1]
+Fixture:row.height   => 50
+MessageLOG:header.font  => java.awt.Font[family=Verdana,name=Verdana,style=plain,size=0]
+GCode:filename.foreground  => java.awt.Color[r=0,g=0,b=0]
+Toolbar:button.size  => java.awt.Dimension[width=100,height=100]
+Tool:number.background  => java.awt.Color[r=217,g=229,b=241]
+DRO:rel.foreground   => java.awt.Color[r=0,g=0,b=255]
+Toolbar:grid.color   => java.awt.Color[r=255,g=255,b=0]
