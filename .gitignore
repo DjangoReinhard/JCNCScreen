@@ -1,0 +1,13 @@
+*.bak
+*.class
+*.d
+*.o
+*~
+build/*
+exHdr/*
+runtime/*
+test/*
+unused*
+bin*
+lib/LCExportHandler.jar
+JCNCScreen-bin.zip
