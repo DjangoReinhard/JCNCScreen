@@ -417,6 +417,7 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       double    height     = screenSize.getHeight();
 
       exportHandlerDir = "../exHdr";
+      themeName        = "Gtk";
       portraitMode     = height > width;
       for (int i = 0; i < args.length; ++i) {
          String arg = args[i];
