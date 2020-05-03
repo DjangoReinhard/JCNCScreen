@@ -142,8 +142,12 @@ public class UITheme {
    public static void setupDefaults(String theme) {
       settings.put("GCode:basedir", new File("/usr/local/src/linuxcnc-dev", "nc_files"));
 
-      if ((theme != null) && "dark".compareTo(theme) == 0) {
-         t = new ThemeDark(settings);
+      if (theme != null) {
+         if ("dark".compareTo(theme) == 0) {
+            t = new ThemeDark(settings);
+         } else if ("Gtk".compareTo(theme) == 0) {
+            t = new ThemeGtk(settings);
+         }
       } else {
          t = new ThemeRMA(settings);
       }
