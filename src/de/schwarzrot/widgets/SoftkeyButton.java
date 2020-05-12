@@ -50,6 +50,7 @@ public class SoftkeyButton extends ConditionButton implements ChangeListener {
          ICondition condActive) {
       super(null, condEnable);
       this.condActive = condActive;
+      this.condActive.addPropertyChangeListener(this);
       this.setPreferredSize(UITheme.getDimension("Toolbar:button.size"));
       this.setMinimumSize(UITheme.getDimension("Toolbar:button.size"));
       this.setMaximumSize(UITheme.getDimension("Toolbar:button.size"));
@@ -63,7 +64,6 @@ public class SoftkeyButton extends ConditionButton implements ChangeListener {
       if (selectedIconPath != null)
          this.setSelectedIcon(loadIcon(selectedIconPath));
       this.setDisabledIcon(createDisabledIcon(icon));
-      this.condActive.addPropertyChangeListener(this);
       checkState();
    }
 
@@ -83,8 +83,8 @@ public class SoftkeyButton extends ConditionButton implements ChangeListener {
    @Override
    protected void checkState() {
       super.checkState();
-      if (condActive != null && isEnabled())
-         setSelected(condActive.eval());
+      if (condActive != null && this.isEnabled())
+         model.setSelected(condActive.eval());
    }
 
 

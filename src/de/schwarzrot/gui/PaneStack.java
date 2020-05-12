@@ -42,8 +42,12 @@ import de.schwarzrot.app.ApplicationMode;
 import de.schwarzrot.bean.AppSetup;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
+import de.schwarzrot.logic.AndCondition;
+import de.schwarzrot.logic.EqualCondition;
+import de.schwarzrot.logic.ICondition;
 import de.schwarzrot.model.ValueModel;
 import de.schwarzrot.nml.TaskMode;
+import de.schwarzrot.nml.TaskState;
 import de.schwarzrot.system.CommandWriter;
 import de.schwarzrot.system.ErrorReader;
 import de.schwarzrot.util.BindUtils;
@@ -63,6 +67,8 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
       appMode.addPropertyChangeListener(this);
       taskMode = LCStatus.getStatus().getModel("taskMode");
       taskMode.addPropertyChangeListener(this);
+      execState = LCStatus.getStatus().getModel("execState");
+      execState.addPropertyChangeListener(this);
       allHomed = LCStatus.getStatus().getModel("allHomed");
       allHomed.addPropertyChangeListener(this);
       paneStack = (CardLayout) getLayout();
@@ -76,7 +82,12 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
    }
 
 
-   public JComponent getEditGCodePane() {
+   public String getCurrentPage() {
+      return currentPage.name();
+   }
+
+
+   public GCodeEditor getEditGCodePane() {
       return editGCodePane;
    }
 
@@ -141,7 +152,7 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
       JComponent component = (JComponent) e.getSource();
 
       if ((HierarchyEvent.SHOWING_CHANGED & e.getChangeFlags()) != 0 && component.isShowing()) {
-         // System.out.println("hierarchy changed to: " + component);
+         //         System.err.println("hierarchy changed to: " + component);
          component.transferFocus();
       }
    }
@@ -152,6 +163,7 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
       if ("applicationMode".compareTo(evt.getPropertyName()) == 0) {
          ApplicationMode am = (ApplicationMode) evt.getNewValue();
 
+         validateAppMode(am);
          selectPane(am);
       } else if ("taskMode".compareTo(evt.getPropertyName()) == 0) {
          TaskMode tm = (TaskMode) evt.getNewValue();
@@ -177,32 +189,60 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
    }
 
 
-   public void selectPane(ApplicationMode mode) {
-      //      System.out.println("select pane from Stack: " + mode.name());
+   protected void selectPane(ApplicationMode mode) {
+      //      System.err.println("select pane from Stack: " + mode.name());
 
+      currentPage = mode;
       paneStack.show(this, mode.name());
    }
 
 
-   private void createUI(ErrorReader errorReader) {
-      AppSetup setup = LCStatus.getStatus().getSetup();
+   protected void validateAppMode(ApplicationMode am) {
+      //TODO: check es
+      switch (taskMode.getValue()) {
+         case TaskModeAuto:
+            if (am != ApplicationMode.AmAuto) {
+               //               System.err.println("validate appmode: appMode == " + am + " - taskmode is auto ...");
 
-      fileManager = new FileManager(LCStatus.getStatus().lm("NC-files"), UITheme.getFile("GCode:basedir"));
-      gcodeLister = new AutoGCodeLister(cmdWriter);
-      manualPane  = new JLabel(LCStatus.getStatus().lm("manualJogMode"), JLabel.CENTER);
-      manualPane.setFont(UITheme.getFont("DRO:speed.header.font"));
+               appMode.setValue(ApplicationMode.AmAuto);
+            }
+            break;
+         case TaskModeMDI:
+            if (am != ApplicationMode.AmMDI) {
+               //               System.err.println("validate appmode: appMode == " + am + " - taskmode is mdi ...");
+
+               appMode.setValue(ApplicationMode.AmMDI);
+            }
+            break;
+      }
+   }
+
+
+   private void createUI(ErrorReader errorReader) {
+      LCStatus            status      = LCStatus.getStatus();
+      AppSetup            setup       = status.getSetup();
+      ValueModel<Boolean> errorActive = status.getModel("errorActive");
+
+      fileManager    = new FileManager(LCStatus.getStatus().lm("NC-files"), UITheme.getFile("GCode:basedir"));
+      gcodeLister    = new AutoGCodeLister(cmdWriter);
+      //TODO:
+      manualPane     = new JogPane(setup,
+            new AndCondition(new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel("allHomed"), false)),
+            new AndCondition(new ICondition[] {
+                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new EqualCondition<Boolean>(errorActive, false),
+                  new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmManual) }));
 
       messageLogPane = new MessageLogPane(errorReader.getLog());
       mdiPane        = new GCodeLister(cmdWriter, LCStatus.getStatus().getMDIHistory());
-      toolTable      = new ToolTable(cmdWriter);
-      fixturePane    = new FixturePane(setup, cmdWriter);
 
       // TODO
       touchPane      = new JLabel("touch? ... not yet!");
 
       // // TODO
       // wheelPane = new JLabel("Wheely? ... not yet!");
-
       editGCodePane  = new GCodeEditor(cmdWriter);
       settingsPane   = new AppSettingsPane(cmdWriter);
 
@@ -214,12 +254,11 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
       add(manualPane, ApplicationMode.AmManual.name());
       // add(wheelPane, ApplicationMode.AmWheel.name());
       add(editGCodePane, ApplicationMode.AmEdit.name());
-      add(toolTable, ApplicationMode.AmTools.name());
       add(touchPane, ApplicationMode.AmTouch.name());
-      add(fixturePane, ApplicationMode.AmOffsets.name());
       add(settingsPane, ApplicationMode.AmSettings.name());
       add(messageLogPane, ApplicationMode.AmMessageLog.name());
       add(fileManager, ApplicationMode.AmFileManager.name());
+      appMode.setValue(ApplicationMode.AmManual);
       selectPane(ApplicationMode.AmManual);
    }
 
@@ -246,15 +285,16 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
    private GCodeLister                 mdiPane;
    private JComponent                  manualPane;
    private JComponent                  wheelPane;
-   private JComponent                  editGCodePane;
+   private GCodeEditor                 editGCodePane;
    private JComponent                  settingsPane;
    private MessageLogPane              messageLogPane;
    private FileManager                 fileManager;
-   private ToolManager                 toolManager;
    private CommandWriter               cmdWriter;
    private ValueModel<ApplicationMode> appMode;
    private ValueModel<TaskMode>        taskMode;
+   private ValueModel<Integer>         execState;
    private ValueModel<Boolean>         allHomed;
+   private ApplicationMode             currentPage;
    private static PaneStack            instance;
    private static final long           serialVersionUID = 1L;
 }

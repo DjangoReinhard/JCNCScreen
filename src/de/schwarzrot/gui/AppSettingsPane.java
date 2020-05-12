@@ -47,6 +47,7 @@ import javax.swing.border.EmptyBorder;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.system.CommandWriter;
+import de.schwarzrot.widgets.ToolTable;
 
 
 public class AppSettingsPane extends JTabbedPane implements ActionListener {
@@ -61,9 +62,13 @@ public class AppSettingsPane extends JTabbedPane implements ActionListener {
       addComponents(settingsPane);
 
       ToolManager toolManager = new ToolManager(LCStatus.getStatus().lm("tooltable"), cmdWriter);
+      ToolTable   toolTable   = new ToolTable(cmdWriter);
+      FixturePane fixturePane = new FixturePane(status.getSetup(), cmdWriter);
 
       this.addTab(LCStatus.getStatus().lm("ToolManager"), toolManager);
       this.addTab(LCStatus.getStatus().lm("Settings"), settingsPane);
+      this.addTab(LCStatus.getStatus().lm("ToolTable"), toolTable);
+      this.addTab(LCStatus.getStatus().lm("Fixture"), fixturePane);
    }
 
 

@@ -10,6 +10,8 @@ exHdr/*
 runtime/*
 test/*
 lc
+rednose
+.prjInfo
 unused*
 bin*
 native/libLinuxCNC.so

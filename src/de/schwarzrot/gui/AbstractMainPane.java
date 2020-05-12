@@ -65,7 +65,6 @@ import de.schwarzrot.nml.TaskState;
 import de.schwarzrot.system.CommandWriter;
 import de.schwarzrot.system.ErrorReader;
 import de.schwarzrot.widgets.ConditionButton;
-import de.schwarzrot.widgets.HomeAllButton;
 import de.schwarzrot.widgets.PowerButton;
 import de.schwarzrot.widgets.SoftkeyButton;
 
@@ -342,9 +341,36 @@ public abstract class AbstractMainPane extends JDesktopPane
                   new EqualCondition<TaskMode>(status.getModel("taskMode"), TaskMode.TaskModeAuto)));
       sb.setActionCommand(ApplicationMode.AmAuto.name());
       sb.addActionListener(this);
-      sb.setSelected(true);
+      //      sb.setSelected(true);
       applicationButtons.add(sb);
       buttonPane.add(sb);
+
+      sb = new SoftkeyButton("images/SK_Manual.png", "images/SK_Manual_active.png",
+            new AndCondition(new ICondition[] {
+                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new SmallerCondition<Integer>(status.getModel("execState"),
+                        TaskExecState.TaskExecWait4Motion.getStateNum()),
+                  new EqualCondition<Boolean>(errorActive, false) }),
+            new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmManual));
+      sb.setActionCommand(ApplicationMode.AmManual.name());
+      sb.addActionListener(this);
+      applicationButtons.add(sb);
+      buttonPane.add(sb);
+
+      sb = new SoftkeyButton("images/SK_Wheel.png", "images/SK_Wheel_active.png",
+            new AndCondition(new ICondition[] {
+                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new SmallerCondition<Integer>(status.getModel("execState"),
+                        TaskExecState.TaskExecWait4Motion.getStateNum()),
+                  new EqualCondition<Boolean>(errorActive, false) }),
+            new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmWheel));
+      sb.setActionCommand(ApplicationMode.AmWheel.name());
+      sb.addActionListener(this);
+      applicationButtons.add(sb);
+      buttonPane.add(sb);
+
       sb = new SoftkeyButton("images/SK_MDI.png", "images/SK_MDI_active.png",
             new AndCondition(new ICondition[] {
                   new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
@@ -498,30 +524,6 @@ public abstract class AbstractMainPane extends JDesktopPane
       sb.setActionCommand(ApplicationMode.AmSettings.name());
       applicationButtons.add(sb);
       buttonPane.add(sb);
-      sb = new SoftkeyButton("images/SK_Tools.png", "images/SK_Tools_active.png",
-            new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
-                  new SmallerCondition<Integer>(status.getModel("execState"),
-                        TaskExecState.TaskExecWait4Motion.getStateNum()),
-                  new EqualCondition<Boolean>(errorActive, false) }),
-            new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmTools));
-      sb.addActionListener(this);
-      sb.setActionCommand(ApplicationMode.AmTools.name());
-      applicationButtons.add(sb);
-      buttonPane.add(sb);
-      sb = new SoftkeyButton("images/SK_Offsets.png", "images/SK_Offsets_active.png",
-            new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
-                  new SmallerCondition<Integer>(status.getModel("execState"),
-                        TaskExecState.TaskExecWait4Motion.getStateNum()),
-                  new EqualCondition<Boolean>(errorActive, false) }),
-            new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmOffsets));
-      sb.addActionListener(this);
-      sb.setActionCommand(ApplicationMode.AmOffsets.name());
-      applicationButtons.add(sb);
-      buttonPane.add(sb);
       sb = new SoftkeyButton("images/SK_Touch.png", "images/SK_Touch_active.png",
             new AndCondition(new ICondition[] {
                   new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
@@ -539,21 +541,11 @@ public abstract class AbstractMainPane extends JDesktopPane
       applicationButtons.add(sb);
       buttonPane.add(sb);
       buttonPane.add(Box.createHorizontalGlue());
-      SoftkeyButton sbHomeAll = new HomeAllButton("images/SK_HomeAll.png", "images/SK_HomeAll_active.png",
-            new AndCondition(new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), false)),
-            new EqualCondition<Boolean>(status.getModel("allHomed"), true));
-      sbHomeAll.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent ae) {
-            cmdWriter.homeAll();
-         }
-      });
+
       SoftkeyButton sbPosRelative = new SoftkeyButton("images/SK_PosRelative.png",
             "images/SK_PosAbsolute.png",
             new AndCondition(new ICondition[] {
                   new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new EqualCondition<Boolean>(absPosition, true));
       sbPosRelative.addActionListener(new ActionListener() {
@@ -562,8 +554,8 @@ public abstract class AbstractMainPane extends JDesktopPane
             status.getModel("absPosition").setValue(!((Boolean) status.getModel("absPosition").getValue()));
          }
       });
-      AlternatingPane ap = new AlternatingPane(status.getModel("allHomed"), sbPosRelative, sbHomeAll);
-      buttonPane.add(ap);
+      buttonPane.add(sbPosRelative);
+
       buttonPane.add(Box.createHorizontalGlue());
 
       return buttonPane;

@@ -81,7 +81,6 @@ public class ToolTable extends JPanel implements ActionListener, ListSelectionLi
       String s          = toolLen.getText().strip().replace(',', '.');
       double toolLength = 0;
       double toolDia    = 0;
-      double d          = 0;
 
       try {
          toolLength = Double.parseDouble(s);
@@ -112,8 +111,8 @@ public class ToolTable extends JPanel implements ActionListener, ListSelectionLi
       toolDiam.setText(String.format("%.3f", te.getDiameter()));
       toolLen.setText(String.format("%.3f", te.getOffset().getZ()));
       toolDesc.setText(te.getDescription());
-      System.out.println();
-      System.out.println(te);
+      //      System.out.println();
+      //      System.out.println(te);
    }
 
 
@@ -122,6 +121,7 @@ public class ToolTable extends JPanel implements ActionListener, ListSelectionLi
       GridBagConstraints c = new GridBagConstraints();
 
       p.setLayout(new GridBagLayout());
+      p.setPreferredSize(new Dimension(800, 60));
       p.setOpaque(true);
       p.setBackground(UITheme.getColor("Tool:editor.grid.color"));
       toolNumber = new JLabel("T99", JLabel.CENTER);
@@ -247,11 +247,7 @@ public class ToolTable extends JPanel implements ActionListener, ListSelectionLi
    protected JComponent createUI(JComponent table, JComponent editor) {
       JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, table, editor);
 
-      if (UITheme.getBoolean("Application:mode.portrait")) {
-         splitPane.setDividerLocation(1050);
-      } else {
-         splitPane.setDividerLocation(960);
-      }
+      splitPane.setResizeWeight(1);
       splitPane.setDividerSize(2);
 
       return splitPane;
@@ -285,7 +281,6 @@ public class ToolTable extends JPanel implements ActionListener, ListSelectionLi
    private JLabel                toolDesc;
    private int                   toolNum;
    private JButton               btSave;
-   private int                   oldSelection;
    private CommandWriter         cmdWriter;
    private EventList<ToolEntry>  tools;
    private SortedList<ToolEntry> sl;

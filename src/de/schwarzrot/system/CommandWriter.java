@@ -45,6 +45,12 @@ import de.schwarzrot.nml.TaskState;
 
 
 public class CommandWriter {
+   class JogInfo {
+      public int axis;
+      public int direction;
+   }
+
+
    public CommandWriter(List<SystemMessage> log, StatusReader statusReader) {
       this.log          = log;
       this.statusReader = statusReader;
@@ -138,7 +144,20 @@ public class CommandWriter {
 
    public void homeAll() {
       log.add(new SystemMessage(LCStatus.getStatus().lm("cmdHomeAll")));
+      ValueModel<TaskMode> tm = LCStatus.getStatus().getModel("taskMode");
+      System.err.println("execute home all axis - task mode is: " + tm.getValue());
       homeAxis(-1);
+   }
+
+
+   public void jogStep(String what, double stepSize, double speed) {
+      System.out.println("jogStep: " + what + " - stepSize: " + stepSize + " - speed: " + speed);
+      JogInfo ji = new JogInfo();
+
+      determineJogInfo(ji, what);
+
+      System.err.println("from what: " + what + "\tgot axis: " + ji.axis + " and dir: " + ji.direction);
+      jogStep(ji.axis, stepSize * ji.direction, speed);
    }
 
 
@@ -295,10 +314,87 @@ public class CommandWriter {
    }
 
 
+   public void startJogging(String what, double speed) {
+      System.out.println("jogStart: " + what + " - speed: " + speed);
+      JogInfo ji = new JogInfo();
+
+      determineJogInfo(ji, what);
+
+      System.err.println("from what: " + what + "\tgot axis: " + ji.axis + " and dir: " + ji.direction);
+      jogStart(ji.axis, ji.direction * speed);
+   }
+
+
+   public void stopJogging(String what) {
+      System.out.println("jogStop: " + what);
+      JogInfo ji = new JogInfo();
+
+      determineJogInfo(ji, what);
+
+      System.err.println("from what: " + what + "\tgot axis: " + ji.axis + " and dir: " + ji.direction);
+      jogStop(ji.axis);
+   }
+
+
+   protected void determineJogInfo(JogInfo ji, String what) {
+      switch (what.charAt(0)) {
+         case 'X':
+         case 'x':
+            ji.axis = 0;
+            break;
+         case 'Y':
+         case 'y':
+            ji.axis = 1;
+            break;
+         case 'Z':
+         case 'z':
+            ji.axis = 2;
+            break;
+         case 'A':
+         case 'a':
+            ji.axis = 3;
+            break;
+         case 'B':
+         case 'b':
+            ji.axis = 4;
+            break;
+         case 'C':
+         case 'c':
+            ji.axis = 5;
+            break;
+         case 'U':
+         case 'u':
+            ji.axis = 6;
+            break;
+         case 'V':
+         case 'v':
+            ji.axis = 7;
+            break;
+         case 'W':
+         case 'w':
+            ji.axis = 8;
+            break;
+      }
+      if (what.charAt(1) == '-')
+         ji.direction = -1;
+      else
+         ji.direction = 1;
+   }
+
+
    protected native final void homeAxis(int jointNum);
 
 
    protected native final int init();
+
+
+   protected native final void jogStart(int axis, double speed);
+
+
+   protected native final void jogStep(int axis, double stepSize, double speed);
+
+
+   protected native final void jogStop(int axis);
 
 
    protected native final void loadTaskPlan(String fileName);

@@ -42,7 +42,6 @@ import java.util.Properties;
 import de.schwarzrot.bean.GCodeLine;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
-import de.schwarzrot.gui.AppSettingsPane;
 import de.schwarzrot.gui.PaneStack;
 
 
@@ -152,56 +151,66 @@ public class ConfigHolder {
 
 
    protected void exportPreferences(File prefFile) {
-      PaneStack       ps  = PaneStack.getInstance();
-      PrintWriter     pw  = null;
-      AppSettingsPane asp = (AppSettingsPane) ps.getSettingsPane();
+      PaneStack   ps     = PaneStack.getInstance();
+      PrintWriter pw     = null;
+      //      AppSettingsPane asp    = (AppSettingsPane) ps.getSettingsPane();
+      LCStatus    status = LCStatus.getStatus();
 
       try {
          pw = new PrintWriter(prefFile, "UTF-8");
 
-         printColor(pw, "DRO:abs.background", asp.getAbsPos().getBackground());
-         printColor(pw, "DRO:abs.foreground", asp.getAbsPos().getForeground());
-         printFont(pw, "DRO:abs.font", asp.getAbsPos().getFont());
+         pw.println("auto-gcode = " + status.getGCodeInfo().getFileName());
+         pw.println("edit-gcode = " + ps.getEditGCodePane().getFileName());
+         pw.println("feed-factor = " + status.getSpeedInfo().getFeedFactor());
+         pw.println("rapid-factor = " + status.getSpeedInfo().getRapidFactor());
+         pw.println("spindle-factor = " + status.getSpeedInfo().getSpindleFactor());
+         pw.println("theme = " + UITheme.getThemeName());
 
-         printColor(pw, "DRO:rel.background", asp.getRelPos().getBackground());
-         printColor(pw, "DRO:rel.foreground", asp.getRelPos().getForeground());
-         printFont(pw, "DRO:rel.font", asp.getRelPos().getFont());
-
-         printColor(pw, "DRO:dtg.background", asp.getRelPos().getBackground());
-         printColor(pw, "DRO:dtg.foreground", asp.getRelPos().getForeground());
-         printFont(pw, "DRO:dtg.font", asp.getRelPos().getFont());
-
-         printColor(pw, "GCode:line.background", asp.getGCode().getBackground());
-         printColor(pw, "GCode:line.foreground", asp.getGCode().getForeground());
-         printFont(pw, "GCode:line.font", asp.getGCode().getFont());
-         //speed
-         printColor(pw, "DRO:speed.background", asp.getSpeed().getBackground());
-         printColor(pw, "DRO:speed.foreground", asp.getSpeed().getForeground());
-         printFont(pw, "DRO:speed.font", asp.getSpeed().getFont());
-         //axisletter
-         printColor(pw, "Axis:background", asp.getSpeed().getBackground());
-         printColor(pw, "Axis:foreground", asp.getSpeed().getForeground());
-         printFont(pw, "Axis:font", asp.getSpeed().getFont());
-         //toolnum
-         printColor(pw, "Tool:number.background", asp.getSpeed().getBackground());
-         printColor(pw, "Tool:number.foreground", asp.getSpeed().getForeground());
-         printFont(pw, "Tool:number.font", asp.getSpeed().getFont());
-         //toolinfo
-         printColor(pw, "Tool:info.background", asp.getSpeed().getBackground());
-         printColor(pw, "Tool:info.foreground", asp.getSpeed().getForeground());
-         printFont(pw, "Tool:info.font", asp.getSpeed().getFont());
-         //filemgr
-         printColor(pw, "FileManager:background", asp.getSpeed().getBackground());
-         printColor(pw, "FileManager:foreground", asp.getSpeed().getForeground());
-         printFont(pw, "FileManager:font", asp.getSpeed().getFont());
-         //tooltable
-         printColor(pw, "ToolTable.background", asp.getSpeed().getBackground());
-         printColor(pw, "ToolTable.foreground", asp.getSpeed().getForeground());
-         printFont(pw, "ToolTable.font", asp.getSpeed().getFont());
-         //fixturetable
-         printColor(pw, "Fixture:background", asp.getSpeed().getBackground());
-         printColor(pw, "Fixture:foreground", asp.getSpeed().getForeground());
-         printFont(pw, "Fixture:table.font", asp.getSpeed().getFont());
+         //TODO: rework app-settings pane to support all themed values
+         //
+         //         printColor(pw, "DRO:abs.background", asp.getAbsPos().getBackground());
+         //         printColor(pw, "DRO:abs.foreground", asp.getAbsPos().getForeground());
+         //         printFont(pw, "DRO:abs.font", asp.getAbsPos().getFont());
+         //
+         //         printColor(pw, "DRO:rel.background", asp.getRelPos().getBackground());
+         //         printColor(pw, "DRO:rel.foreground", asp.getRelPos().getForeground());
+         //         printFont(pw, "DRO:rel.font", asp.getRelPos().getFont());
+         //
+         //         printColor(pw, "DRO:dtg.background", asp.getRelPos().getBackground());
+         //         printColor(pw, "DRO:dtg.foreground", asp.getRelPos().getForeground());
+         //         printFont(pw, "DRO:dtg.font", asp.getRelPos().getFont());
+         //
+         //         printColor(pw, "GCode:line.background", asp.getGCode().getBackground());
+         //         printColor(pw, "GCode:line.foreground", asp.getGCode().getForeground());
+         //         printFont(pw, "GCode:line.font", asp.getGCode().getFont());
+         //         //speed
+         //         printColor(pw, "DRO:speed.background", asp.getSpeed().getBackground());
+         //         printColor(pw, "DRO:speed.foreground", asp.getSpeed().getForeground());
+         //         printFont(pw, "DRO:speed.font", asp.getSpeed().getFont());
+         //         //axisletter
+         //         printColor(pw, "Axis:background", asp.getSpeed().getBackground());
+         //         printColor(pw, "Axis:foreground", asp.getSpeed().getForeground());
+         //         printFont(pw, "Axis:font", asp.getSpeed().getFont());
+         //         //toolnum
+         //         printColor(pw, "Tool:number.background", asp.getSpeed().getBackground());
+         //         printColor(pw, "Tool:number.foreground", asp.getSpeed().getForeground());
+         //         printFont(pw, "Tool:number.font", asp.getSpeed().getFont());
+         //         //toolinfo
+         //         printColor(pw, "Tool:info.background", asp.getSpeed().getBackground());
+         //         printColor(pw, "Tool:info.foreground", asp.getSpeed().getForeground());
+         //         printFont(pw, "Tool:info.font", asp.getSpeed().getFont());
+         //         //filemgr
+         //         printColor(pw, "FileManager:background", asp.getSpeed().getBackground());
+         //         printColor(pw, "FileManager:foreground", asp.getSpeed().getForeground());
+         //         printFont(pw, "FileManager:font", asp.getSpeed().getFont());
+         //         //tooltable
+         //         printColor(pw, "ToolTable.background", asp.getSpeed().getBackground());
+         //         printColor(pw, "ToolTable.foreground", asp.getSpeed().getForeground());
+         //         printFont(pw, "ToolTable.font", asp.getSpeed().getFont());
+         //         //fixturetable
+         //         printColor(pw, "Fixture:background", asp.getSpeed().getBackground());
+         //         printColor(pw, "Fixture:foreground", asp.getSpeed().getForeground());
+         //         printFont(pw, "Fixture:table.font", asp.getSpeed().getFont());
       } catch (FileNotFoundException | UnsupportedEncodingException e) {
          e.printStackTrace();
       } finally {
@@ -265,7 +274,48 @@ public class ConfigHolder {
 
 
    protected void importPreferences(File prefFile) {
-      // TODO:
+      LCStatus       status    = LCStatus.getStatus();
+      CommandWriter  cmdWriter = status.getApp().getCommandWriter();
+      BufferedReader br        = null;
+      String         line      = null;
+
+      try {
+         br = new BufferedReader(new FileReader(prefFile));
+
+         //         pw.println("auto-gcode = " + status.getGCodeInfo().getFileName());
+         //         pw.println("edit-gcode = " + ps.getEditGCodePane().getFileName());
+         //         pw.println("feed-factor = " + status.getSpeedInfo().getFeedFactor());
+         //         pw.println("rapid-factor = " + status.getSpeedInfo().getRapidFactor());
+         //         pw.println("spindle-factor = " + status.getSpeedInfo().getSpindleFactor());
+         //         pw.println("theme = " + UITheme.getThemeName());
+         while ((line = br.readLine()) != null) {
+            String[] parts = line.split("\\s*=\\s*", 2);
+
+            if ("auto-gcode".compareTo(parts[0]) == 0) {
+               //               status.getGCodeInfo().setFileName(parts[1]);
+               // issue nml?
+            } else if ("edit-gcode".compareTo(parts[0]) == 0) {
+               status.getGCodeInfo().setEditFile(parts[1]);
+            } else if ("feed-factor".compareTo(parts[0]) == 0) {
+               // issue nml?
+            } else if ("rapid-factor".compareTo(parts[0]) == 0) {
+               // issue nml?
+            } else if ("spindle-factor".compareTo(parts[0]) == 0) {
+               // issue nml?
+            } else if ("theme".compareTo(parts[0]) == 0) {
+               UITheme.setupDefaults(parts[1]);
+            }
+         }
+      } catch (FileNotFoundException e) {
+         e.printStackTrace();
+      } catch (IOException e) {
+         e.printStackTrace();
+      } finally {
+         try {
+            br.close();
+         } catch (IOException e) {
+         }
+      }
    }
 
 

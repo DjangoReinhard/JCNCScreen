@@ -7,7 +7,7 @@ package de.schwarzrot.gui;
  *  subproject: graphical application frontend
  *  purpose:    create a smart application, that assists in managing
  *              control of cnc-machines                           
- *  created:    13.10.2019 by Django Reinhard
+ *  created:    4.5.2020 by Django Reinhard
  *  copyright:  all rights reserved
  * 
  *  This program is free software: you can redistribute it and/or modify 
@@ -26,98 +26,121 @@ package de.schwarzrot.gui;
  * **************************************************************************
  */
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+
+import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import de.schwarzrot.bean.ITheme;
-import de.schwarzrot.system.CommandWriter;
+import de.schwarzrot.bean.IAxisMask;
+import de.schwarzrot.logic.ICondition;
+import de.schwarzrot.widgets.CircleButtonPane;
+import de.schwarzrot.widgets.DualLinearJogPane;
+import de.schwarzrot.widgets.LinearJogPane;
+import de.schwarzrot.widgets.PieButtonPane;
 
 
 public class JogPane extends JPanel {
-   public JogPane(ITheme settings, CommandWriter cmdWriter) {
-      this.cmdWriter = cmdWriter;
-      setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-      add(createManualJogPane(settings));
-      add(createJogWheelPane(settings));
-   }
-   
-   protected JComponent createManualJogPane(ITheme settings) {
-      JPanel pane = new JPanel();
-      Font fButton = new Font("Verdana", Font.BOLD, 45);
-      
-      pane.setLayout(new GridLayout(0, 3));
-      pane.setPreferredSize(new Dimension(600, 600));
-      
-      btJogXPos = new JButton("X", new ImageIcon("images/go-next.png"));
-      btJogXNeg = new JButton("X", new ImageIcon("images/go-previous.png"));
-      btJogYPos = new JButton("Y", new ImageIcon("images/go-up.png"));
-      btJogYNeg = new JButton("Y", new ImageIcon("images/go-down.png"));
-      
-      btJogXPos.setFont(fButton);
-      btJogXNeg.setFont(fButton);
-      btJogYPos.setFont(fButton);
-      btJogYNeg.setFont(fButton);
-      btJogXNeg.setHorizontalTextPosition(JButton.LEFT);
-      btJogXPos.setHorizontalTextPosition(JButton.RIGHT);
-      btJogYPos.setVerticalTextPosition(JButton.TOP);
-      btJogYPos.setHorizontalTextPosition(JButton.CENTER);
-      btJogYNeg.setVerticalTextPosition(JButton.BOTTOM);
-      btJogYNeg.setHorizontalTextPosition(JButton.CENTER);
-      btJogXPos.setContentAreaFilled(false);
-      btJogXNeg.setContentAreaFilled(false);
-      btJogYPos.setContentAreaFilled(false);
-      btJogYNeg.setContentAreaFilled(false);
-      btJogXPos.setBorderPainted(false);
-      btJogXNeg.setBorderPainted(false);
-      btJogYPos.setBorderPainted(false);
-      btJogYNeg.setBorderPainted(false);
-      pane.add(new JLabel(" "));
-      pane.add(btJogYPos);
-      pane.add(new JLabel(" "));
-      pane.add(btJogXNeg);
-      pane.add(new JLabel(" "));
-      pane.add(btJogXPos);
-      pane.add(new JLabel(" "));
-      pane.add(btJogYNeg);
-      pane.add(new JLabel(" "));
-      
-      return pane;
-   }
-   
-   protected JComponent createJogWheelPane(ITheme settings) {
-      JPanel pane = new JPanel();
-      
-      pane.setPreferredSize(new Dimension(600, 600));
-      
-      return pane;
+   public JogPane(IAxisMask am, ICondition condEnableCenter, ICondition condEnable) {
+      FlowLayout fl = new FlowLayout();
+
+      fl.setHgap(0);
+      fl.setVgap(0);
+
+      setLayout(fl);
+      setOpaque(true);
+
+      //      setBackground(Color.RED);
+      setPreferredSize(new Dimension(1200, 1150));
+      this.am = am;
+      createComponents(this, condEnableCenter, condEnable);
    }
 
-   private JButton           btJogXPos;
-   private JButton           btJogXNeg;
-   private JButton           btJogYPos;
-   private JButton           btJogYNeg;
-   private JButton           btJogZPos;
-   private JButton           btJogZNeg;
-   private JButton           btJogUPos;
-   private JButton           btJogUNeg;
-   private JButton           btJogVPos;
-   private JButton           btJogVNeg;
-   private JButton           btJogWPos;
-   private JButton           btJogWNeg;
-   private JButton           btJogAPos;
-   private JButton           btJogANeg;
-   private JButton           btJogBPos;
-   private JButton           btJogBNeg;
-   private JButton           btJogCPos;
-   private JButton           btJogCNeg;
-   private CommandWriter     cmdWriter;
+
+   protected void createComponents(JPanel pane, ICondition condEnableCenter, ICondition condEnable) {
+      JPanel     p  = new JPanel();
+      FlowLayout fl = new FlowLayout();
+      int        h0 = 520;
+      int        h2 = 270;
+      int        w2 = 550;
+
+      if (!(am.hasCAxis() && am.hasUAxis())) {
+         h0 = 725;
+         h2 = 300;
+         w2 = 600;
+      }
+      fl.setHgap(20);
+      fl.setVgap(0);
+      p.setOpaque(true);
+      p.setLayout(fl);
+      p.setPreferredSize(new Dimension(1200, h0));
+
+      if (am.hasVAxis()) {
+         p.add(new LinearJogPane('V', 150, h0, condEnable));
+      }
+      if (am.hasXAxis() || am.hasYAxis()) {
+         p.add(new CircleButtonPane(h0, h0, condEnableCenter, condEnable));
+      }
+      p.add(new DualLinearJogPane(am, 'Z', 'W', 160, h0, condEnable));
+      pane.add(p);
+
+      if (am.hasUAxis() || am.hasCAxis()) {
+         p = new JPanel();
+         p.setPreferredSize(new Dimension(1200, 250));
+         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+
+         JPanel subPane = new JPanel();
+
+         subPane.setOpaque(true);
+         subPane.setPreferredSize(new Dimension(400, 250));
+         subPane.setLayout(new BoxLayout(subPane, BoxLayout.Y_AXIS));
+         subPane.add(Box.createVerticalGlue());
+         if (am.hasUAxis()) {
+            subPane.add(new LinearJogPane('U', 500, 180, condEnable, true));
+         }
+         subPane.add(Box.createVerticalGlue());
+         p.add(subPane);
+
+         p.add(Box.createHorizontalGlue());
+         if (am.hasCAxis()) {
+            PieButtonPane pp = new PieButtonPane('C', 580, 250, condEnable, true);
+
+            pp.setAlignmentX(0.5f);
+            pp.setAlignmentY(0.5f);
+            p.add(pp);
+         }
+         p.add(Box.createHorizontalStrut(10));
+
+         pane.add(p);
+      }
+
+      if (am.hasAAxis() || am.hasBAxis()) {
+         p = new JPanel();
+         p.setPreferredSize(new Dimension(1200, h2));
+         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+         p.add(Box.createHorizontalStrut(10));
+         p.add(Box.createHorizontalGlue());
+         if (am.hasAAxis()) {
+            PieButtonPane pp = new PieButtonPane('A', w2, h2, condEnable);
+
+            pp.setAlignmentX(0.5f);
+            p.add(pp);
+         }
+         if (am.hasBAxis()) {
+            p.add(Box.createHorizontalGlue());
+            PieButtonPane pp = new PieButtonPane('B', w2, h2, condEnable);
+
+            pp.setAlignmentX(0.5f);
+            p.add(pp);
+            p.add(Box.createHorizontalStrut(10));
+         }
+         pane.add(p);
+      }
+   }
+
+
+   private IAxisMask         am;
    private static final long serialVersionUID = 1L;
 }
