@@ -127,6 +127,11 @@ public class UITheme {
    }
 
 
+   public static String getThemeName() {
+      return themeName;
+   }
+
+
    public static void put(String key, Object o) {
       settings.put(key, o);
    }
@@ -144,12 +149,15 @@ public class UITheme {
 
       if (theme != null) {
          if ("dark".compareTo(theme) == 0) {
-            t = new ThemeDark(settings);
+            themeName = "dark";
+            t         = new ThemeDark(settings);
          } else if ("Gtk".compareTo(theme) == 0) {
-            t = new ThemeGtk(settings);
+            themeName = "Gtk";
+            t         = new ThemeGtk(settings);
          }
       } else {
-         t = new ThemeRMA(settings);
+         themeName = "RMA";
+         t         = new ThemeRMA(settings);
       }
    }
 
@@ -175,6 +183,7 @@ public class UITheme {
 
    private static Map<String, Object> settings;
    private static ITheme              t;
+   private static String              themeName;
    static {
       settings = new HashMap<String, Object>();
    }

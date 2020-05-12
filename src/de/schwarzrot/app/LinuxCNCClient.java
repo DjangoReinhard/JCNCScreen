@@ -32,6 +32,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.SplashScreen;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -57,7 +58,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
-import de.schwarzrot.bean.AppSetup;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.database.DBToolLibrary;
@@ -112,6 +112,11 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       dialogParent      = this;
       errorReader.setErrorSignal(errorActive);
       LCStatus.getStatus().setApp(this);
+   }
+
+
+   public final CommandWriter getCommandWriter() {
+      return cmdWriter;
    }
 
 
@@ -196,14 +201,18 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       if (gcodeFile.exists() && gcodeFile.canRead()) {
          loadFile(gcodeFile);
       }
-      ISysTickStarter stStarter = new ISysTickStarter() {
-         @Override
-         public void start() {
-            double cycleTime = LCStatus.getStatus().getSetup().getDisplaySettings().getCycleTime();
+      final SplashScreen splash    = SplashScreen.getSplashScreen();
+      ISysTickStarter    stStarter = new ISysTickStarter() {
+                                      @Override
+                                      public void start() {
+                                         double cycleTime = LCStatus.getStatus().getSetup()
+                                               .getDisplaySettings().getCycleTime();
 
-            sysTick = new SysTick(new SysUpdater(statusReader), (long) (cycleTime * 1000));
-         }
-      };
+                                         sysTick = new SysTick(new SysUpdater(statusReader),
+                                               (long) (cycleTime * 100));
+                                      }
+                                   };
+
       stStarter.start();
       if (fullScreen)
          SwingUtilities.invokeLater(new Runnable() {
@@ -212,6 +221,8 @@ public class LinuxCNCClient extends JFrame implements Runnable {
                toFullScreen();
             }
          });
+      if (splash != null)
+         splash.close();
       this.setVisible(true);
    }
 
@@ -315,16 +326,8 @@ public class LinuxCNCClient extends JFrame implements Runnable {
    // message #207 (EMC_TRAJ_SET_MAX_VELOCITY) of size 32
    //
    protected void initializeLC() {
-      AppSetup setup = LCStatus.getStatus().getSetup();
-
       cmdWriter.enableOptionalStop();
       cmdWriter.skipCComment();
-      double f = Double.parseDouble(setup.findProperty("MAX_FEED_OVERRIDE"));
-      cmdWriter.setFeedRate(f);
-      cmdWriter.setRapidRate(1.0);
-
-      f = Double.parseDouble(setup.findProperty("MAX_SPINDLE_OVERRIDE"));
-      cmdWriter.setSpindleSpeedFactor(f);
    }
 
 
@@ -442,11 +445,11 @@ public class LinuxCNCClient extends JFrame implements Runnable {
    }
 
 
-   private StatusReader          statusReader;
+   private final StatusReader    statusReader;
    @SuppressWarnings("unused")
    private SysTick               sysTick;
-   private CommandWriter         cmdWriter;
-   private ErrorReader           errorReader;
+   private final CommandWriter   cmdWriter;
+   private final ErrorReader     errorReader;
    private ValueModel<Boolean>   errorActive;
    private PaneStack             paneStack;
    private JDesktopPane          desktop;

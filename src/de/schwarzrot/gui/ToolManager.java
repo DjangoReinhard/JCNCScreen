@@ -307,13 +307,13 @@ public class ToolManager extends AbstractTreeView<ToolDefinition, ToolDefTableFo
                entryFields[i] = new JTextField();
             }
             prompts[i].setFont(UITheme.getFont(getUIId() + ":editor.prompt.font"));
-            prompts[i].setForeground(UITheme.getColor(getUIId() + ":foreground"));
+            prompts[i].setForeground(UITheme.getColor(getUIId() + ":editor.foreground"));
             entryFields[i].setFont(UITheme.getFont(getUIId() + ":editor.entry.font"));
             entryFields[i].addFocusListener(this);
             entryFields[i].addKeyListener(this);
          }
          p.setLayout(new GridBagLayout());
-         p.setBackground(UITheme.getColor(getUIId() + ":background"));
+         p.setBackground(UITheme.getColor(getUIId() + ":editor.background"));
          GridBagConstraints c = new GridBagConstraints();
 
          c.fill      = GridBagConstraints.BOTH;

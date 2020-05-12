@@ -43,7 +43,7 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 
 
-public class AppSetup implements PropertyChangeListener {
+public class AppSetup implements PropertyChangeListener, IAxisMask {
    public AppSetup(LCStatus status) {
       this(status, false);
    }
@@ -59,6 +59,8 @@ public class AppSetup implements PropertyChangeListener {
       fixture                   = new Fixtures();
       allHomed                  = new ValueModel<Boolean>("allHomed", false);
       unit                      = LengthUnit.MM;
+      joints2Axis               = new int[9];
+
       if (status != null)
          setupModels();
    }
@@ -178,46 +180,90 @@ public class AppSetup implements PropertyChangeListener {
    }
 
 
+   @Override
    public boolean hasAAxis() {
       return (axisMask & 0x08) != 0;
    }
 
 
+   @Override
+   public boolean hasAxis(Character c) {
+      switch (c) {
+         case 'A':
+         case 'a':
+            return hasAAxis();
+         case 'B':
+         case 'b':
+            return hasBAxis();
+         case 'C':
+         case 'c':
+            return hasCAxis();
+         case 'U':
+         case 'u':
+            return hasUAxis();
+         case 'V':
+         case 'v':
+            return hasVAxis();
+         case 'W':
+         case 'w':
+            return hasWAxis();
+         case 'X':
+         case 'x':
+            return hasXAxis();
+         case 'Y':
+         case 'y':
+            return hasYAxis();
+         case 'Z':
+         case 'z':
+            return hasZAxis();
+      }
+      return false;
+   }
+
+
+   @Override
    public boolean hasBAxis() {
       return (axisMask & 0x10) != 0;
    }
 
 
+   @Override
    public boolean hasCAxis() {
       return (axisMask & 0x20) != 0;
    }
 
 
+   @Override
    public boolean hasUAxis() {
       return (axisMask & 0x40) != 0;
    }
 
 
+   @Override
    public boolean hasVAxis() {
       return (axisMask & 0x80) != 0;
    }
 
 
+   @Override
    public boolean hasWAxis() {
       return (axisMask & 0x100) != 0;
    }
 
 
+   @Override
    public boolean hasXAxis() {
       return (axisMask & 0x01) != 0;
    }
 
 
+   @Override
    public boolean hasYAxis() {
       return (axisMask & 0x02) != 0;
    }
 
 
+   @Override
    public boolean hasZAxis() {
       return (axisMask & 0x04) != 0;
    }
@@ -231,53 +277,8 @@ public class AppSetup implements PropertyChangeListener {
       properties = ifp.parseIniFile(fileName);
       ifp.processDisplaySection(displaySettings, properties.get("DISPLAY"));
 
-      if (properties.containsKey("TRAJ")) {
-         String axisSetup = getProperty("TRAJ", "COORDINATES");
-
-         for (int i = 0; i < axisSetup.length(); ++i) {
-            Character c = axisSetup.charAt(i);
-
-            switch (c) {
-               case 'x':
-               case 'X':
-                  joints2Axis[0] = i;
-                  break;
-               case 'y':
-               case 'Y':
-                  joints2Axis[1] = i;
-                  break;
-               case 'z':
-               case 'Z':
-                  joints2Axis[2] = i;
-                  break;
-               case 'a':
-               case 'A':
-                  joints2Axis[3] = i;
-                  break;
-               case 'b':
-               case 'B':
-                  joints2Axis[4] = i;
-                  break;
-               case 'c':
-               case 'C':
-                  joints2Axis[5] = i;
-                  break;
-               case 'u':
-               case 'U':
-                  joints2Axis[6] = i;
-                  break;
-               case 'v':
-               case 'V':
-                  joints2Axis[7] = i;
-                  break;
-               case 'w':
-               case 'W':
-                  joints2Axis[8] = i;
-                  break;
-            }
-
-         }
-      }
+      if (properties.containsKey("TRAJ"))
+         processAxisSetup(getProperty("TRAJ", "COORDINATES"));
 
       // search for fixture file definition
       if (properties.containsKey("RS274NGC")) {
@@ -301,6 +302,10 @@ public class AppSetup implements PropertyChangeListener {
             ifp.processTools(toolTableFile.getAbsolutePath());
          }
       }
+      //      System.out.println("============ INI - Settings   Start =============");
+      //      System.out.println(this);
+      //      System.out.println(dumpProperties());
+      //      System.out.println("============ INI - Settings   END   =============");
    }
 
 
@@ -318,6 +323,7 @@ public class AppSetup implements PropertyChangeListener {
 
 
    public void setAxisMask(int axisMask) {
+      // axismask is set from backend by StatusReader
       if (this.axisMask != 0 && (axisMask != this.axisMask))
          throw new UnsupportedOperationException("application setup is not allowed to change!");
       this.axisMask = axisMask;
@@ -348,17 +354,13 @@ public class AppSetup implements PropertyChangeListener {
          case 1:
             this.unit = LengthUnit.Inch;
             break;
-         case 2:
-            this.unit = LengthUnit.MM;
-            break;
          case 3:
             this.unit = LengthUnit.CM;
             break;
+         case 2:
          default:
             this.unit = LengthUnit.MM;
             break;
-         // throw new IllegalArgumentException("unknown/unsupported length unit: "
-         // + unitID);
       }
    }
 
@@ -403,8 +405,6 @@ public class AppSetup implements PropertyChangeListener {
             sb.append("cm");
             break;
       }
-      //      sb.append(dumpProperties());
-
       return sb.toString();
    }
 
@@ -414,7 +414,6 @@ public class AppSetup implements PropertyChangeListener {
       boolean                 allJointsHomed = true;
       Map<String, ValueModel> models         = status.getValueModels();
 
-      //      System.out.println("checkHomedState() ... start ...");
       if (this.hasXAxis()) {
          if (!((Boolean) models.get(String.format(jointModelPattern, getXJoint())).getValue())) {
             System.out.println("X Axis is not homed");
@@ -469,8 +468,12 @@ public class AppSetup implements PropertyChangeListener {
             allJointsHomed = false;
          }
       }
-      //      System.out.println("\tcheckHomedState() - allHomed set to: " + (allJointsHomed ? "TRUE" : "False"));
+      boolean ov = allHomed.getValue();
+
       allHomed.setValue(allJointsHomed);
+      if (allJointsHomed && !ov) {
+         System.out.println("\nnow all JOINTS are homed.\n");
+      }
    }
 
 
@@ -491,6 +494,57 @@ public class AppSetup implements PropertyChangeListener {
          }
       }
       return sb.toString();
+   }
+
+
+   protected void processAxisSetup(String axisPattern) {
+      int[] joints2Axis = new int[9];
+      int   joint       = 0;
+
+      for (char c : axisPattern.toCharArray()) {
+         if (c == ' ' || c == '\t')
+            continue;
+
+         switch (c) {
+            case 'x':
+            case 'X':
+               joints2Axis[0] = joint;
+               break;
+            case 'y':
+            case 'Y':
+               joints2Axis[1] = joint;
+               break;
+            case 'z':
+            case 'Z':
+               joints2Axis[2] = joint;
+               break;
+            case 'a':
+            case 'A':
+               joints2Axis[3] = joint;
+               break;
+            case 'b':
+            case 'B':
+               joints2Axis[4] = joint;
+               break;
+            case 'c':
+            case 'C':
+               joints2Axis[5] = joint;
+               break;
+            case 'u':
+            case 'U':
+               joints2Axis[6] = joint;
+               break;
+            case 'v':
+            case 'V':
+               joints2Axis[7] = joint;
+               break;
+            case 'w':
+            case 'W':
+               joints2Axis[8] = joint;
+               break;
+         }
+         ++joint;
+      }
    }
 
 
@@ -523,7 +577,7 @@ public class AppSetup implements PropertyChangeListener {
    private DisplaySettings                  displaySettings;
    private Fixtures                         fixture;
    private File                             toolTableFile;
-   private int[]                            joints2Axis       = new int[9];
+   private int[]                            joints2Axis;
    private Map<String, Map<String, String>> properties;
    private Map<Integer, Double>             parameters;
    public static final String               jointModelPattern = "joint_%d_homed";

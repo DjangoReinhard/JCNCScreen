@@ -236,6 +236,11 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
    }
 
 
+   public String getFileName() {
+      return fileName.getText();
+   }
+
+
    public List<GCodeLine> getList() {
       return lines;
    }

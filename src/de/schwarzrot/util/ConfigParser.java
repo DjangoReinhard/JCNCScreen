@@ -245,24 +245,6 @@ public class ConfigParser {
    }
 
 
-   // 5061 - probe values from G38
-   // 5070 - probe tripped (1 for success, 0 for failure)
-   // 5161 - G28 reference point
-   // 5181 - G30 reference point
-   // 5210 - if G92 offset is applied, 0 otherwise
-   // 5211 - G92 offsets
-   // 5220 - active fixture (1-9)
-   //
-   // 5221-5230 - Coordinate System 1, G54 for X, Y, Z, A, B, C, U, V, W & R. R denotes the XY
-   // rotation angle around the Z axis. Persistent.
-   // 5241-5250 - Coordinate System 2, G55 for X, Y, Z, A, B, C, U, V, W & R. Persistent.
-   // 5261-5270 - Coordinate System 3, G56 for X, Y, Z, A, B, C, U, V, W & R. Persistent.
-   // 5281-5290 - Coordinate System 4, G57 for X, Y, Z, A, B, C, U, V, W & R. Persistent.
-   // 5301-5310 - Coordinate System 5, G58 for X, Y, Z, A, B, C, U, V, W & R. Persistent.
-   // 5321-5330 - Coordinate System 6, G59 for X, Y, Z, A, B, C, U, V, W & R. Persistent.
-   // 5341-5350 - Coordinate System 7, G59.1 for X, Y, Z, A, B, C, U, V, W & R. Persistent.
-   // 5361-5370 - Coordinate System 8, G59.2 for X, Y, Z, A, B, C, U, V, W & R. Persistent.
-   // 5381-5390 - Coordinate System 9, G59.3 for X, Y, Z, A, B, C, U, V, W & R. Persistent.
    public Map<Integer, Double> parseVarFile(String fileName) {
       Map<Integer, Double> parameters = new HashMap<Integer, Double>();
       BufferedReader       br         = null;
@@ -309,9 +291,9 @@ public class ConfigParser {
          } else if (key.compareTo("DEFAULT_SPINDLE_SPEED") == 0) {
             settings.setDefaultSpindleSpeed(Integer.parseInt(parameters.get(key)));
          } else if (key.compareTo("PROGRAM_PREFIX") == 0) {
-            settings.setGcodeBaseDir(key);
+            settings.setGcodeBaseDir(parameters.get(key));
          } else if (key.compareTo("INTRO_GRAPHIC") == 0) {
-            settings.setIntroGraphic(key);
+            settings.setIntroGraphic(parameters.get(key));
          } else if (key.compareTo("INTRO_TIME") == 0) {
             settings.setIntroTime(Integer.parseInt(parameters.get(key)));
          } else if (key.compareTo("CYCLE_TIME") == 0) {
@@ -321,11 +303,13 @@ public class ConfigParser {
             // } else if (key.compareTo("POSITION_OFFSET") == 0) {
             // ;
          } else if (key.compareTo("DRO_FORMAT_MM") == 0) {
-            settings.setDroFormatMM(key);
+            settings.setDroFormatMM(parameters.get(key));
          } else if (key.compareTo("DRO_FORMAT_INCH") == 0) {
-            settings.setDroFormatInch(key);
+            settings.setDroFormatInch(parameters.get(key));
          } else if (key.compareTo("PREFERENCE_FILE_PATH") == 0) {
-            settings.setPreferenceFile(key);
+            settings.setPreferenceFile(parameters.get(key));
+         } else if (key.compareTo("INCREMENTS") == 0) {
+            settings.setIncrements(parameters.get(key));
          }
       }
    }
@@ -333,100 +317,6 @@ public class ConfigParser {
 
    public void processTools(String toolDefFile) {
       ttHdr.importToolTable(toolDefFile);
-      // List<ToolEntry> tools = appSetup.getTools();
-      // File toolsDef = new File(toolDefFile);
-      // BufferedReader br = null;
-      //
-      // if (toolsDef.exists() && toolsDef.canRead()) {
-      // tools.clear();
-      //
-      // try {
-      // br = new BufferedReader(new FileReader(toolsDef));
-      // String line = null;
-      // ToolEntry tool = null;
-      // int intValue;
-      // double doubleValue;
-      //
-      // while ((line = br.readLine()) != null) {
-      // String[] parts = line.split(";");
-      // String[] toolParts = parts[0].split("\\s+");
-      //
-      // tool = new ToolEntry();
-      // if (parts.length > 1) tool.setDescription(parts[1]);
-      //
-      // for (int i = 0; i < toolParts.length; ++i) {
-      // try {
-      // if (toolParts[i].startsWith("T")) {
-      // intValue = Integer.parseInt(toolParts[i].substring(1));
-      // tool.setToolNumber(intValue);
-      // } else if (toolParts[i].startsWith("P")) {
-      // intValue = Integer.parseInt(toolParts[i].substring(1));
-      // tool.setPocketUsed(intValue);
-      // } else if (toolParts[i].startsWith("D")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.setDiameter(doubleValue);
-      // } else if (toolParts[i].startsWith("X")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.getOffset().setX(doubleValue);
-      // } else if (toolParts[i].startsWith("Y")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.getOffset().setY(doubleValue);
-      // } else if (toolParts[i].startsWith("Z")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.getOffset().setZ(doubleValue);
-      // } else if (toolParts[i].startsWith("A")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.getOffset().setA(doubleValue);
-      // } else if (toolParts[i].startsWith("B")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.getOffset().setB(doubleValue);
-      // } else if (toolParts[i].startsWith("C")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.getOffset().setC(doubleValue);
-      // } else if (toolParts[i].startsWith("U")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.getOffset().setU(doubleValue);
-      // } else if (toolParts[i].startsWith("V")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.getOffset().setV(doubleValue);
-      // } else if (toolParts[i].startsWith("W")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.getOffset().setW(doubleValue);
-      // } else if (toolParts[i].startsWith("I")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.setFrontAngle(doubleValue);
-      // } else if (toolParts[i].startsWith("J")) {
-      // doubleValue =
-      // Double.parseDouble(toolParts[i].substring(1));
-      // tool.setBackAngle(doubleValue);
-      // } else if (toolParts[i].startsWith("Q")) {
-      // intValue = Integer.parseInt(toolParts[i].substring(1));
-      // tool.setOrientation(intValue);
-      // }
-      // }
-      // catch (Throwable t) {}
-      // }
-      // tools.add(tool);
-      // }
-      // }
-      // catch (FileNotFoundException e) {
-      // e.printStackTrace();
-      // }
-      // catch (IOException e) {
-      // e.printStackTrace();
-      // }
-      // }
    }
 
 

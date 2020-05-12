@@ -32,8 +32,9 @@ import java.util.Comparator;
 
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.gui.WritableTableFormat;
-import de.schwarzrot.bean.AppSetup;
+
 import de.schwarzrot.bean.Fixture;
+import de.schwarzrot.bean.IAxisMask;
 import de.schwarzrot.bean.LCStatus;
 
 
@@ -41,7 +42,7 @@ public class FixtureTableFormat implements
                                 AdvancedTableFormat<Fixture>,
                                 WritableTableFormat<Fixture> {
    public FixtureTableFormat() {
-      AppSetup setup = LCStatus.getStatus().getSetup();
+      IAxisMask setup = LCStatus.getStatus().getSetup();
 
       int columns = 1;
       columnHeaders    = new String[11];

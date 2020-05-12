@@ -39,14 +39,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import de.schwarzrot.bean.AppSetup;
+import de.schwarzrot.bean.IAxisMask;
 import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.model.CanonPosition;
 import de.schwarzrot.system.CommandWriter;
 
 
 public class FixtureEditor extends JPanel implements ActionListener {
-   public FixtureEditor(AppSetup setup, CommandWriter cw, String title, CanonPosition p) {
+   public FixtureEditor(IAxisMask setup, CommandWriter cw, String title, CanonPosition p) {
       this.setup    = setup;
       this.title    = title;
       commandWriter = cw;
@@ -253,7 +253,7 @@ public class FixtureEditor extends JPanel implements ActionListener {
    }
 
 
-   private AppSetup            setup;
+   private IAxisMask            setup;
    private JTextField[]        entries;
    private String              title;
    private JButton             btSave;

@@ -48,7 +48,9 @@ public class PowerButton extends JButton implements PropertyChangeListener {
       this.setMaximumSize(UITheme.getDimension("Toolbar:button.size"));
       this.setBackground(UITheme.getColor("Toolbar:grid.color"));
       this.setBorder(new EmptyBorder(1, 1, 1, 1));
-      this.setOpaque(true);
+      this.setFocusPainted(false);
+      this.setOpaque(false);
+      this.setContentAreaFilled(false);
       this.imgOff  = loadIcon(iconOff);
       this.imgOff1 = loadIcon(iconOff1);
       this.imgON   = loadIcon(iconON);

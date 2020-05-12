@@ -89,7 +89,12 @@ public class StatusReader {
       // Date end = new Date();
       //
       // System.out.println("update took " + (end.getTime() - begin.getTime()));
-      // System.out.println(LCStatus.getStatus().getModel("applicationMode"));
+      //      System.out.println();
+      //      System.out.println(LCStatus.getStatus().getModel("taskState"));
+      //      System.out.println(LCStatus.getStatus().getModel("taskMode"));
+      //      System.out.println(LCStatus.getStatus().getModel("execState"));
+      //      System.out.println(LCStatus.getStatus().getModel("interpState"));
+      //      System.out.println(LCStatus.getStatus().getModel("applicationMode"));
    }
 
 
