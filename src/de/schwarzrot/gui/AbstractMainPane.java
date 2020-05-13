@@ -358,18 +358,18 @@ public abstract class AbstractMainPane extends JDesktopPane
       applicationButtons.add(sb);
       buttonPane.add(sb);
 
-      sb = new SoftkeyButton("images/SK_Wheel.png", "images/SK_Wheel_active.png",
-            new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
-                  new SmallerCondition<Integer>(status.getModel("execState"),
-                        TaskExecState.TaskExecWait4Motion.getStateNum()),
-                  new EqualCondition<Boolean>(errorActive, false) }),
-            new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmWheel));
-      sb.setActionCommand(ApplicationMode.AmWheel.name());
-      sb.addActionListener(this);
-      applicationButtons.add(sb);
-      buttonPane.add(sb);
+      //      sb = new SoftkeyButton("images/SK_Wheel.png", "images/SK_Wheel_active.png",
+      //            new AndCondition(new ICondition[] {
+      //                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
+      //                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+      //                  new SmallerCondition<Integer>(status.getModel("execState"),
+      //                        TaskExecState.TaskExecWait4Motion.getStateNum()),
+      //                  new EqualCondition<Boolean>(errorActive, false) }),
+      //            new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmWheel));
+      //      sb.setActionCommand(ApplicationMode.AmWheel.name());
+      //      sb.addActionListener(this);
+      //      applicationButtons.add(sb);
+      //      buttonPane.add(sb);
 
       sb = new SoftkeyButton("images/SK_MDI.png", "images/SK_MDI_active.png",
             new AndCondition(new ICondition[] {

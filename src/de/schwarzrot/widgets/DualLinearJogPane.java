@@ -94,6 +94,7 @@ public class DualLinearJogPane extends JPanel {
       margin.setPreferredSize(new Dimension((int) other, (int) (gap * 0.5)));
       pane.add(margin);
       p.setLayout(bl);
+      p.setOpaque(false);
       p.setPreferredSize(new Dimension(width, (int) (r3o - r3i)));
       if (hasLeft) {
          bt = new JogButton(leftPosText, 3, other, r3o - r3i, condEnable);
@@ -111,6 +112,7 @@ public class DualLinearJogPane extends JPanel {
       p  = new JPanel();
       bl = new BoxLayout(p, BoxLayout.X_AXIS);
       p.setLayout(bl);
+      p.setOpaque(false);
       p.setPreferredSize(new Dimension(width, (int) (r2o - r2i)));
       if (hasLeft) {
          bt = new JogButton(leftPosText, 2, other, r2o - r2i, condEnable);
@@ -128,6 +130,7 @@ public class DualLinearJogPane extends JPanel {
       p  = new JPanel();
       bl = new BoxLayout(p, BoxLayout.X_AXIS);
       p.setLayout(bl);
+      p.setOpaque(false);
       p.setPreferredSize(new Dimension(width, (int) (r1o - r1i)));
       if (hasLeft) {
          bt = new JogButton(leftPosText, 1, other, r1o - r1i, condEnable);
@@ -148,12 +151,17 @@ public class DualLinearJogPane extends JPanel {
       cbContinuous.setHorizontalAlignment(JCheckBox.LEFT);
       cbContinuous.setVerticalAlignment(JCheckBox.CENTER);
       cbContinuous.setSelected(true);
+      cbContinuous.setBorderPainted(false);
+      cbContinuous.setFocusPainted(false);
+      cbContinuous.setBackground(UITheme.getColor("JogButtonPane:background"));
+      cbContinuous.setForeground(UITheme.getColor("JogButton:foreground"));
       cbContinuous.setFont(new Font("Verdana", Font.BOLD, 24));
       pane.add(cbContinuous);
 
       p  = new JPanel();
       bl = new BoxLayout(p, BoxLayout.X_AXIS);
       p.setLayout(bl);
+      p.setOpaque(false);
       p.setPreferredSize(new Dimension(width, (int) (r1o - r1i)));
       if (hasLeft) {
          bt = new JogButton(leftNegText, 1, other, r1o - r1i, condEnable);
@@ -171,6 +179,7 @@ public class DualLinearJogPane extends JPanel {
       p  = new JPanel();
       bl = new BoxLayout(p, BoxLayout.X_AXIS);
       p.setLayout(bl);
+      p.setOpaque(false);
       p.setPreferredSize(new Dimension(width, (int) (r2o - r2i)));
       if (hasLeft) {
          bt = new JogButton(leftNegText, 2, other, r2o - r2i, condEnable);
@@ -188,6 +197,7 @@ public class DualLinearJogPane extends JPanel {
       p  = new JPanel();
       bl = new BoxLayout(p, BoxLayout.X_AXIS);
       p.setLayout(bl);
+      p.setOpaque(false);
       p.setPreferredSize(new Dimension(width, (int) (r3o - r3i)));
       if (hasLeft) {
          bt = new JogButton(leftNegText, 3, other, r3o - r3i, condEnable);

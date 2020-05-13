@@ -68,7 +68,7 @@ public class AppSettingsPane extends JTabbedPane implements ActionListener {
       this.addTab(LCStatus.getStatus().lm("ToolManager"), toolManager);
       this.addTab(LCStatus.getStatus().lm("Settings"), settingsPane);
       this.addTab(LCStatus.getStatus().lm("ToolTable"), toolTable);
-      this.addTab(LCStatus.getStatus().lm("Fixture"), fixturePane);
+      this.addTab(LCStatus.getStatus().lm("FixtureTable"), fixturePane);
    }
 
 
