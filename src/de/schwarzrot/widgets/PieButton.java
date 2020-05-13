@@ -42,6 +42,7 @@ import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.logic.ICondition;
 
 
@@ -124,14 +125,17 @@ public class PieButton extends AbstractJogConditionButton {
       Point2D center = new Point2D.Double(xCenter, yCenter);
       float   r      = (float) (1.2 * radius);
       float[] dist   = { 0.6f, 0.82f };
-      Color[] colors = { new Color(90, 116, 140), new Color(198, 224, 234) };
-      Color[] dCols  = { Color.GRAY, Color.LIGHT_GRAY };
+      Color[] colors = { UITheme.getColor("JogButton:gradient.end"),
+            UITheme.getColor("JogButton:gradient.start") };
+      Color[] dCols  = { UITheme.getColor("JogButton:gradient.disabled.end"),
+            UITheme.getColor("JogButton:gradient.disabled.start") };
 
       paint         = new RadialGradientPaint(center, r, dist, colors, CycleMethod.NO_CYCLE);
       paintDisabled = new RadialGradientPaint(center, r, dist, dCols, CycleMethod.NO_CYCLE);
       r             = (float) (1.95 * radius);
       float[] dist1   = { 0.2f, 0.3f };
-      Color[] colors1 = { new Color(254, 246, 152), new Color(227, 202, 70) };
+      Color[] colors1 = { UITheme.getColor("JogButton:gradient.selected.end"),
+            UITheme.getColor("JogButton:gradient.selected.start") };
 
       paint1 = new RadialGradientPaint(center, r, dist1, colors1, CycleMethod.NO_CYCLE);
    }

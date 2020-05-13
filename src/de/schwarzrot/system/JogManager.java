@@ -34,8 +34,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -53,16 +51,16 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
       jogSingleStep  = new ValueModel<Boolean>("jogSingleStep", false);
       allHomed       = LCStatus.getStatus().getModel("allHomed");
       increments     = LCStatus.getStatus().getSetup().getDisplaySettings().getIncrements();
-      allHomed.addPropertyChangeListener(new PropertyChangeListener() {
-         @Override
-         public void propertyChange(PropertyChangeEvent e) {
-            if ("allHomed".compareTo(e.getPropertyName()) == 0) {
-               if (!((Boolean) e.getOldValue()) && ((Boolean) e.getNewValue())) {
-                  cmdWriter.setTaskModeAuto();
-               }
-            }
-         }
-      });
+      //      allHomed.addPropertyChangeListener(new PropertyChangeListener() {
+      //         @Override
+      //         public void propertyChange(PropertyChangeEvent e) {
+      //            //            if ("allHomed".compareTo(e.getPropertyName()) == 0) {
+      //            //               if (!((Boolean) e.getOldValue()) && ((Boolean) e.getNewValue())) {
+      //            //                  cmdWriter.setTaskModeAuto();
+      //            //               }
+      //            //            }
+      //         }
+      //      });
    }
 
 

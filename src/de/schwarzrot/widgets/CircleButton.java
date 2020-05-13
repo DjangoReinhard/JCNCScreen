@@ -94,6 +94,7 @@ public class CircleButton extends AbstractJogConditionButton {
    public void setTextCenter(double x, double y) {
       this.xText = x;
       this.yText = y;
+      calcPaint();
    }
 
 
