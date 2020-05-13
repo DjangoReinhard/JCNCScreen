@@ -28,6 +28,7 @@ package de.schwarzrot.bean;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -39,7 +40,6 @@ public class DisplaySettings {
       defaultSpindleSpeed = 1000;
       cycleTime           = 0.1;
       introTime           = 5;
-      increments          = new ArrayList<Double>();
       //      gcodeBaseDir;
       //      introGraphic;
       //      preferenceFile;
@@ -78,7 +78,7 @@ public class DisplaySettings {
    }
 
 
-   public List<Double> getIncrements() {
+   public final double[] getIncrements() {
       return increments;
    }
 
@@ -137,19 +137,19 @@ public class DisplaySettings {
       this.gcodeBaseDir = gcodeBaseDir;
    }
 
-
-   public void setIncrements(List<Double> l) {
-      this.increments = l;
-   }
+   //   public void setIncrements(List<Double> l) {
+   //      this.increments = l;
+   //   }
 
 
    public void setIncrements(String configLine) {
-      String[] parts     = configLine.split(",\\s*");
-      char[]   unitChars = { 'c', 'm', 'i' };
-      double[] factors   = { 10, 1, 25.4, 0.0254 };
-      Integer  unit      = null;
-      String   rawValue;
-      double   value;
+      String[]     parts      = configLine.split(",\\s*");
+      char[]       unitChars  = { 'c', 'm', 'i' };
+      double[]     factors    = { 10, 1, 25.4, 0.0254 };
+      List<Double> increments = new ArrayList<Double>();
+      Integer      unit       = null;
+      String       rawValue;
+      double       value;
 
       for (String s : parts) {
          unit = null;
@@ -191,17 +191,26 @@ public class DisplaySettings {
             }
          }
       }
-      //      System.out.println("got these increments ...");
-      //      boolean first = true;
-      //
-      //      for (Double dv : increments) {
-      //         if (first)
-      //            first = false;
-      //         else
-      //            System.out.print(", ");
-      //         System.out.print(dv);
-      //      }
-      //      System.out.println();
+      Collections.sort(increments);
+      int size = Math.min(4, increments.size());
+
+      this.increments    = new double[size + 1];
+      this.increments[0] = 0;
+      for (int i = 0; i < size; ++i) {
+         this.increments[i + 1] = increments.get(i);
+      }
+
+      System.out.println("got these increments ...");
+      boolean first = true;
+
+      for (Double dv : this.increments) {
+         if (first)
+            first = false;
+         else
+            System.out.print(", ");
+         System.out.print(dv);
+      }
+      System.out.println();
    }
 
 
@@ -230,16 +239,16 @@ public class DisplaySettings {
    }
 
 
-   private double       feedOverrideMax;
-   private double       spindleOverrideMin;
-   private double       spindleOverrideMax;
-   private int          defaultSpindleSpeed;
-   private double       cycleTime;
-   private int          introTime;
-   private List<Double> increments;
-   private String       gcodeBaseDir;
-   private String       introGraphic;
-   private String       preferenceFile;
-   private String       droFormatMM;
-   private String       droFormatInch;
+   private double   feedOverrideMax;
+   private double   spindleOverrideMin;
+   private double   spindleOverrideMax;
+   private int      defaultSpindleSpeed;
+   private double   cycleTime;
+   private int      introTime;
+   private double[] increments;
+   private String   gcodeBaseDir;
+   private String   introGraphic;
+   private String   preferenceFile;
+   private String   droFormatMM;
+   private String   droFormatInch;
 }

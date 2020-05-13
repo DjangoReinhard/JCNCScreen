@@ -29,7 +29,9 @@ package de.schwarzrot.widgets;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseListener;
 
 import javax.swing.Box;
@@ -40,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import de.schwarzrot.bean.IAxisMask;
+import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.logic.ICondition;
 import de.schwarzrot.system.JogManager;
@@ -89,6 +92,7 @@ public class DualLinearJogPane extends JPanel {
       JPanel        p      = new JPanel();
       BoxLayout     bl     = new BoxLayout(p, BoxLayout.X_AXIS);
       MouseListener ml     = JogManager.getInstance();
+      ItemListener  il     = JogManager.getInstance();
       JButton       bt     = null;
 
       margin.setPreferredSize(new Dimension((int) other, (int) (gap * 0.5)));
@@ -145,18 +149,51 @@ public class DualLinearJogPane extends JPanel {
       }
       pane.add(p);
 
-      cbContinuous = new JCheckBox("single step");
-      cbContinuous.addItemListener(JogManager.getInstance());
-      cbContinuous.setPreferredSize(new Dimension((int) (2.0 * other + 0.7 * gap), (int) (r1i * 2)));
+      p = new JPanel();
+      p.setLayout(new GridLayout(2, 0));
+      p.setPreferredSize(new Dimension((int) (2.0 * other + 0.7 * gap), (int) (r1i * 2)));
+      // create checkbox here, as it is needed on setSelected()
+      cbFastMove = new JCheckBox(LCStatus.getStatus().lm("rapidJog"));
+      cbFastMove.setName("fastMove");
+
+      cbContinuous = new JCheckBox(LCStatus.getStatus().lm("singleStep"));
+      cbContinuous.setName("singleStep");
+      cbContinuous.addItemListener(il);
+      cbContinuous.addItemListener(new ItemListener() {
+         @Override
+         public void itemStateChanged(ItemEvent e) {
+            Object o = e.getSource();
+
+            if (o.equals(cbContinuous)) {
+               if (cbContinuous.isSelected()) {
+                  cbFastMove.setSelected(false);
+                  cbFastMove.setEnabled(false);
+               } else {
+                  cbFastMove.setEnabled(true);
+               }
+            }
+         }
+      });
       cbContinuous.setHorizontalAlignment(JCheckBox.LEFT);
       cbContinuous.setVerticalAlignment(JCheckBox.CENTER);
       cbContinuous.setSelected(true);
       cbContinuous.setBorderPainted(false);
       cbContinuous.setFocusPainted(false);
       cbContinuous.setBackground(UITheme.getColor("JogButtonPane:background"));
-      cbContinuous.setForeground(UITheme.getColor("JogButton:foreground"));
-      cbContinuous.setFont(new Font("Verdana", Font.BOLD, 24));
-      pane.add(cbContinuous);
+      //      cbContinuous.setForeground(UITheme.getColor("JogButton:foreground"));
+      cbContinuous.setFont(UITheme.getFont("MessageLOG:header.font"));
+      p.add(cbContinuous);
+      cbFastMove.addItemListener(il);
+      cbFastMove.setHorizontalAlignment(JCheckBox.LEFT);
+      cbFastMove.setVerticalAlignment(JCheckBox.CENTER);
+      //      cbFastMove.setSelected(false);
+      cbFastMove.setBorderPainted(false);
+      cbFastMove.setFocusPainted(false);
+      cbFastMove.setBackground(UITheme.getColor("JogButtonPane:background"));
+      //      cbFastMove.setForeground(UITheme.getColor("JogButton:foreground"));
+      cbFastMove.setFont(UITheme.getFont("MessageLOG:header.font"));
+      p.add(cbFastMove);
+      pane.add(p);
 
       p  = new JPanel();
       bl = new BoxLayout(p, BoxLayout.X_AXIS);
@@ -225,5 +262,6 @@ public class DualLinearJogPane extends JPanel {
    private double            other;
    private int               width;
    private JCheckBox         cbContinuous;
+   private JCheckBox         cbFastMove;
    private static final long serialVersionUID = 1L;
 }

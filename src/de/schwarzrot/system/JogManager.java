@@ -34,12 +34,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 
 import de.schwarzrot.bean.LCStatus;
+import de.schwarzrot.model.SpeedInfo;
 import de.schwarzrot.model.ValueModel;
 import de.schwarzrot.widgets.AbstractJogConditionButton;
 
@@ -49,6 +49,7 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
    private JogManager(CommandWriter cmdWriter) {
       this.cmdWriter = cmdWriter;
       jogSingleStep  = new ValueModel<Boolean>("jogSingleStep", false);
+      rapidJog       = new ValueModel<Boolean>("rapidJog", false);
       allHomed       = LCStatus.getStatus().getModel("allHomed");
       increments     = LCStatus.getStatus().getSetup().getDisplaySettings().getIncrements();
       //      allHomed.addPropertyChangeListener(new PropertyChangeListener() {
@@ -87,7 +88,10 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
       Object source = e.getItemSelectable();
 
       if (source instanceof JCheckBox) {
-         jogSingleStep.setValue(((JCheckBox) source).isSelected());
+         if ("singleStep".compareTo(((JCheckBox) source).getName()) == 0)
+            jogSingleStep.setValue(((JCheckBox) source).isSelected());
+         else if ("fastMove".compareTo(((JCheckBox) source).getName()) == 0)
+            rapidJog.setValue(((JCheckBox) source).isSelected());
       }
    }
 
@@ -97,8 +101,8 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
       if (jogSingleStep.getValue()) {
          if (((JButton) e.getSource()).isEnabled()) {
             int    level    = ((AbstractJogConditionButton) (e.getSource())).getLevel();
-            double speed    = LCStatus.getStatus().getSpeedInfo().getNominalFeed() / 60.0;
-            double stepSize = increments.get(level);
+            double speed    = getJogSpeed();
+            double stepSize = increments[level];
 
             cmdWriter.jogStep(((JButton) e.getSource()).getText(), stepSize, speed);
          }
@@ -110,7 +114,7 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
    public void mousePressed(MouseEvent e) {
       if (!jogSingleStep.getValue()) {
          if (((JButton) e.getSource()).isEnabled()) {
-            double speed = LCStatus.getStatus().getSpeedInfo().getNominalFeed() / 60.0;
+            double speed = getJogSpeed();
 
             cmdWriter.startJogging(((JButton) e.getSource()).getText(), speed);
          }
@@ -128,6 +132,27 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
    }
 
 
+   protected double getJogSpeed() {
+      SpeedInfo si    = LCStatus.getStatus().getSpeedInfo();
+
+      double    feed  = si.getNominalFeed() / 60.0;
+      double    ff    = si.getFeedFactor() / 100.0;
+      double    sf    = si.getRapidFactor() / 100.0;
+      double    speed = si.getMaxSpeed() / 60.0;
+
+      System.err.println("feed: " + feed + " - feed-factor: " + ff);
+      System.err.println("rapid-feed: " + speed + " - rapid-factor: " + sf);
+
+      if (rapidJog.getValue()) {
+         System.err.println("rapid jog requested");
+         return speed * sf;
+      } else {
+         System.err.println("normal jog wanted");
+         return feed * ff;
+      }
+   }
+
+
    public static JogManager getInstance() {
       if (instance == null) {
          instance = new JogManager(LCStatus.getStatus().getApp().getCommandWriter());
@@ -139,6 +164,7 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
    private final CommandWriter cmdWriter;
    private ValueModel<Boolean> allHomed;
    private ValueModel<Boolean> jogSingleStep;
-   private List<Double>        increments;
+   private ValueModel<Boolean> rapidJog;
+   private double[]            increments;
    private static JogManager   instance;
 }
