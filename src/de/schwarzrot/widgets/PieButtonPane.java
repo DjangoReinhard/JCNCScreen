@@ -36,7 +36,7 @@ import javax.swing.JPanel;
 import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.gui.PieLayout;
 import de.schwarzrot.logic.ICondition;
-import de.schwarzrot.system.JogManager;
+import de.schwarzrot.system.MachineControl;
 
 
 public class PieButtonPane extends AbstractShapedPanel {
@@ -61,7 +61,7 @@ public class PieButtonPane extends AbstractShapedPanel {
 
    protected void createComponents(JPanel p, ICondition condEnable) {
       JButton       bt = new PieButton(negText, condEnable, 1);
-      MouseListener ml = JogManager.getInstance();
+      MouseListener ml = MachineControl.getInstance();
 
       bt.addMouseListener(ml);
       p.add(bt, 1);

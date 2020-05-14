@@ -45,7 +45,7 @@ import de.schwarzrot.bean.IAxisMask;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.logic.ICondition;
-import de.schwarzrot.system.JogManager;
+import de.schwarzrot.system.MachineControl;
 
 
 public class DualLinearJogPane extends JPanel {
@@ -91,8 +91,8 @@ public class DualLinearJogPane extends JPanel {
       JLabel        margin = new JLabel(" ");
       JPanel        p      = new JPanel();
       BoxLayout     bl     = new BoxLayout(p, BoxLayout.X_AXIS);
-      MouseListener ml     = JogManager.getInstance();
-      ItemListener  il     = JogManager.getInstance();
+      MouseListener ml     = MachineControl.getInstance();
+      ItemListener  il     = MachineControl.getInstance();
       JButton       bt     = null;
 
       margin.setPreferredSize(new Dimension((int) other, (int) (gap * 0.5)));

@@ -41,14 +41,14 @@ import de.schwarzrot.logic.EqualCondition;
 import de.schwarzrot.logic.ICondition;
 import de.schwarzrot.logic.OrCondition;
 import de.schwarzrot.model.ValueModel;
-import de.schwarzrot.system.JogManager;
+import de.schwarzrot.system.MachineControl;
 
 
 public class AbstractJogConditionButton extends JButton {
    public AbstractJogConditionButton(String text, ICondition condEnable, int level) {
       super(text);
       this.level = new ValueModel<Integer>("jogLevel", level);
-      ValueModel<Boolean> jogSingleStep = JogManager.getInstance().getSingleStepModel();
+      ValueModel<Boolean> jogSingleStep = MachineControl.getInstance().getSingleStepModel();
       this.setContentAreaFilled(false);
       this.setFocusPainted(false);
       this.setOpaque(false);

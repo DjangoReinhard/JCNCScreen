@@ -34,9 +34,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.model.SpeedInfo;
@@ -44,31 +47,36 @@ import de.schwarzrot.model.ValueModel;
 import de.schwarzrot.widgets.AbstractJogConditionButton;
 
 
-public class JogManager extends MouseAdapter implements ItemListener, MouseListener, ActionListener {
+public class MachineControl extends MouseAdapter
+      implements ItemListener, MouseListener, ActionListener, MouseWheelListener {
    @SuppressWarnings("unchecked")
-   private JogManager(CommandWriter cmdWriter) {
+   private MachineControl(CommandWriter cmdWriter) {
       this.cmdWriter = cmdWriter;
       jogSingleStep  = new ValueModel<Boolean>("jogSingleStep", false);
       rapidJog       = new ValueModel<Boolean>("rapidJog", false);
       allHomed       = LCStatus.getStatus().getModel("allHomed");
       increments     = LCStatus.getStatus().getSetup().getDisplaySettings().getIncrements();
-      //      allHomed.addPropertyChangeListener(new PropertyChangeListener() {
-      //         @Override
-      //         public void propertyChange(PropertyChangeEvent e) {
-      //            //            if ("allHomed".compareTo(e.getPropertyName()) == 0) {
-      //            //               if (!((Boolean) e.getOldValue()) && ((Boolean) e.getNewValue())) {
-      //            //                  cmdWriter.setTaskModeAuto();
-      //            //               }
-      //            //            }
-      //         }
-      //      });
    }
 
 
    @Override
    public void actionPerformed(ActionEvent e) {
-      if (e.getActionCommand().compareTo("HomeAll") == 0) {
+      if ("HomeAll".compareTo(e.getActionCommand()) == 0) {
          cmdWriter.homeAll();
+      } else if ("startSpindleCW".compareTo(e.getActionCommand()) == 0) {
+         SpeedInfo si    = LCStatus.getStatus().getSpeedInfo();
+         int       speed = (int) (si.getSpindleNominalSpeed() * si.getSpindleFactor() / 100.0);
+
+         cmdWriter.startSpindleCW(speed);
+      } else if ("startSpindleCCW".compareTo(e.getActionCommand()) == 0) {
+         SpeedInfo si    = LCStatus.getStatus().getSpeedInfo();
+         int       speed = (int) (si.getSpindleNominalSpeed() * si.getSpindleFactor() / 100.0);
+
+         cmdWriter.startSpindleCCW(speed);
+      } else if ("stopSpindle".compareTo(e.getActionCommand()) == 0) {
+         cmdWriter.stopSpindle();
+      } else {
+         System.err.println("unsupported action command: >" + e.getActionCommand() + "<");
       }
    }
 
@@ -98,13 +106,28 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
 
    @Override
    public void mouseClicked(MouseEvent e) {
-      if (jogSingleStep.getValue()) {
-         if (((JButton) e.getSource()).isEnabled()) {
-            int    level    = ((AbstractJogConditionButton) (e.getSource())).getLevel();
-            double speed    = getJogSpeed();
-            double stepSize = increments[level];
+      JComponent c = (JComponent) e.getSource();
 
-            cmdWriter.jogStep(((JButton) e.getSource()).getText(), stepSize, speed);
+      if (c.getName() == null) {
+         if (c instanceof JButton && jogSingleStep.getValue()) {
+            if (((JButton) e.getSource()).isEnabled()) {
+               int    level    = ((AbstractJogConditionButton) (e.getSource())).getLevel();
+               double speed    = getJogSpeed();
+               double stepSize = increments[level];
+
+               cmdWriter.jogStep(((JButton) e.getSource()).getText(), stepSize, speed);
+            }
+         }
+      } else {
+         if ("curFeed".compareTo(c.getName()) == 0 || "nomFeed".compareTo(c.getName()) == 0) {
+            //         System.out.println("set feed to 0");
+            cmdWriter.setFeedRate(0);
+         } else if ("curRapid".compareTo(c.getName()) == 0) {
+            //         System.out.println("set rapid move to 0");
+            cmdWriter.setRapidRate(0);
+         } else if ("curSpindle".compareTo(c.getName()) == 0 || "nomSpindle".compareTo(c.getName()) == 0) {
+            //         System.out.println("set spindle-speed to 0");
+            cmdWriter.setSpindleSpeedFactor(0);
          }
       }
    }
@@ -112,11 +135,13 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
 
    @Override
    public void mousePressed(MouseEvent e) {
-      if (!jogSingleStep.getValue()) {
+      JComponent c = (JComponent) e.getSource();
+
+      if (c instanceof JButton && !jogSingleStep.getValue()) {
          if (((JButton) e.getSource()).isEnabled()) {
             double speed = getJogSpeed();
 
-            cmdWriter.startJogging(((JButton) e.getSource()).getText(), speed);
+            cmdWriter.startJogging(((JButton) c).getText(), speed);
          }
       }
    }
@@ -124,10 +149,54 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
 
    @Override
    public void mouseReleased(MouseEvent e) {
-      if (!jogSingleStep.getValue()) {
+      JComponent c = (JComponent) e.getSource();
+
+      if (c instanceof JButton && !jogSingleStep.getValue()) {
          if (((JButton) e.getSource()).isEnabled()) {
             cmdWriter.stopJogging(((JButton) e.getSource()).getText());
          }
+      }
+   }
+
+
+   @Override
+   public void mouseWheelMoved(MouseWheelEvent e) {
+      JComponent c  = (JComponent) e.getSource();
+      SpeedInfo  si = LCStatus.getStatus().getSpeedInfo();
+
+      if (c.getName() == null)
+         return;
+      int su = e.getUnitsToScroll();
+
+      if ("feedOverride".compareTo(c.getName()) == 0 || "nomFeed".compareTo(c.getName()) == 0
+            || "curFeed".compareTo(c.getName()) == 0) {
+         double ff = si.getFeedFactor() / 100.0;
+
+         if (su < 0)
+            ff += 0.01;
+         else
+            ff -= 0.01;
+         //         System.out.println("feed changed by: " + su);
+         cmdWriter.setFeedRate(ff);
+      } else if ("rapidOverride".compareTo(c.getName()) == 0 || "curRapid".compareTo(c.getName()) == 0) {
+         double rf = si.getRapidFactor() / 100.0;
+
+         if (su < 0)
+            rf += 0.01;
+         else
+            rf -= 0.01;
+         //         System.out.println("rapid-feed changed by: " + su);
+         cmdWriter.setRapidRate(rf);
+      } else if ("spindleOverride".compareTo(c.getName()) == 0 || "curSpindle".compareTo(c.getName()) == 0
+            || "nomSpindle".compareTo(c.getName()) == 0) {
+         double sf = si.getSpindleFactor() / 100.0;
+
+         if (su < 0)
+            sf += 0.01;
+         else
+            sf -= 0.01;
+         //         System.out.println("spindle-speed changed by: " + su);
+         cmdWriter.setSpindleSpeedFactor(sf);
       }
    }
 
@@ -153,9 +222,9 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
    }
 
 
-   public static JogManager getInstance() {
+   public static MachineControl getInstance() {
       if (instance == null) {
-         instance = new JogManager(LCStatus.getStatus().getApp().getCommandWriter());
+         instance = new MachineControl(LCStatus.getStatus().getApp().getCommandWriter());
       }
       return instance;
    }
@@ -166,5 +235,5 @@ public class JogManager extends MouseAdapter implements ItemListener, MouseListe
    private ValueModel<Boolean> jogSingleStep;
    private ValueModel<Boolean> rapidJog;
    private double[]            increments;
-   private static JogManager   instance;
+   private static MachineControl   instance;
 }

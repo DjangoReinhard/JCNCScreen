@@ -37,7 +37,7 @@ import javax.swing.JPanel;
 import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.gui.CircleLayout;
 import de.schwarzrot.logic.ICondition;
-import de.schwarzrot.system.JogManager;
+import de.schwarzrot.system.MachineControl;
 
 
 public class CircleButtonPane extends AbstractShapedPanel {
@@ -52,8 +52,8 @@ public class CircleButtonPane extends AbstractShapedPanel {
 
    protected void createComponents(JPanel p, ICondition condEnableCenter, ICondition condEnable) {
       JButton        bt = new RoundButton("HomeAll", condEnableCenter);
-      ActionListener al = JogManager.getInstance();
-      MouseListener  ml = JogManager.getInstance();
+      ActionListener al = MachineControl.getInstance();
+      MouseListener  ml = MachineControl.getInstance();
 
       bt.addActionListener(al);
       add(bt);

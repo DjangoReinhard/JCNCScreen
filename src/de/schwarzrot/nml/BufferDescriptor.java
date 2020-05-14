@@ -126,6 +126,7 @@ public class BufferDescriptor implements IBufferDescriptor {
       //      [  1832] feed_override_enabled
       //      [  1833] adaptive_feed_enabled
       //      [  1834] feed_hold_enabled
+      //      [  6592] spindle[0]
       //      [  6696] spindle[0]speed
       //      [  6704] spindle[0]scale
       //      [  6712] spindle[0]css_max
@@ -194,11 +195,28 @@ public class BufferDescriptor implements IBufferDescriptor {
       bufferEntries.put("axisMask", new BufferEntry("axisMask", 1428, 1, BufferEntryType.Byte));
       bufferEntries.put("joints", new BufferEntry("joints", 1416, 1, BufferEntryType.Byte));
 
+      //      [  6696] spindle[0]speed
+      //      [  6704] spindle[0]scale
+      //      [  6712] spindle[0]css_max
+      //      [  6720] spindle[0]css_fak
+      //      [  6728] spindle[0]dir
+      //      [  6732] spindle[0]brake
+      //      [  6736] spindle[0]increasing
+      //      [  6740] spindle[0]enabled
+      //      [  6744] spindle[0]orient_state
+      //      [  6748] spindle[0]orient_fault
+      //      [  6752] spindle[0]override_enable
+      //      [  6753] spindle[0]homed
       bufferEntries.put("spindles", new BufferEntry("spindles", 6592, 1, BufferEntryType.Byte));
       bufferEntries.put("spindleSpeed", new BufferEntry("spindleSpeed", 6696, 1, BufferEntryType.Byte));
       bufferEntries.put("spindleScale", new BufferEntry("spindleScale", 6704, 1, BufferEntryType.Byte));
       bufferEntries.put("spindleDir", new BufferEntry("spindleDir", 6728, 1, BufferEntryType.Byte));
+      bufferEntries.put("spindleIncreasing",
+            new BufferEntry("spindleIncreasing", 6736, 1, BufferEntryType.Byte));
+      bufferEntries.put("spindleOverrideEnable",
+            new BufferEntry("spindleOverrideEnable", 6752, 1, BufferEntryType.Byte));
       bufferEntries.put("spindleEnabled", new BufferEntry("spindleEnable", 6740, 1, BufferEntryType.Byte));
+      bufferEntries.put("spindleHomed", new BufferEntry("spindleHomed", 6753, 1, BufferEntryType.Byte));
 
       bufferEntries.put("feedrate", new BufferEntry("feedrate", 1464, 1, BufferEntryType.Byte));
       bufferEntries.put("rapidrate", new BufferEntry("rapidrate", 1472, 1, BufferEntryType.Byte));

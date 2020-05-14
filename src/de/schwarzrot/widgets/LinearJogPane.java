@@ -37,7 +37,7 @@ import javax.swing.JPanel;
 
 import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.logic.ICondition;
-import de.schwarzrot.system.JogManager;
+import de.schwarzrot.system.MachineControl;
 
 
 public class LinearJogPane extends JPanel {
@@ -82,7 +82,7 @@ public class LinearJogPane extends JPanel {
       double        r1o    = r2i;
       double        r1i    = r2i - w1;
       JLabel        margin = new JLabel(" ");
-      MouseListener ml     = JogManager.getInstance();
+      MouseListener ml     = MachineControl.getInstance();
       JButton       bt     = null;
 
       if (isVertical) {
