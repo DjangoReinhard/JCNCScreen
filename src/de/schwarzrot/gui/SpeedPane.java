@@ -145,6 +145,7 @@ public class SpeedPane extends JPanel {
       pg.setName("rapidOverride");
       BindUtils.bind("rapidFactor", LCStatus.getStatus().getSpeedInfo(), pg);
       pg.addMouseWheelListener(MachineControl.getInstance());
+      pg.addMouseListener(ml);
       add(pg, c);
 
       c.gridx      = 0;
@@ -194,7 +195,7 @@ public class SpeedPane extends JPanel {
       pg.setName("spindleOverride");
       BindUtils.bind("spindleFactor", LCStatus.getStatus().getSpeedInfo(), pg);
       pg.addMouseWheelListener(mwl);
-      pg.addMouseWheelListener(mwl);
+      pg.addMouseListener(ml);
       add(pg, c);
    }
 
