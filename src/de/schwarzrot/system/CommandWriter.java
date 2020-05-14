@@ -325,6 +325,16 @@ public class CommandWriter {
    }
 
 
+   public void startSpindleCCW(int speed) {
+      this.setSpindle(true, speed, -1);
+   }
+
+
+   public void startSpindleCW(int speed) {
+      this.setSpindle(true, speed, 1);
+   }
+
+
    public void stopJogging(String what) {
       System.out.println("jogStop: " + what);
       JogInfo ji = new JogInfo();
@@ -333,6 +343,11 @@ public class CommandWriter {
 
       System.err.println("from what: " + what + "\tgot axis: " + ji.axis + " and dir: " + ji.direction);
       jogStop(ji.axis);
+   }
+
+
+   public void stopSpindle() {
+      this.setSpindle(false, 0, 0);
    }
 
 

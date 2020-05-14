@@ -45,11 +45,11 @@ import ca.odell.glazedlists.EventList;
 
 
 public class StatusReader {
-
    public StatusReader(ErrorReader errorReader, IBufferDescriptor bufDesc) {
       this.initializationCompleted = false;
       this.errorReader             = errorReader;
       this.bufDesc                 = bufDesc;
+      this.activeSpindle           = 0;
       statusBuffer                 = init();
       statusBuffer.order(ByteOrder.LITTLE_ENDIAN);
       status = LCStatus.getStatus();
@@ -57,6 +57,11 @@ public class StatusReader {
       readSetup();
       update(); // at least once before timer start
       this.initializationCompleted = true;
+   }
+
+
+   public ByteBuffer getStatusBuffer() {
+      return statusBuffer;
    }
 
 
@@ -239,6 +244,45 @@ public class StatusReader {
 
 
    @SuppressWarnings("unchecked")
+   protected int handleMultiSpindle() {
+      BufferEntry e;
+      boolean     spindleSeen = false;
+      int         enabled;
+      int         cSpindles   = 0;
+
+      // [ 6600] spindle_speed
+      // [ 6608] spindle_scale
+      // [ 6632] spindle_dir
+      // [ 6644] spindle_enabled
+      for (int i = 0; i < 8; ++i) {
+         e       = bufDesc.get("spindleEnabled");
+         enabled = statusBuffer.getInt(e.offset + i * 168);
+
+         if (enabled != 0) {
+            ++cSpindles;
+            spindleSeen = true;
+            e           = bufDesc.get("spindleSpeed");
+            status.getSpeedInfo().setSpindleCurSpeed(statusBuffer.getDouble(e.offset + i * 168));
+
+            e = bufDesc.get("spindleScale");
+            status.getSpeedInfo().setSpindleFactor(statusBuffer.getDouble(e.offset + i * 168) * 100.0);
+
+            e = bufDesc.get("spindleDir");
+            status.getModel("spindleDir").setValue(statusBuffer.getInt(e.offset + i * 168));
+         }
+      }
+      if (!spindleSeen) {
+         status.getModel("spindleDir").setValue(0);
+         status.getSpeedInfo().setSpindleCurSpeed(0);
+      }
+      // System.out.println(status.getSpeedInfo());
+      // System.out.println();
+
+      return cSpindles;
+   }
+
+
+   @SuppressWarnings("unchecked")
    protected void handlePosition() {
       // System.out.println("StatusReader.update() ...");
       //      BufferEntry   e    = bufDesc.get("relPosX");
@@ -392,39 +436,17 @@ public class StatusReader {
    @SuppressWarnings("unchecked")
    protected int handleSpindle() {
       BufferEntry e;
-      boolean     spindleSeen = false;
-      int         enabled;
-      int         cSpindles   = 0;
 
-      // [ 6600] spindle_speed
-      // [ 6608] spindle_scale
-      // [ 6632] spindle_dir
-      // [ 6644] spindle_enabled
-      for (int i = 0; i < 8; ++i) {
-         e       = bufDesc.get("spindleEnabled");
-         enabled = statusBuffer.getInt(e.offset + i * 168);
+      e = bufDesc.get("spindleSpeed");
+      status.getSpeedInfo().setSpindleCurSpeed(statusBuffer.getDouble(e.offset + activeSpindle * 168));
 
-         if (enabled != 0) {
-            ++cSpindles;
-            spindleSeen = true;
-            e           = bufDesc.get("spindleSpeed");
-            status.getSpeedInfo().setSpindleCurSpeed(statusBuffer.getDouble(e.offset + i * 168));
+      e = bufDesc.get("spindleScale");
+      status.getSpeedInfo().setSpindleFactor(statusBuffer.getDouble(e.offset + activeSpindle * 168) * 100.0);
 
-            e = bufDesc.get("spindleScale");
-            status.getSpeedInfo().setSpindleFactor(statusBuffer.getDouble(e.offset + i * 168) * 100.0);
+      e = bufDesc.get("spindleDir");
+      status.getModel("spindleDir").setValue(statusBuffer.getInt(e.offset + activeSpindle * 168));
 
-            e = bufDesc.get("spindleDir");
-            status.getModel("spindleDir").setValue(statusBuffer.getInt(e.offset + i * 168));
-         }
-      }
-      if (!spindleSeen) {
-         status.getModel("spindleDir").setValue(0);
-         status.getSpeedInfo().setSpindleCurSpeed(0);
-      }
-      // System.out.println(status.getSpeedInfo());
-      // System.out.println();
-
-      return cSpindles;
+      return 1;
    }
 
 
@@ -566,21 +588,6 @@ public class StatusReader {
 
    private native final ByteBuffer init();
 
-
-   // [ 992] active_gcodes
-   // [ 1056] active_mcodes
-   private void printActiveCodes() {
-      int gcBase = 992;
-      int mcBase = 1056;
-
-      for (int i = 0; i < 16; ++i) {
-         System.out.println("active G-Code: " + statusBuffer.getInt(gcBase + i * 4));
-      }
-      for (int i = 0; i < 10; ++i) {
-         System.out.println("active M-Code: " + statusBuffer.getInt(mcBase + i * 4));
-      }
-   }
-
    //   [    20] echo_serial_number
    //   [    20] echo_serial_number
    //   [    24] state
@@ -685,11 +692,27 @@ public class StatusReader {
    //   [122264] debug
 
 
+   // [ 992] active_gcodes
+   // [ 1056] active_mcodes
+   private void printActiveCodes() {
+      int gcBase = 992;
+      int mcBase = 1056;
+
+      for (int i = 0; i < 16; ++i) {
+         System.out.println("active G-Code: " + statusBuffer.getInt(gcBase + i * 4));
+      }
+      for (int i = 0; i < 10; ++i) {
+         System.out.println("active M-Code: " + statusBuffer.getInt(mcBase + i * 4));
+      }
+   }
+
+
    private ByteBuffer              statusBuffer;
    private LCStatus                status;
    private ErrorReader             errorReader;
    private boolean                 initializationCompleted;
    private final IBufferDescriptor bufDesc;
+   private final int               activeSpindle;
    private static final String     NmlConfigFile = "/usr/local/src/linuxcnc-dev/configs/common/linuxcnc.nml";
    private static final String[]   listOfSignals = { "joint_0_enabled", "joint_1_enabled", "joint_2_enabled",
          "joint_3_enabled", "joint_4_enabled", "joint_5_enabled", "joint_6_enabled", "joint_7_enabled",

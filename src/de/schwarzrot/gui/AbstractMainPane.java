@@ -58,12 +58,12 @@ import de.schwarzrot.logic.OrCondition;
 import de.schwarzrot.logic.SmallerCondition;
 import de.schwarzrot.model.ValueModel;
 import de.schwarzrot.nml.InterpState;
-import de.schwarzrot.nml.SpindleDirection;
 import de.schwarzrot.nml.TaskExecState;
 import de.schwarzrot.nml.TaskMode;
 import de.schwarzrot.nml.TaskState;
 import de.schwarzrot.system.CommandWriter;
 import de.schwarzrot.system.ErrorReader;
+import de.schwarzrot.system.MachineControl;
 import de.schwarzrot.widgets.ConditionButton;
 import de.schwarzrot.widgets.PowerButton;
 import de.schwarzrot.widgets.SoftkeyButton;
@@ -358,19 +358,6 @@ public abstract class AbstractMainPane extends JDesktopPane
       applicationButtons.add(sb);
       buttonPane.add(sb);
 
-      //      sb = new SoftkeyButton("images/SK_Wheel.png", "images/SK_Wheel_active.png",
-      //            new AndCondition(new ICondition[] {
-      //                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-      //                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
-      //                  new SmallerCondition<Integer>(status.getModel("execState"),
-      //                        TaskExecState.TaskExecWait4Motion.getStateNum()),
-      //                  new EqualCondition<Boolean>(errorActive, false) }),
-      //            new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmWheel));
-      //      sb.setActionCommand(ApplicationMode.AmWheel.name());
-      //      sb.addActionListener(this);
-      //      applicationButtons.add(sb);
-      //      buttonPane.add(sb);
-
       sb = new SoftkeyButton("images/SK_MDI.png", "images/SK_MDI_active.png",
             new AndCondition(new ICondition[] {
                   new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
@@ -460,30 +447,16 @@ public abstract class AbstractMainPane extends JDesktopPane
                   new EqualCondition<Boolean>(status.getModel("allHomed"), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new EqualCondition<Integer>(status.getModel("spindleDir"), 1));
-      sb.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent ae) {
-            if (((AbstractButton) ae.getSource()).isSelected()) {
-               cmdWriter.enableSpindle(false, 0, SpindleDirection.SpindleClockwise);
-            } else {
-               cmdWriter.enableSpindle(true, 20000, SpindleDirection.SpindleClockwise);
-            }
-         }
-
-      });
+      sb.setActionCommand("startSpindleCW");
+      sb.addActionListener(MachineControl.getInstance());
       buttonPane.add(sb);
       bg.add(sb);
       sb = new SoftkeyButton("images/SK_Spindle_Stop.png", "images/SK_Spindle_Stop_active.png",
             new AndCondition(new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
                   new EqualCondition<Boolean>(errorActive, false)),
             new EqualCondition<Integer>(status.getModel("spindleDir"), 0));
-      sb.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent ae) {
-            cmdWriter.enableSpindle(false, 0, SpindleDirection.SpindleClockwise);
-         }
-
-      });
+      sb.setActionCommand("stopSpindle");
+      sb.addActionListener(MachineControl.getInstance());
       buttonPane.add(sb);
       bg.add(sb);
       sb = new SoftkeyButton("images/SK_Spindle_CCW.png", "images/SK_Spindle_CCW_active.png",
@@ -492,17 +465,8 @@ public abstract class AbstractMainPane extends JDesktopPane
                   new EqualCondition<Boolean>(status.getModel("allHomed"), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new EqualCondition<Integer>(status.getModel("spindleDir"), -1));
-      sb.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent ae) {
-            if (((AbstractButton) ae.getSource()).isSelected()) {
-               cmdWriter.enableSpindle(false, 0, SpindleDirection.SpindleCounterClockwise);
-            } else {
-               cmdWriter.enableSpindle(true, 20000, SpindleDirection.SpindleCounterClockwise);
-            }
-         }
-
-      });
+      sb.setActionCommand("startSpindleCCW");
+      sb.addActionListener(MachineControl.getInstance());
       buttonPane.add(sb);
       bg.add(sb);
 

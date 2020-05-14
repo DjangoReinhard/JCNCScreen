@@ -1,28 +1,28 @@
 package de.schwarzrot.gui;
-/* 
+/*
  * **************************************************************************
- * 
+ *
  *  file:       SpeedPane.java
  *  project:    GUI for linuxcnc
  *  subproject: graphical application frontend
  *  purpose:    create a smart application, that assists in managing
- *              control of cnc-machines                           
+ *              control of cnc-machines
  *  created:    25.9.2019 by Django Reinhard
  *  copyright:  all rights reserved
- * 
- *  This program is free software: you can redistribute it and/or modify 
- *  it under the terms of the GNU General Public License as published by 
- *  the Free Software Foundation, either version 2 of the License, or 
- *  (at your option) any later version. 
- *   
- *  This program is distributed in the hope that it will be useful, 
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- *  GNU General Public License for more details. 
- *   
- *  You should have received a copy of the GNU General Public License 
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  * **************************************************************************
  */
 
@@ -33,6 +33,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelListener;
 import java.text.NumberFormat;
 
 import javax.swing.JLabel;
@@ -42,6 +44,7 @@ import javax.swing.SwingUtilities;
 import de.schwarzrot.bean.AppSetup;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
+import de.schwarzrot.system.MachineControl;
 import de.schwarzrot.util.BindUtils;
 import de.schwarzrot.widgets.DRO;
 import de.schwarzrot.widgets.ProgressBar;
@@ -64,6 +67,8 @@ public class SpeedPane extends JPanel {
       Color              cf    = UITheme.getColor("DRO:speed.foreground");
       Color              cb    = UITheme.getColor("DRO:speed.background");
       Font               f     = UITheme.getFont("DRO:speed.font");
+      MouseWheelListener mwl   = MachineControl.getInstance();
+      MouseListener      ml    = MachineControl.getInstance();
       DRO                dro;
 
       c.fill       = GridBagConstraints.BOTH;
@@ -79,14 +84,20 @@ public class SpeedPane extends JPanel {
       c.gridheight = 1;
       c.weightx    = 0.4;
       dro          = createDRO(nf, cf, cb, f);
+      dro.setName("nomFeed");
       BindUtils.bind("nominalFeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      dro.addMouseWheelListener(mwl);
+      dro.addMouseListener(ml);
       add(dro, c);
 
       c.gridx      = 2;
       c.gridheight = 1;
       c.weightx    = 0.6;
       dro          = createDRO(nf, cf, cb, f);
+      dro.setName("curFeed");
       BindUtils.bind("curFeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      dro.addMouseWheelListener(mwl);
+      dro.addMouseListener(ml);
       add(dro, c);
 
       c.gridx     = 1;
@@ -101,7 +112,10 @@ public class SpeedPane extends JPanel {
       } catch (Throwable t) {
       }
       ProgressBar pg = new ProgressBar(0, Double.valueOf(lim * 100).intValue());
+
+      pg.setName("feedOverride");
       BindUtils.bind("feedFactor", LCStatus.getStatus().getSpeedInfo(), pg);
+      pg.addMouseWheelListener(mwl);
       add(pg, c);
 
       c.gridx      = 0;
@@ -117,7 +131,10 @@ public class SpeedPane extends JPanel {
       c.gridheight = 1;
       c.gridwidth  = 2;
       dro          = createDRO(nf, cf, cb, f);
+      dro.setName("curRapid");
       BindUtils.bind("maxSpeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      dro.addMouseWheelListener(mwl);
+      dro.addMouseListener(ml);
       add(dro, c);
 
       c.gridx     = 1;
@@ -125,7 +142,9 @@ public class SpeedPane extends JPanel {
       c.gridwidth = 2;
       c.weighty   = 0;
       pg          = new ProgressBar(0, 100);
+      pg.setName("rapidOverride");
       BindUtils.bind("rapidFactor", LCStatus.getStatus().getSpeedInfo(), pg);
+      pg.addMouseWheelListener(MachineControl.getInstance());
       add(pg, c);
 
       c.gridx      = 0;
@@ -144,7 +163,10 @@ public class SpeedPane extends JPanel {
       size         = dro.calcMinSize(23000);
       dro.setMinimumSize(size);
       dro.setPreferredSize(size);
+      dro.setName("nomSpindle");
       BindUtils.bind("spindleNominalSpeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      dro.addMouseWheelListener(mwl);
+      dro.addMouseListener(ml);
       add(dro, c);
 
       c.gridx   = 2;
@@ -152,7 +174,10 @@ public class SpeedPane extends JPanel {
       dro       = createDRO(nf, cf, cb, f);
       dro.setMinimumSize(size);
       dro.setPreferredSize(size);
+      dro.setName("curSpindle");
       BindUtils.bind("spindleCurSpeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      dro.addMouseWheelListener(mwl);
+      dro.addMouseListener(ml);
       add(dro, c);
 
       c.gridx     = 1;
@@ -166,7 +191,10 @@ public class SpeedPane extends JPanel {
       } catch (Throwable t) {
       }
       pg = new ProgressBar(0, Double.valueOf(lim * 100).intValue());
+      pg.setName("spindleOverride");
       BindUtils.bind("spindleFactor", LCStatus.getStatus().getSpeedInfo(), pg);
+      pg.addMouseWheelListener(mwl);
+      pg.addMouseWheelListener(mwl);
       add(pg, c);
    }
 
