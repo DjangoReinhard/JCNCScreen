@@ -47,7 +47,7 @@ public class FixturePane extends JPanel {
       l.setHgap(30);
       l.setVgap(30);
       setLayout(l);
-      setBackground(UITheme.getColor("Fixture:grid.color"));
+      setBackground(UITheme.getColor(UITheme.Fixture_grid_color));
       addComponents(this, cw);
       setPreferredSize(new Dimension(1193, 1074));
    }

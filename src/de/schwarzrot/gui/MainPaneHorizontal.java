@@ -112,7 +112,7 @@ public class MainPaneHorizontal extends AbstractMainPane {
       JPanel buttonPane = new JPanel();
 
       buttonPane.setOpaque(true);
-      buttonPane.setBackground(UITheme.getColor("Toolbar:grid.color"));
+      buttonPane.setBackground(UITheme.getColor(UITheme.Toolbar_grid_color));
       buttonPane.setForeground(Color.RED);
       buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
       createToolbar1(buttonPane);

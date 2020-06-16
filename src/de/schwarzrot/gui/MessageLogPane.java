@@ -75,10 +75,10 @@ public class MessageLogPane extends JPanel {
 
          private static final long serialVersionUID = 1L;
       };
-      table.setFont(UITheme.getFont("MessageLOG:message.font"));
-      table.setGridColor(UITheme.getColor("MessageLOG:grid.color"));
-      table.getTableHeader().setFont(UITheme.getFont("MessageLOG:header.font"));
-      table.setRowHeight(UITheme.getInt("MessageLOG:message.row.height"));
+      table.setFont(UITheme.getFont(UITheme.MessageLOG_message_font));
+      table.setGridColor(UITheme.getColor(UITheme.MessageLOG_grid_color));
+      table.getTableHeader().setFont(UITheme.getFont(UITheme.MessageLOG_header_font));
+      table.setRowHeight(UITheme.getInt(UITheme.MessageLOG_message_row_height));
       table.setFillsViewportHeight(true);
       table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       setupColumnWidth(msgTableModel);

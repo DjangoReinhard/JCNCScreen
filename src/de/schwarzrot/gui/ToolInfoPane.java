@@ -1,28 +1,28 @@
 package de.schwarzrot.gui;
-/* 
+/*
  * **************************************************************************
- * 
+ *
  *  file:       ToolInfoPane.java
  *  project:    GUI for linuxcnc
  *  subproject: graphical application frontend
  *  purpose:    create a smart application, that assists in managing
- *              control of cnc-machines                           
+ *              control of cnc-machines
  *  created:    29.9.2019 by Django Reinhard
  *  copyright:  all rights reserved
- * 
- *  This program is free software: you can redistribute it and/or modify 
- *  it under the terms of the GNU General Public License as published by 
- *  the Free Software Foundation, either version 2 of the License, or 
- *  (at your option) any later version. 
- *   
- *  This program is distributed in the hope that it will be useful, 
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- *  GNU General Public License for more details. 
- *   
- *  You should have received a copy of the GNU General Public License 
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  * **************************************************************************
  */
 
@@ -40,6 +40,8 @@ import javax.swing.JPanel;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.ToolEntry;
 import de.schwarzrot.bean.themes.UITheme;
+import de.schwarzrot.model.CanonPosition;
+import de.schwarzrot.model.ToolInfo;
 import de.schwarzrot.widgets.ToolNumberLabel;
 
 
@@ -55,7 +57,7 @@ public class ToolInfoPane extends JPanel implements PropertyChangeListener {
 
    @Override
    public void propertyChange(PropertyChangeEvent e) {
-      if ("activeToolNum".compareTo(e.getPropertyName()) == 0) {
+      if (ToolInfo.ActiveToolNum.compareTo(e.getPropertyName()) == 0) {
          System.out.println("active tool changed to T" + e.getNewValue());
          for (ToolEntry t : tools) {
             if (t.getToolNumber() == (int) e.getNewValue()) {
@@ -65,9 +67,9 @@ public class ToolInfoPane extends JPanel implements PropertyChangeListener {
                toolDesc.setText(t.getDescription());
             }
          }
-      } else if ("nextToolNum".compareTo(e.getPropertyName()) == 0) {
+      } else if (ToolInfo.NextToolNum.compareTo(e.getPropertyName()) == 0) {
          System.out.println("prepare tool T" + e.getNewValue() + " for next change");
-      } else if ("Z".compareTo(e.getPropertyName()) == 0) {
+      } else if (CanonPosition.Z.compareTo(e.getPropertyName()) == 0) {
          toolLength.setText(String.format("DL: %.3f", e.getNewValue()));
       }
    }

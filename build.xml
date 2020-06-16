@@ -50,7 +50,6 @@
     </target>
 
     <target name = "clean" description = "clean output directories">
-        <mkdir dir = "${build.dir}"/>
         <delete>
             <fileset dir = "${build.dir}">
                 <include name = "**/*"/>

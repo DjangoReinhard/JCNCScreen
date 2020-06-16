@@ -1,28 +1,28 @@
 package de.schwarzrot.gui;
-/* 
+/*
  * **************************************************************************
- * 
+ *
  *  file:       PositionPane.java
  *  project:    GUI for linuxcnc
  *  subproject: graphical application frontend
  *  purpose:    create a smart application, that assists in managing
- *              control of cnc-machines                           
+ *              control of cnc-machines
  *  created:    7.9.2019 by Django Reinhard
  *  copyright:  all rights reserved
- * 
- *  This program is free software: you can redistribute it and/or modify 
- *  it under the terms of the GNU General Public License as published by 
- *  the Free Software Foundation, either version 2 of the License, or 
- *  (at your option) any later version. 
- *   
- *  This program is distributed in the hope that it will be useful, 
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- *  GNU General Public License for more details. 
- *   
- *  You should have received a copy of the GNU General Public License 
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  * **************************************************************************
  */
 
@@ -54,14 +54,14 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
    public PositionPane() {
       setLayout(new GridBagLayout());
       setOpaque(true);
-      setBackground(UITheme.getColor("DRO:grid.color"));
-      absFont       = UITheme.getFont("DRO:abs.font");
-      relFont       = UITheme.getFont("DRO:rel.font");
-      absForeground = UITheme.getColor("DRO:abs.foreground");
-      relForeground = UITheme.getColor("DRO:rel.foreground");
-      absBackground = UITheme.getColor("DRO:abs.background");
-      relBackground = UITheme.getColor("DRO:rel.background");
-      absPosition   = LCStatus.getStatus().getModel("absPosition");
+      setBackground(UITheme.getColor(UITheme.DRO_grid_color));
+      absFont       = UITheme.getFont(UITheme.DRO_abs_font);
+      relFont       = UITheme.getFont(UITheme.DRO_rel_font);
+      absForeground = UITheme.getColor(UITheme.DRO_abs_foreground);
+      relForeground = UITheme.getColor(UITheme.DRO_rel_foreground);
+      absBackground = UITheme.getColor(UITheme.DRO_abs_background);
+      relBackground = UITheme.getColor(UITheme.DRO_rel_background);
+      absPosition   = LCStatus.getStatus().getModel(LCStatus.MN_AbsPosition);
       absPosition.addPropertyChangeListener(this);
       createGUI();
    }
@@ -175,12 +175,12 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
          CanonPosition dtg    = LCStatus.getStatus().getDistanceToGo();
          LCStatus      status = LCStatus.getStatus();
          DRO           dro    = new DRO();
-         Font          f      = UITheme.getFont("DRO:dtg.font");
-         Color         cf     = UITheme.getColor("DRO:dtg.foreground");
-         Color         cb     = UITheme.getColor("DRO:dtg.background");
+         Font          f      = UITheme.getFont(UITheme.DRO_dtg_font);
+         Color         cf     = UITheme.getColor(UITheme.DRO_dtg_foreground);
+         Color         cb     = UITheme.getColor(UITheme.DRO_dtg_background);
          Dimension     size;
 
-         dro.setFont(UITheme.getFont("DRO:abs.font"));
+         dro.setFont(UITheme.getFont(UITheme.DRO_abs_font));
          size = dro.calcMinSize();
 
          if (setup.hasXAxis()) {
@@ -192,8 +192,8 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
             dtgX.setFont(f);
             dtgX.setBackground(cb);
             dtgX.setForeground(cf);
-            BindUtils.bind("X", pos, posX);
-            BindUtils.bind("X", dtg, dtgX);
+            BindUtils.bind(CanonPosition.X, pos, posX);
+            BindUtils.bind(CanonPosition.X, dtg, dtgX);
          }
          if (setup.hasYAxis()) {
             posY   = new DRO();
@@ -204,8 +204,8 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
             dtgY.setFont(f);
             dtgY.setBackground(cb);
             dtgY.setForeground(cf);
-            BindUtils.bind("Y", pos, posY);
-            BindUtils.bind("Y", dtg, dtgY);
+            BindUtils.bind(CanonPosition.Y, pos, posY);
+            BindUtils.bind(CanonPosition.Y, dtg, dtgY);
          }
          if (setup.hasZAxis()) {
             posZ   = new DRO();
@@ -216,8 +216,8 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
             dtgZ.setFont(f);
             dtgZ.setBackground(cb);
             dtgZ.setForeground(cf);
-            BindUtils.bind("Z", pos, posZ);
-            BindUtils.bind("Z", dtg, dtgZ);
+            BindUtils.bind(CanonPosition.Z, pos, posZ);
+            BindUtils.bind(CanonPosition.Z, dtg, dtgZ);
          }
          if (setup.hasAAxis()) {
             posA   = new DRO();
@@ -228,8 +228,8 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
             dtgA.setFont(f);
             dtgA.setBackground(cb);
             dtgA.setForeground(cf);
-            BindUtils.bind("A", pos, posA);
-            BindUtils.bind("A", dtg, dtgA);
+            BindUtils.bind(CanonPosition.A, pos, posA);
+            BindUtils.bind(CanonPosition.A, dtg, dtgA);
          }
          if (setup.hasBAxis()) {
             posB   = new DRO();
@@ -240,8 +240,8 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
             dtgB.setFont(f);
             dtgB.setBackground(cb);
             dtgB.setForeground(cf);
-            BindUtils.bind("B", pos, posB);
-            BindUtils.bind("B", dtg, dtgB);
+            BindUtils.bind(CanonPosition.B, pos, posB);
+            BindUtils.bind(CanonPosition.B, dtg, dtgB);
          }
          if (setup.hasCAxis()) {
             posC   = new DRO();
@@ -252,8 +252,8 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
             dtgC.setFont(f);
             dtgC.setBackground(cb);
             dtgC.setForeground(cf);
-            BindUtils.bind("C", pos, posC);
-            BindUtils.bind("C", dtg, dtgC);
+            BindUtils.bind(CanonPosition.C, pos, posC);
+            BindUtils.bind(CanonPosition.C, dtg, dtgC);
          }
          if (setup.hasUAxis()) {
             posU   = new DRO();
@@ -264,8 +264,8 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
             dtgU.setFont(f);
             dtgU.setBackground(cb);
             dtgU.setForeground(cf);
-            BindUtils.bind("U", pos, posU);
-            BindUtils.bind("U", dtg, dtgU);
+            BindUtils.bind(CanonPosition.U, pos, posU);
+            BindUtils.bind(CanonPosition.U, dtg, dtgU);
          }
          if (setup.hasVAxis()) {
             posV   = new DRO();
@@ -276,8 +276,8 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
             dtgV.setFont(f);
             dtgV.setBackground(cb);
             dtgV.setForeground(cf);
-            BindUtils.bind("V", pos, posV);
-            BindUtils.bind("V", dtg, dtgV);
+            BindUtils.bind(CanonPosition.V, pos, posV);
+            BindUtils.bind(CanonPosition.V, dtg, dtgV);
          }
          if (setup.hasWAxis()) {
             posW   = new DRO();
@@ -288,8 +288,8 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
             dtgW.setFont(f);
             dtgW.setBackground(cb);
             dtgW.setForeground(cf);
-            BindUtils.bind("W", pos, posW);
-            BindUtils.bind("W", dtg, dtgW);
+            BindUtils.bind(CanonPosition.W, pos, posW);
+            BindUtils.bind(CanonPosition.W, dtg, dtgW);
          }
       }
       GridBagConstraints c    = new GridBagConstraints();
@@ -313,7 +313,7 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
 
          c.gridx   = 2;
          c.weightx = 0;
-         add(new AxisLetter("X"), c);
+         add(new AxisLetter(CanonPosition.X), c);
 
          c.gridx   = 3;
          c.weightx = 0.5;
@@ -331,7 +331,7 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
 
          c.gridx   = 2;
          c.weightx = 0;
-         add(new AxisLetter("Y"), c);
+         add(new AxisLetter(CanonPosition.Y), c);
 
          c.gridx   = 3;
          c.weightx = 0.5;
@@ -349,7 +349,7 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
 
          c.gridx   = 2;
          c.weightx = 0;
-         add(new AxisLetter("Z"), c);
+         add(new AxisLetter(CanonPosition.Z), c);
 
          c.gridx   = 3;
          c.weightx = 0.5;
@@ -367,7 +367,7 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
 
          c.gridx   = 2;
          c.weightx = 0;
-         add(new AxisLetter("A"), c);
+         add(new AxisLetter(CanonPosition.A), c);
 
          c.gridx   = 3;
          c.weightx = 0.5;
@@ -385,7 +385,7 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
 
          c.gridx   = 2;
          c.weightx = 0;
-         add(new AxisLetter("B"), c);
+         add(new AxisLetter(CanonPosition.B), c);
 
          c.gridx   = 3;
          c.weightx = 0.5;
@@ -403,7 +403,7 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
 
          c.gridx   = 2;
          c.weightx = 0;
-         add(new AxisLetter("C"), c);
+         add(new AxisLetter(CanonPosition.C), c);
 
          c.gridx   = 3;
          c.weightx = 0.5;
@@ -421,7 +421,7 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
 
          c.gridx   = 2;
          c.weightx = 0;
-         add(new AxisLetter("U"), c);
+         add(new AxisLetter(CanonPosition.U), c);
 
          c.gridx   = 3;
          c.weightx = 0.5;
@@ -439,7 +439,7 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
 
          c.gridx   = 2;
          c.weightx = 0;
-         add(new AxisLetter("V"), c);
+         add(new AxisLetter(CanonPosition.V), c);
 
          c.gridx   = 3;
          c.weightx = 0.5;
@@ -457,7 +457,7 @@ public class PositionPane extends JPanel implements PropertyChangeListener {
 
          c.gridx   = 2;
          c.weightx = 0;
-         add(new AxisLetter("W"), c);
+         add(new AxisLetter(CanonPosition.W), c);
 
          c.gridx   = 3;
          c.weightx = 0.5;

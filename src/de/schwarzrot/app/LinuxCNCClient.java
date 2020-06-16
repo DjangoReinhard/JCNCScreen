@@ -49,15 +49,22 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
+import com.jme3.util.JmeFormatter;
+
+import de.schwarzrot.bean.AppSetup;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
 import de.schwarzrot.database.DBToolLibrary;
@@ -73,11 +80,13 @@ import de.schwarzrot.system.CommandWriter;
 import de.schwarzrot.system.ConfigHolder;
 import de.schwarzrot.system.ErrorReader;
 import de.schwarzrot.system.ISysTickStarter;
+import de.schwarzrot.system.RS274Reader;
 import de.schwarzrot.system.StatusReader;
 import de.schwarzrot.system.SysTick;
 import de.schwarzrot.system.SysUpdater;
 import de.schwarzrot.system.SystemMessage;
 import de.schwarzrot.util.DatabaseUtils;
+import de.schwarzrot.util.Preview3DCreator;
 
 import ca.odell.glazedlists.BasicEventList;
 
@@ -92,6 +101,11 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       @Override
       public void windowClosing(WindowEvent e) {
          configHolder.saveConfigs();
+         try {
+            jme3App.stop();
+         } catch (Throwable t) {
+            t.printStackTrace();
+         }
          super.windowClosing(e);
       }
 
@@ -122,6 +136,11 @@ public class LinuxCNCClient extends JFrame implements Runnable {
 
    public Map<String, JarInfo> getExportHandlers() {
       return exportHandlers;
+   }
+
+
+   public Preview3DCreator getJME3App() {
+      return jme3App;
    }
 
 
@@ -159,17 +178,18 @@ public class LinuxCNCClient extends JFrame implements Runnable {
             e.printStackTrace();
          }
       }
-      try {
-         LCStatus.getStatus().getSetup().parseIniFile(iniFile.getAbsolutePath());
-      } catch (Throwable t) {
-         throw new RuntimeException("no Config! - Is linuxcnc running?", t);
-      }
+      // process inifile from linuxcnc and pass axis limits to preview creator
+      jme3App = new Preview3DCreator(readSetup());
+      // tell RS274 that we do axis mapping for jme
+      // jme will read that property from Reader
+      jme3App.setGeoParser(new RS274Reader(true));
       exportHandlers = findExportHandlers(exportHandlerDir);
       paneStack      = PaneStack.getInstance(cmdWriter, errorReader);
       ConfigHolder ch        = new ConfigHolder(getClass().getSimpleName(), errorLog);
       File         gcodeFile = new File(LCStatus.getStatus().getGCodeInfo().getFileName());
 
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
       addWindowListener(new WindowEventListener(ch));
       ToolTipManager ttm = ToolTipManager.sharedInstance();
 
@@ -205,11 +225,7 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       ISysTickStarter    stStarter = new ISysTickStarter() {
                                       @Override
                                       public void start() {
-                                         double cycleTime = LCStatus.getStatus().getSetup()
-                                               .getDisplaySettings().getCycleTime();
-
-                                         sysTick = new SysTick(new SysUpdater(statusReader),
-                                               (long) (cycleTime * 100));
+                                         sysTick = new SysTick(new SysUpdater(statusReader), 40l);
                                       }
                                    };
 
@@ -260,6 +276,7 @@ public class LinuxCNCClient extends JFrame implements Runnable {
    }
 
 
+   // browse process list for server instance and get inifile of its runtime arguments
    protected File determineIniFile(String[] args) {
       File file = null;
 
@@ -384,7 +401,71 @@ public class LinuxCNCClient extends JFrame implements Runnable {
    }
 
 
+   protected float[] readSetup() {
+      AppSetup setup  = LCStatus.getStatus().getSetup();
+      float[]  limits = new float[6];
+
+      try {
+         setup.parseIniFile(iniFile.getAbsolutePath());
+
+         String tmp = setup.getProperty("AXIS_X", "MIN_LIMIT");
+
+         try {
+            limits[0] = Float.parseFloat(tmp);
+         } catch (Throwable t) {
+            t.printStackTrace();
+         }
+         tmp = setup.getProperty("AXIS_X", "MAX_LIMIT");
+
+         try {
+            limits[1] = Float.parseFloat(tmp);
+         } catch (Throwable t) {
+            t.printStackTrace();
+         }
+         tmp = setup.getProperty("AXIS_Y", "MIN_LIMIT");
+
+         try {
+            limits[2] = Float.parseFloat(tmp);
+         } catch (Throwable t) {
+            t.printStackTrace();
+         }
+         tmp = setup.getProperty("AXIS_Y", "MAX_LIMIT");
+
+         try {
+            limits[3] = Float.parseFloat(tmp);
+         } catch (Throwable t) {
+            t.printStackTrace();
+         }
+         tmp = setup.getProperty("AXIS_Z", "MIN_LIMIT");
+
+         try {
+            limits[4] = Float.parseFloat(tmp);
+         } catch (Throwable t) {
+            t.printStackTrace();
+         }
+         tmp = setup.getProperty("AXIS_Z", "MAX_LIMIT");
+
+         try {
+            limits[5] = Float.parseFloat(tmp);
+         } catch (Throwable t) {
+            t.printStackTrace();
+         }
+      } catch (Throwable t) {
+         throw new RuntimeException("no Config! - Is linuxcnc running?", t);
+      }
+      return limits;
+   }
+
+
    public static void main(String[] args) {
+      JmeFormatter formatter      = new JmeFormatter();
+      Handler      consoleHandler = new ConsoleHandler();
+
+      consoleHandler.setFormatter(formatter);
+
+      Logger.getLogger("").removeHandler(Logger.getLogger("").getHandlers()[0]);
+      Logger.getLogger("").addHandler(consoleHandler);
+
       checkAppArgs(args);
       GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
       device = ge.getDefaultScreenDevice();
@@ -441,7 +522,7 @@ public class LinuxCNCClient extends JFrame implements Runnable {
             themeName = args[i + 1];
          }
       }
-      UITheme.put("Application:mode.portrait", portraitMode);
+      UITheme.put(UITheme.Application_mode_portrait, portraitMode);
    }
 
 
@@ -453,6 +534,7 @@ public class LinuxCNCClient extends JFrame implements Runnable {
    private ValueModel<Boolean>   errorActive;
    private PaneStack             paneStack;
    private JDesktopPane          desktop;
+   private Preview3DCreator      jme3App;
    private List<SystemMessage>   errorLog;
    private Map<String, JarInfo>  exportHandlers;
    private final File            iniFile;

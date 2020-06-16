@@ -196,7 +196,7 @@ public class PieLayout implements LayoutManager2 {
             pb.setTextCenter(pT.x, pT.y);
             pb.setCenter(pC.x, pC.y);
             int  fontSize      = (int) angSize;
-            Font jogButtonFont = UITheme.getFont("JogButton:font");
+            Font jogButtonFont = UITheme.getFont(UITheme.JogButton_font);
 
             pb.setShadowFont(new Font(jogButtonFont.getFamily(), jogButtonFont.getStyle(), fontSize + 1));
             pb.setFont(new Font(jogButtonFont.getFamily(), jogButtonFont.getStyle(), fontSize));

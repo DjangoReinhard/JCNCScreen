@@ -66,12 +66,10 @@ public class BufferDescriptor implements IBufferDescriptor {
       //      [   246] input_timeout
       //      [   912] rotation_xy
       //      [  1160] delay_left
-      //      [   992] active_gcodes
-      //      [  1060] active_mcodes
-      //      [  1104] active_settings
       //      [  1168] queued_mdi_commands
       //      [  1392] linear_units
       //      [  1400] angular_units
+      //      [  1408] cycle_time
       //      [  1416] joints
       //      [  6592] spindle[0]
       //      [  1428] axis_mask
@@ -82,7 +80,28 @@ public class BufferDescriptor implements IBufferDescriptor {
       //      [  1444] active_queue
       //      [  1448] queue_full
       //      [  1452] id
-      //      [  1408] cycle_time
+      //      [  1456] paused
+      //      [  1464] feedrate
+      //      [  1472] rapidrate
+      //      [  1624] velocityT
+      //      [  5496] velocityA
+      //      [  2104] velocityJ
+      //      [  1632] acceleration
+      //      [  1640] max_velocity
+      //      [  1648] max_acceleration
+      //      [  1728] probe_tripped
+      //      [  1729] probing
+      //      [  1732] probe_val
+      //      [  1736] kinematics_type
+      //      [  1740] motion_type
+      //      [  1744] distance_to_go
+      //      [  1824] current_vel
+      //      [  1832] feed_override_enabled
+      //      [  1833] adaptive_feed_enabled
+      //      [  1834] feed_hold_enabled
+      //      [   992] active_gcodes
+      //      [  1060] active_mcodes
+      //      [  1104] active_settings
       //      [  1480] position
       //      [  1552] actual_pos
       //      [  1752] dtg
@@ -107,26 +126,6 @@ public class BufferDescriptor implements IBufferDescriptor {
       //      [  3410] joint_u_homed
       //      [  3626] joint_v_homed
       //      [  3842] joint_w_homed
-      //      [  1456] paused
-      //      [  1464] feedrate
-      //      [  1472] rapidrate
-      //      [  1624] velocityT
-      //      [  5496] velocityA
-      //      [  2104] velocityJ
-      //      [  1632] acceleration
-      //      [  1640] max_velocity
-      //      [  1648] max_acceleration
-      //      [  1728] probe_tripped
-      //      [  1729] probing
-      //      [  1732] probe_val
-      //      [  1736] kinematics_type
-      //      [  1740] motion_type
-      //      [  1744] distance_to_go
-      //      [  1824] current_vel
-      //      [  1832] feed_override_enabled
-      //      [  1833] adaptive_feed_enabled
-      //      [  1834] feed_hold_enabled
-      //      [  6592] spindle[0]
       //      [  6696] spindle[0]speed
       //      [  6704] spindle[0]scale
       //      [  6712] spindle[0]css_max
@@ -159,41 +158,74 @@ public class BufferDescriptor implements IBufferDescriptor {
 
       bufferEntries = new HashMap<String, BufferEntry>();
 
-      bufferEntries.put("absPosX", new BufferEntry("absPosX", 1480, 8, BufferEntryType.Double));
-      bufferEntries.put("relPosX", new BufferEntry("relPosX", 1552, 8, BufferEntryType.Double));
-      bufferEntries.put("g5xOffsX", new BufferEntry("g5xOffsX", 760, 8, BufferEntryType.Double));
-      bufferEntries.put("g92OffsX", new BufferEntry("g92OffsX", 840, 8, BufferEntryType.Double));
-      bufferEntries.put("toolOffsX", new BufferEntry("toolOffsX", 920, 8, BufferEntryType.Double));
-      bufferEntries.put("dtgX", new BufferEntry("dtgX", 1744, 8, BufferEntryType.Double));
-      bufferEntries.put("rotationXY", new BufferEntry("rotationXY", 912, 8, BufferEntryType.Double));
-      bufferEntries.put("file", new BufferEntry("file", 247, 255, BufferEntryType.String));
-      bufferEntries.put("readLine", new BufferEntry("readLine", 240, 4, BufferEntryType.Integer));
-      bufferEntries.put("motionLine", new BufferEntry("motionLine", 232, 4, BufferEntryType.Integer));
-      bufferEntries.put("currentLine", new BufferEntry("currentLine", 236, 4, BufferEntryType.Integer));
-      bufferEntries.put("joint_0_enabled", new BufferEntry("joint_0_enabled", 2116, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_1_enabled", new BufferEntry("joint_1_enabled", 2332, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_2_enabled", new BufferEntry("joint_2_enabled", 2548, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_3_enabled", new BufferEntry("joint_3_enabled", 2764, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_4_enabled", new BufferEntry("joint_4_enabled", 2980, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_5_enabled", new BufferEntry("joint_5_enabled", 3196, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_6_enabled", new BufferEntry("joint_6_enabled", 3412, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_7_enabled", new BufferEntry("joint_7_enabled", 3628, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_8_enabled", new BufferEntry("joint_8_enabled", 3844, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.AbsPosX,
+            new BufferEntry(BufferDescriptor.AbsPosX, 1480, 8, BufferEntryType.Double));
+      bufferEntries.put(BufferDescriptor.RelPosX,
+            new BufferEntry(BufferDescriptor.RelPosX, 1552, 8, BufferEntryType.Double));
+      bufferEntries.put(BufferDescriptor.G5xOffsX,
+            new BufferEntry(BufferDescriptor.G5xOffsX, 760, 8, BufferEntryType.Double));
+      bufferEntries.put(BufferDescriptor.G92OffsX,
+            new BufferEntry(BufferDescriptor.G92OffsX, 840, 8, BufferEntryType.Double));
+      bufferEntries.put(BufferDescriptor.ToolOffsX,
+            new BufferEntry(BufferDescriptor.ToolOffsX, 920, 8, BufferEntryType.Double));
+      bufferEntries.put(BufferDescriptor.DtgX,
+            new BufferEntry(BufferDescriptor.DtgX, 1752, 8, BufferEntryType.Double));
+      bufferEntries.put(BufferDescriptor.RotationXY,
+            new BufferEntry(BufferDescriptor.RotationXY, 912, 8, BufferEntryType.Double));
+      bufferEntries.put(BufferDescriptor.File,
+            new BufferEntry(BufferDescriptor.File, 247, 255, BufferEntryType.String));
+      bufferEntries.put(BufferDescriptor.ReadLine,
+            new BufferEntry(BufferDescriptor.ReadLine, 240, 4, BufferEntryType.Integer));
+      bufferEntries.put(BufferDescriptor.MotionLine,
+            new BufferEntry(BufferDescriptor.MotionLine, 232, 4, BufferEntryType.Integer));
+      bufferEntries.put(BufferDescriptor.CurrentLine,
+            new BufferEntry(BufferDescriptor.CurrentLine, 236, 4, BufferEntryType.Integer));
+      bufferEntries.put(BufferDescriptor.Joint_0_enabled,
+            new BufferEntry(BufferDescriptor.Joint_0_enabled, 2116, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_1_enabled,
+            new BufferEntry(BufferDescriptor.Joint_1_enabled, 2332, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_2_enabled,
+            new BufferEntry(BufferDescriptor.Joint_2_enabled, 2548, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_3_enabled,
+            new BufferEntry(BufferDescriptor.Joint_3_enabled, 2764, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_4_enabled,
+            new BufferEntry(BufferDescriptor.Joint_4_enabled, 2980, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_5_enabled,
+            new BufferEntry(BufferDescriptor.Joint_5_enabled, 3196, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_6_enabled,
+            new BufferEntry(BufferDescriptor.Joint_6_enabled, 3412, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_7_enabled,
+            new BufferEntry(BufferDescriptor.Joint_7_enabled, 3628, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_8_enabled,
+            new BufferEntry(BufferDescriptor.Joint_8_enabled, 3844, 1, BufferEntryType.Byte));
 
-      bufferEntries.put("joint_0_homed", new BufferEntry("joint_0_homed", 2114, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_1_homed", new BufferEntry("joint_1_homed", 2330, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_2_homed", new BufferEntry("joint_2_homed", 2546, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_3_homed", new BufferEntry("joint_3_homed", 2762, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_4_homed", new BufferEntry("joint_4_homed", 2978, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_5_homed", new BufferEntry("joint_5_homed", 3194, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_6_homed", new BufferEntry("joint_6_homed", 3410, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_7_homed", new BufferEntry("joint_7_homed", 3626, 1, BufferEntryType.Byte));
-      bufferEntries.put("joint_8_homed", new BufferEntry("joint_8_homed", 3842, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_0_homed,
+            new BufferEntry(BufferDescriptor.Joint_0_homed, 2114, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_1_homed,
+            new BufferEntry(BufferDescriptor.Joint_1_homed, 2330, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_2_homed,
+            new BufferEntry(BufferDescriptor.Joint_2_homed, 2546, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_3_homed,
+            new BufferEntry(BufferDescriptor.Joint_3_homed, 2762, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_4_homed,
+            new BufferEntry(BufferDescriptor.Joint_4_homed, 2978, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_5_homed,
+            new BufferEntry(BufferDescriptor.Joint_5_homed, 3194, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_6_homed,
+            new BufferEntry(BufferDescriptor.Joint_6_homed, 3410, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_7_homed,
+            new BufferEntry(BufferDescriptor.Joint_7_homed, 3626, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joint_8_homed,
+            new BufferEntry(BufferDescriptor.Joint_8_homed, 3842, 1, BufferEntryType.Byte));
 
-      bufferEntries.put("activeGCodes", new BufferEntry("activeGCodes", 992, 1, BufferEntryType.Byte));
-      bufferEntries.put("activeMCodes", new BufferEntry("activeMCodes", 1060, 1, BufferEntryType.Byte));
-      bufferEntries.put("axisMask", new BufferEntry("axisMask", 1428, 1, BufferEntryType.Byte));
-      bufferEntries.put("joints", new BufferEntry("joints", 1416, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.ActiveGCodes,
+            new BufferEntry(BufferDescriptor.ActiveGCodes, 992, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.ActiveMCodes,
+            new BufferEntry(BufferDescriptor.ActiveMCodes, 1060, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.AxisMask,
+            new BufferEntry(BufferDescriptor.AxisMask, 1428, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Joints,
+            new BufferEntry(BufferDescriptor.Joints, 1416, 1, BufferEntryType.Byte));
 
       //      [  6696] spindle[0]speed
       //      [  6704] spindle[0]scale
@@ -207,51 +239,79 @@ public class BufferDescriptor implements IBufferDescriptor {
       //      [  6748] spindle[0]orient_fault
       //      [  6752] spindle[0]override_enable
       //      [  6753] spindle[0]homed
-      bufferEntries.put("spindles", new BufferEntry("spindles", 6592, 1, BufferEntryType.Byte));
-      bufferEntries.put("spindleSpeed", new BufferEntry("spindleSpeed", 6696, 1, BufferEntryType.Byte));
-      bufferEntries.put("spindleScale", new BufferEntry("spindleScale", 6704, 1, BufferEntryType.Byte));
-      bufferEntries.put("spindleDir", new BufferEntry("spindleDir", 6728, 1, BufferEntryType.Byte));
-      bufferEntries.put("spindleIncreasing",
-            new BufferEntry("spindleIncreasing", 6736, 1, BufferEntryType.Byte));
-      bufferEntries.put("spindleOverrideEnable",
-            new BufferEntry("spindleOverrideEnable", 6752, 1, BufferEntryType.Byte));
-      bufferEntries.put("spindleEnabled", new BufferEntry("spindleEnable", 6740, 1, BufferEntryType.Byte));
-      bufferEntries.put("spindleHomed", new BufferEntry("spindleHomed", 6753, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Spindles,
+            new BufferEntry(BufferDescriptor.Spindles, 6592, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.SpindleSpeed,
+            new BufferEntry(BufferDescriptor.SpindleSpeed, 6696, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.SpindleScale,
+            new BufferEntry(BufferDescriptor.SpindleScale, 6704, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.SpindleDir,
+            new BufferEntry(BufferDescriptor.SpindleDir, 6728, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.SpindleIncreasing,
+            new BufferEntry(BufferDescriptor.SpindleIncreasing, 6736, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.SpindleOverrideEnable,
+            new BufferEntry(BufferDescriptor.SpindleOverrideEnable, 6752, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.SpindleEnabled,
+            new BufferEntry(BufferDescriptor.SpindleEnabled, 6740, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.SpindleHomed,
+            new BufferEntry(BufferDescriptor.SpindleHomed, 6753, 1, BufferEntryType.Byte));
 
-      bufferEntries.put("feedrate", new BufferEntry("feedrate", 1464, 1, BufferEntryType.Byte));
-      bufferEntries.put("rapidrate", new BufferEntry("rapidrate", 1472, 1, BufferEntryType.Byte));
-      bufferEntries.put("velocity", new BufferEntry("velocity", 1624, 1, BufferEntryType.Byte));
-      bufferEntries.put("velocityA", new BufferEntry("velocityA", 5496, 1, BufferEntryType.Byte));
-      bufferEntries.put("velocityJ", new BufferEntry("velocityJ", 2104, 1, BufferEntryType.Byte));
-      bufferEntries.put("acceleration", new BufferEntry("acceleration", 1632, 1, BufferEntryType.Byte));
-      bufferEntries.put("max_velocity", new BufferEntry("max_velocity", 1640, 1, BufferEntryType.Byte));
-      bufferEntries.put("max_acceleration",
-            new BufferEntry("max_acceleration", 1648, 1, BufferEntryType.Byte));
-      bufferEntries.put("toolTable", new BufferEntry("toolTable", 9816, 1, BufferEntryType.Byte));
-      bufferEntries.put("toolInSpindle", new BufferEntry("toolInSpindle", 9812, 1, BufferEntryType.Byte));
-      bufferEntries.put("pocketPrepared", new BufferEntry("pocketPrepared", 9808, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Feedrate,
+            new BufferEntry(BufferDescriptor.Feedrate, 1464, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Rapidrate,
+            new BufferEntry(BufferDescriptor.Rapidrate, 1472, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Velocity,
+            new BufferEntry(BufferDescriptor.Velocity, 1624, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.VelocityA,
+            new BufferEntry(BufferDescriptor.VelocityA, 5496, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.VelocityJ,
+            new BufferEntry(BufferDescriptor.VelocityJ, 2104, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Acceleration,
+            new BufferEntry(BufferDescriptor.Acceleration, 1632, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Max_velocity,
+            new BufferEntry(BufferDescriptor.Max_velocity, 1640, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Max_acceleration,
+            new BufferEntry(BufferDescriptor.Max_acceleration, 1648, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.ToolTable,
+            new BufferEntry(BufferDescriptor.ToolTable, 9816, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.ToolInSpindle,
+            new BufferEntry(BufferDescriptor.ToolInSpindle, 9812, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.PocketPrepared,
+            new BufferEntry(BufferDescriptor.PocketPrepared, 9808, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.TaskMode,
+            new BufferEntry(BufferDescriptor.TaskMode, 212, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.TaskState,
+            new BufferEntry(BufferDescriptor.TaskState, 216, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.ExecState,
+            new BufferEntry(BufferDescriptor.ExecState, 220, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.InterpState,
+            new BufferEntry(BufferDescriptor.InterpState, 224, 1, BufferEntryType.Byte));
 
-      bufferEntries.put("taskMode", new BufferEntry("taskMode", 212, 1, BufferEntryType.Byte));
-      bufferEntries.put("taskState", new BufferEntry("taskState", 216, 1, BufferEntryType.Byte));
-      bufferEntries.put("execState", new BufferEntry("execState", 220, 1, BufferEntryType.Byte));
-      bufferEntries.put("interpState", new BufferEntry("interpState", 224, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.ProgramUnits,
+            new BufferEntry(BufferDescriptor.ProgramUnits, 1144, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Distance2Go,
+            new BufferEntry(BufferDescriptor.Distance2Go, 1752, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.ActiveSettings,
+            new BufferEntry(BufferDescriptor.ActiveSettings, 1104, 3, BufferEntryType.Double));
 
-      bufferEntries.put("programUnits", new BufferEntry("programUnits", 1144, 1, BufferEntryType.Byte));
-      bufferEntries.put("distance2Go", new BufferEntry("distance2Go", 1752, 1, BufferEntryType.Byte));
-      bufferEntries.put("activeSettings", new BufferEntry("activeSettings", 1104, 3, BufferEntryType.Double));
+      bufferEntries.put(BufferDescriptor.Current_vel,
+            new BufferEntry(BufferDescriptor.Current_vel, 1824, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Feed_override_enabled,
+            new BufferEntry(BufferDescriptor.Feed_override_enabled, 1832, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Adaptive_feed_enabled,
+            new BufferEntry(BufferDescriptor.Adaptive_feed_enabled, 1833, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.Feed_hold_enabled,
+            new BufferEntry(BufferDescriptor.Feed_hold_enabled, 1834, 1, BufferEntryType.Byte));
 
-      bufferEntries.put("current_vel", new BufferEntry("current_vel", 1824, 1, BufferEntryType.Byte));
-      bufferEntries.put("feed_override_enabled",
-            new BufferEntry("feed_override_enabled", 1832, 1, BufferEntryType.Byte));
-      bufferEntries.put("adaptive_feed_enabled",
-            new BufferEntry("adaptive_feed_enabled", 1833, 1, BufferEntryType.Byte));
-      bufferEntries.put("feed_hold_enabled",
-            new BufferEntry("feed_hold_enabled", 1834, 1, BufferEntryType.Byte));
-
-      bufferEntries.put("coolMist", new BufferEntry("coolMist", 122032, 1, BufferEntryType.Integer));
-      bufferEntries.put("coolFlood", new BufferEntry("coolFlood", 122036, 1, BufferEntryType.Integer));
-      bufferEntries.put("lube", new BufferEntry("lube", 122256, 1, BufferEntryType.Integer));
-      bufferEntries.put("estop", new BufferEntry("estop", 122144, 1, BufferEntryType.Integer));
-      bufferEntries.put("debug", new BufferEntry("debug", 122264, 1, BufferEntryType.Integer));
+      bufferEntries.put(BufferDescriptor.CoolMist,
+            new BufferEntry(BufferDescriptor.CoolMist, 122032, 1, BufferEntryType.Integer));
+      bufferEntries.put(BufferDescriptor.CoolFlood,
+            new BufferEntry(BufferDescriptor.CoolFlood, 122036, 1, BufferEntryType.Integer));
+      bufferEntries.put(BufferDescriptor.Lube,
+            new BufferEntry(BufferDescriptor.Lube, 122256, 1, BufferEntryType.Integer));
+      bufferEntries.put(BufferDescriptor.Estop,
+            new BufferEntry(BufferDescriptor.Estop, 122144, 1, BufferEntryType.Integer));
+      bufferEntries.put(BufferDescriptor.Debug,
+            new BufferEntry(BufferDescriptor.Debug, 122264, 1, BufferEntryType.Integer));
    }
 }

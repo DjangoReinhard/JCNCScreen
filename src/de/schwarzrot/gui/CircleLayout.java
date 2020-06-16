@@ -263,7 +263,7 @@ public class CircleLayout implements LayoutManager2 {
             c.setTextCenter(pT.x, pT.y);
             c.setCenter(pC.x, pC.y);
             int  fontSize      = (int) ((rOuter - rInner) * 0.45);
-            Font jogButtonFont = UITheme.getFont("JogButton:font");
+            Font jogButtonFont = UITheme.getFont(UITheme.JogButton_font);
 
             c.setShadowFont(new Font(jogButtonFont.getFamily(), jogButtonFont.getStyle(), fontSize + 1));
             c.setFont(new Font(jogButtonFont.getFamily(), jogButtonFont.getStyle(), fontSize));

@@ -54,14 +54,14 @@ public class PowerButton extends JButton implements PropertyChangeListener {
       this.imgOff  = loadIcon(iconOff);
       this.imgOff1 = loadIcon(iconOff1);
       this.imgON   = loadIcon(iconON);
-      LCStatus.getStatus().getModel("taskState").addPropertyChangeListener(this);
-      changeIcon((TaskState) LCStatus.getStatus().getModel("taskState").getValue());
+      LCStatus.getStatus().getModel(LCStatus.MN_TaskState).addPropertyChangeListener(this);
+      changeIcon((TaskState) LCStatus.getStatus().getModel(LCStatus.MN_TaskState).getValue());
    }
 
 
    @Override
    public void propertyChange(PropertyChangeEvent e) {
-      if (e.getPropertyName().compareTo(IDTaskState) == 0) {
+      if (e.getPropertyName().compareTo(LCStatus.MN_TaskState) == 0) {
          changeIcon((TaskState) e.getNewValue());
       }
    }
@@ -97,9 +97,8 @@ public class PowerButton extends JButton implements PropertyChangeListener {
    }
 
 
-   private ImageIcon           imgOff;
-   private ImageIcon           imgOff1;
-   private ImageIcon           imgON;
-   private static final long   serialVersionUID = 1L;
-   private static final String IDTaskState      = "taskState";
+   private ImageIcon         imgOff;
+   private ImageIcon         imgOff1;
+   private ImageIcon         imgON;
+   private static final long serialVersionUID = 1L;
 }

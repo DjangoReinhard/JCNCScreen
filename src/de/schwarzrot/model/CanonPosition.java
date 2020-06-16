@@ -1,28 +1,28 @@
 package de.schwarzrot.model;
-/* 
+/*
  * **************************************************************************
- * 
+ *
  *  file:       CanonPosition.java
  *  project:    GUI for linuxcnc
  *  subproject: graphical application frontend
  *  purpose:    create a smart application, that assists in managing
- *              control of cnc-machines                           
+ *              control of cnc-machines
  *  created:    1.9.2019 by Django Reinhard
  *  copyright:  all rights reserved
- * 
- *  This program is free software: you can redistribute it and/or modify 
- *  it under the terms of the GNU General Public License as published by 
- *  the Free Software Foundation, either version 2 of the License, or 
- *  (at your option) any later version. 
- *   
- *  This program is distributed in the hope that it will be useful, 
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- *  GNU General Public License for more details. 
- *   
- *  You should have received a copy of the GNU General Public License 
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  * **************************************************************************
  */
 
@@ -99,7 +99,7 @@ public class CanonPosition extends AbstractModel {
       double ov = this.a;
       this.a = a;
       if (ov != a)
-         firePropertyChange(new PropertyChangeEvent(this, "A", ov, a));
+         firePropertyChange(new PropertyChangeEvent(this, A, ov, a));
    }
 
 
@@ -107,7 +107,7 @@ public class CanonPosition extends AbstractModel {
       double ov = this.b;
       this.b = b;
       if (ov != b)
-         firePropertyChange(new PropertyChangeEvent(this, "B", ov, b));
+         firePropertyChange(new PropertyChangeEvent(this, B, ov, b));
    }
 
 
@@ -115,7 +115,7 @@ public class CanonPosition extends AbstractModel {
       double ov = this.c;
       this.c = c;
       if (ov != c)
-         firePropertyChange(new PropertyChangeEvent(this, "C", ov, c));
+         firePropertyChange(new PropertyChangeEvent(this, C, ov, c));
    }
 
 
@@ -124,7 +124,7 @@ public class CanonPosition extends AbstractModel {
 
       this.rotation = rotation;
       if (ov != rotation)
-         firePropertyChange(new PropertyChangeEvent(this, "R", ov, rotation));
+         firePropertyChange(new PropertyChangeEvent(this, R, ov, rotation));
    }
 
 
@@ -132,7 +132,7 @@ public class CanonPosition extends AbstractModel {
       double ov = this.u;
       this.u = u;
       if (ov != u)
-         firePropertyChange(new PropertyChangeEvent(this, "U", ov, u));
+         firePropertyChange(new PropertyChangeEvent(this, U, ov, u));
    }
 
 
@@ -140,7 +140,7 @@ public class CanonPosition extends AbstractModel {
       double ov = this.v;
       this.v = v;
       if (ov != v)
-         firePropertyChange(new PropertyChangeEvent(this, "V", ov, v));
+         firePropertyChange(new PropertyChangeEvent(this, V, ov, v));
    }
 
 
@@ -148,7 +148,7 @@ public class CanonPosition extends AbstractModel {
       double ov = this.w;
       this.w = w;
       if (ov != v)
-         firePropertyChange(new PropertyChangeEvent(this, "W", ov, w));
+         firePropertyChange(new PropertyChangeEvent(this, W, ov, w));
    }
 
 
@@ -156,7 +156,7 @@ public class CanonPosition extends AbstractModel {
       double ov = this.x;
       this.x = x;
       if (ov != x)
-         firePropertyChange(new PropertyChangeEvent(this, "X", ov, x));
+         firePropertyChange(new PropertyChangeEvent(this, X, ov, x));
    }
 
 
@@ -164,7 +164,7 @@ public class CanonPosition extends AbstractModel {
       double ov = this.y;
       this.y = y;
       if (ov != y)
-         firePropertyChange(new PropertyChangeEvent(this, "Y", ov, y));
+         firePropertyChange(new PropertyChangeEvent(this, Y, ov, y));
    }
 
 
@@ -172,7 +172,7 @@ public class CanonPosition extends AbstractModel {
       double ov = this.z;
       this.z = z;
       if (ov != z)
-         firePropertyChange(new PropertyChangeEvent(this, "Z", ov, z));
+         firePropertyChange(new PropertyChangeEvent(this, Z, ov, z));
    }
 
 
@@ -204,14 +204,24 @@ public class CanonPosition extends AbstractModel {
    }
 
 
-   private double x;
-   private double y;
-   private double z;
-   private double a;
-   private double b;
-   private double c;
-   private double u;
-   private double v;
-   private double w;
-   private double rotation;
+   private double             x;
+   private double             y;
+   private double             z;
+   private double             a;
+   private double             b;
+   private double             c;
+   private double             u;
+   private double             v;
+   private double             w;
+   private double             rotation;
+   public static final String A = "A";
+   public static final String B = "B";
+   public static final String C = "C";
+   public static final String R = "R";
+   public static final String U = "U";
+   public static final String V = "V";
+   public static final String W = "W";
+   public static final String X = "X";
+   public static final String Y = "Y";
+   public static final String Z = "Z";
 }

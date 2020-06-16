@@ -44,6 +44,7 @@ import javax.swing.SwingUtilities;
 import de.schwarzrot.bean.AppSetup;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
+import de.schwarzrot.model.SpeedInfo;
 import de.schwarzrot.system.MachineControl;
 import de.schwarzrot.util.BindUtils;
 import de.schwarzrot.widgets.DRO;
@@ -54,7 +55,7 @@ public class SpeedPane extends JPanel {
    public SpeedPane() {
       setLayout(new GridBagLayout());
       setOpaque(true);
-      setBackground(UITheme.getColor("Speed:grid.color"));
+      setBackground(UITheme.getColor(UITheme.Speed_grid_color));
       addComponents2Pane();
    }
 
@@ -63,10 +64,10 @@ public class SpeedPane extends JPanel {
    protected void addComponents2Pane() {
       GridBagConstraints c     = new GridBagConstraints();
       AppSetup           setup = LCStatus.getStatus().getSetup();
-      NumberFormat       nf    = UITheme.getFormat("DRO:speed.format");
-      Color              cf    = UITheme.getColor("DRO:speed.foreground");
-      Color              cb    = UITheme.getColor("DRO:speed.background");
-      Font               f     = UITheme.getFont("DRO:speed.font");
+      NumberFormat       nf    = UITheme.getFormat(UITheme.DRO_speed_format);
+      Color              cf    = UITheme.getColor(UITheme.DRO_speed_foreground);
+      Color              cb    = UITheme.getColor(UITheme.DRO_speed_background);
+      Font               f     = UITheme.getFont(UITheme.DRO_speed_font);
       MouseWheelListener mwl   = MachineControl.getInstance();
       MouseListener      ml    = MachineControl.getInstance();
       DRO                dro;
@@ -84,8 +85,8 @@ public class SpeedPane extends JPanel {
       c.gridheight = 1;
       c.weightx    = 0.4;
       dro          = createDRO(nf, cf, cb, f);
-      dro.setName("nomFeed");
-      BindUtils.bind("nominalFeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      dro.setName(SpeedInfo.NominalFeed);
+      BindUtils.bind(SpeedInfo.NominalFeed, LCStatus.getStatus().getSpeedInfo(), dro);
       dro.addMouseWheelListener(mwl);
       dro.addMouseListener(ml);
       add(dro, c);
@@ -94,8 +95,8 @@ public class SpeedPane extends JPanel {
       c.gridheight = 1;
       c.weightx    = 0.6;
       dro          = createDRO(nf, cf, cb, f);
-      dro.setName("curFeed");
-      BindUtils.bind("curFeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      dro.setName(SpeedInfo.CurFeed);
+      BindUtils.bind(SpeedInfo.CurFeed, LCStatus.getStatus().getSpeedInfo(), dro);
       dro.addMouseWheelListener(mwl);
       dro.addMouseListener(ml);
       add(dro, c);
@@ -114,7 +115,7 @@ public class SpeedPane extends JPanel {
       ProgressBar pg = new ProgressBar(0, Double.valueOf(lim * 100).intValue());
 
       pg.setName("feedOverride");
-      BindUtils.bind("feedFactor", LCStatus.getStatus().getSpeedInfo(), pg);
+      BindUtils.bind(SpeedInfo.FeedFactor, LCStatus.getStatus().getSpeedInfo(), pg);
       pg.addMouseWheelListener(mwl);
       add(pg, c);
 
@@ -132,7 +133,7 @@ public class SpeedPane extends JPanel {
       c.gridwidth  = 2;
       dro          = createDRO(nf, cf, cb, f);
       dro.setName("curRapid");
-      BindUtils.bind("maxSpeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      BindUtils.bind(SpeedInfo.MaxSpeed, LCStatus.getStatus().getSpeedInfo(), dro);
       dro.addMouseWheelListener(mwl);
       dro.addMouseListener(ml);
       add(dro, c);
@@ -143,7 +144,7 @@ public class SpeedPane extends JPanel {
       c.weighty   = 0;
       pg          = new ProgressBar(0, 100);
       pg.setName("rapidOverride");
-      BindUtils.bind("rapidFactor", LCStatus.getStatus().getSpeedInfo(), pg);
+      BindUtils.bind(SpeedInfo.RapidFactor, LCStatus.getStatus().getSpeedInfo(), pg);
       pg.addMouseWheelListener(MachineControl.getInstance());
       pg.addMouseListener(ml);
       add(pg, c);
@@ -165,7 +166,7 @@ public class SpeedPane extends JPanel {
       dro.setMinimumSize(size);
       dro.setPreferredSize(size);
       dro.setName("nomSpindle");
-      BindUtils.bind("spindleNominalSpeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      BindUtils.bind(SpeedInfo.SpindleNominalSpeed, LCStatus.getStatus().getSpeedInfo(), dro);
       dro.addMouseWheelListener(mwl);
       dro.addMouseListener(ml);
       add(dro, c);
@@ -176,7 +177,7 @@ public class SpeedPane extends JPanel {
       dro.setMinimumSize(size);
       dro.setPreferredSize(size);
       dro.setName("curSpindle");
-      BindUtils.bind("spindleCurSpeed", LCStatus.getStatus().getSpeedInfo(), dro);
+      BindUtils.bind(SpeedInfo.SpindleCurSpeed, LCStatus.getStatus().getSpeedInfo(), dro);
       dro.addMouseWheelListener(mwl);
       dro.addMouseListener(ml);
       add(dro, c);
@@ -193,7 +194,7 @@ public class SpeedPane extends JPanel {
       }
       pg = new ProgressBar(0, Double.valueOf(lim * 100).intValue());
       pg.setName("spindleOverride");
-      BindUtils.bind("spindleFactor", LCStatus.getStatus().getSpeedInfo(), pg);
+      BindUtils.bind(SpeedInfo.SpindleFactor, LCStatus.getStatus().getSpeedInfo(), pg);
       pg.addMouseWheelListener(mwl);
       pg.addMouseListener(ml);
       add(pg, c);
@@ -216,15 +217,15 @@ public class SpeedPane extends JPanel {
       JLabel label = new JLabel(labelText);
 
       label.setOpaque(true);
-      label.setFont(UITheme.getFont("DRO:speed.header.font"));
+      label.setFont(UITheme.getFont(UITheme.DRO_speed_header_font));
       FontMetrics fm = this.getFontMetrics(label.getFont());
       Dimension   s  = new Dimension(SwingUtilities.computeStringWidth(fm, "T99"), fm.getHeight());
 
       label.setMinimumSize(s);
       label.setPreferredSize(s);
       if (isHeader) {
-         label.setForeground(UITheme.getColor("DRO:speed.header.foreground"));
-         label.setBackground(UITheme.getColor("DRO:speed.header.background"));
+         label.setForeground(UITheme.getColor(UITheme.DRO_speed_header_foreground));
+         label.setBackground(UITheme.getColor(UITheme.DRO_speed_header_background));
       } else
          label.setHorizontalAlignment(JLabel.RIGHT);
 
