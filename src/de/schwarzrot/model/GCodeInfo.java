@@ -53,35 +53,35 @@ public class GCodeInfo extends AbstractModel {
 
    public void setBackendLine(int line) {
       int ov = this.beLine;
-      firePropertyChange(new PropertyChangeEvent(this, "backendLine", ov, line));
+      firePropertyChange(new PropertyChangeEvent(this, BackEndLine, ov, line));
       this.beLine = line;
    }
 
 
    public void setEditFile(String fileName) {
       String ov = this.editFile;
-      firePropertyChange(new PropertyChangeEvent(this, "editFile", ov, fileName));
+      firePropertyChange(new PropertyChangeEvent(this, EditFile, ov, fileName));
       this.editFile = fileName;
    }
 
 
    public void setFileName(String fileName) {
       String ov = this.fileName;
-      firePropertyChange(new PropertyChangeEvent(this, "fileName", ov, fileName));
+      firePropertyChange(new PropertyChangeEvent(this, FileName, ov, fileName));
       this.fileName = fileName;
    }
 
 
    public void setFrontendLine(int line) {
       int ov = this.feLine;
-      firePropertyChange(new PropertyChangeEvent(this, "frontendLine", ov, line));
+      firePropertyChange(new PropertyChangeEvent(this, FrontEndLine, ov, line));
       this.feLine = line;
    }
 
 
    public void setProcessTime(double processTime) {
       double ov = this.processTime;
-      firePropertyChange(new PropertyChangeEvent(this, "processTime", ov, processTime));
+      firePropertyChange(new PropertyChangeEvent(this, ProcessTime, ov, processTime));
       this.processTime = processTime;
    }
 
@@ -99,9 +99,14 @@ public class GCodeInfo extends AbstractModel {
    }
 
 
-   private String fileName;
-   private String editFile;
-   private int    feLine;
-   private int    beLine;
-   private double processTime;
+   private String             fileName;
+   private String             editFile;
+   private int                feLine;
+   private int                beLine;
+   private double             processTime;
+   public static final String EditFile     = "editFile";
+   public static final String FileName     = "fileName";
+   public static final String BackEndLine  = "backendLine";
+   public static final String FrontEndLine = "frontendLine";
+   public static final String ProcessTime  = "processTime";
 }

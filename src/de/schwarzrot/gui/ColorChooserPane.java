@@ -50,7 +50,7 @@ public class ColorChooserPane extends JPanel implements ActionListener, ChangeLi
    public ColorChooserPane() {
       super(new BorderLayout());
       setOpaque(true);
-      setBackground(UITheme.getColor("Main:grid.color"));
+      setBackground(UITheme.getColor(UITheme.Main_grid_color));
       addComponents();
    }
 
@@ -133,8 +133,8 @@ public class ColorChooserPane extends JPanel implements ActionListener, ChangeLi
 
       cbBackground.setBorder(new EmptyBorder(0, 12, 15, 10));
       cbBackground.addActionListener(this);
-      cbBackground.setBackground(UITheme.getColor("Main.grid.color"));
-      cbBackground.setForeground(UITheme.getColor("AppSettings:foreground"));
+      cbBackground.setBackground(UITheme.getColor(UITheme.Main_grid_color));
+      cbBackground.setForeground(UITheme.getColor(UITheme.AppSettings_foreground));
       add(banner, BorderLayout.NORTH);
       add(cc, BorderLayout.CENTER);
       add(cbBackground, BorderLayout.SOUTH);

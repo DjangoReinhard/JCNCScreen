@@ -166,8 +166,8 @@ public class FontChooserPane extends JPanel implements ActionListener, ListSelec
       cbMono = new JCheckBox("nur Schriftarten mit gleicher Buchstabenbreite");
       cbMono.setBorder(new EmptyBorder(15, 20, 0, 20));
       cbMono.addActionListener(this);
-      cbMono.setBackground(UITheme.getColor("Main:grid.color"));
-      cbMono.setForeground(UITheme.getColor("AppSettings:foreground"));
+      cbMono.setBackground(UITheme.getColor(UITheme.Main_grid_color));
+      cbMono.setForeground(UITheme.getColor(UITheme.AppSettings_foreground));
       add(cbMono, BorderLayout.NORTH);
       lcFontFamilies = new JList<String>(mAllFonts);
 
@@ -175,12 +175,12 @@ public class FontChooserPane extends JPanel implements ActionListener, ListSelec
       lcFontFamilies.setSelectedIndex(0);
       lcFontFamilies.addListSelectionListener(this);
       lcFontFamilies.setVisibleRowCount(15);
-      lcFontFamilies.setBackground(UITheme.getColor("Main:grid.color"));
-      lcFontFamilies.setForeground(UITheme.getColor("AppSettings:foreground"));
+      lcFontFamilies.setBackground(UITheme.getColor(UITheme.Main_grid_color));
+      lcFontFamilies.setForeground(UITheme.getColor(UITheme.AppSettings_foreground));
       JScrollPane lsp0 = new JScrollPane(lcFontFamilies);
 
       lsp0.setBorder(new EmptyBorder(15, 20, 20, 10));
-      lsp0.setBackground(UITheme.getColor("Main:grid.color"));
+      lsp0.setBackground(UITheme.getColor(UITheme.Main_grid_color));
       p.add(lsp0, BorderLayout.WEST);
 
       DefaultListModel<String> lmFS = new DefaultListModel<String>();
@@ -196,12 +196,12 @@ public class FontChooserPane extends JPanel implements ActionListener, ListSelec
       lcFontStyles.setSelectedIndex(0);
       lcFontStyles.addListSelectionListener(this);
       lcFontStyles.setVisibleRowCount(5);
-      lcFontStyles.setBackground(UITheme.getColor("Main:grid.color"));
-      lcFontStyles.setForeground(UITheme.getColor("AppSettings:foreground"));
+      lcFontStyles.setBackground(UITheme.getColor(UITheme.Main_grid_color));
+      lcFontStyles.setForeground(UITheme.getColor(UITheme.AppSettings_foreground));
       JScrollPane lsp1 = new JScrollPane(lcFontStyles);
 
       lsp1.setBorder(new EmptyBorder(15, 10, 20, 10));
-      lsp1.setBackground(UITheme.getColor("Main:grid.color"));
+      lsp1.setBackground(UITheme.getColor(UITheme.Main_grid_color));
       p.add(lsp1, BorderLayout.CENTER);
 
       DefaultListModel<Integer> lmS  = new DefaultListModel<Integer>();
@@ -221,12 +221,12 @@ public class FontChooserPane extends JPanel implements ActionListener, ListSelec
       lcFontSizes.setSelectedIndex(0);
       lcFontSizes.addListSelectionListener(this);
       lcFontSizes.setVisibleRowCount(5);
-      lcFontSizes.setBackground(UITheme.getColor("Main:grid.color"));
-      lcFontSizes.setForeground(UITheme.getColor("AppSettings:foreground"));
+      lcFontSizes.setBackground(UITheme.getColor(UITheme.Main_grid_color));
+      lcFontSizes.setForeground(UITheme.getColor(UITheme.AppSettings_foreground));
       JScrollPane lsp2 = new JScrollPane(lcFontSizes);
 
       lsp2.setBorder(new EmptyBorder(15, 10, 20, 20));
-      lsp2.setBackground(UITheme.getColor("Main:grid.color"));
+      lsp2.setBackground(UITheme.getColor(UITheme.Main_grid_color));
       p.add(lsp2, BorderLayout.EAST);
 
       sampleText = new JTextField();

@@ -56,7 +56,7 @@ public abstract class AbstractModel {
 
 
    public Object getPropertyValue(String propertyName) {
-      StringBuilder sb          = new StringBuilder("get");
+      StringBuilder sb          = new StringBuilder(GetterPrefix);
       Object        returnValue = null;
 
       sb.append(propertyName.substring(0, 1).toUpperCase());
@@ -96,4 +96,5 @@ public abstract class AbstractModel {
 
 
    private List<PropertyChangeListener> listeners;
+   private static final String          GetterPrefix = "get";
 }

@@ -39,6 +39,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
 
+import com.jme3.app.SimpleApplication;
+
 import de.schwarzrot.bean.GCodeLine;
 import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.themes.UITheme;
@@ -57,6 +59,11 @@ public class ConfigHolder {
       // System.out.println("app-base is: " + appBase.getAbsolutePath());
 
       readConfigs();
+   }
+
+
+   public SimpleApplication getJME3App() {
+      return this.jme3App;
    }
 
 
@@ -102,6 +109,11 @@ public class ConfigHolder {
 
    public void setErrorLog(List<SystemMessage> list) {
       this.errorLog = list;
+   }
+
+
+   public void setJME3App(SimpleApplication app) {
+      this.jme3App = app;
    }
 
 
@@ -379,5 +391,6 @@ public class ConfigHolder {
 
    private List<SystemMessage> errorLog;
    private final File          appBase;
+   private SimpleApplication   jme3App;
    private static final String HomeDirectory = "user.home";
 }

@@ -46,7 +46,7 @@ public class ActiveCodesPane extends JPanel {
       setLayout(grid);
       grid.setHgap(2);
       grid.setVgap(2);
-      setBackground(UITheme.getColor("ActiveCode:grid.color"));
+      setBackground(UITheme.getColor(UITheme.ActiveCode_grid_color));
       setOpaque(true);
       createGUI();
    }

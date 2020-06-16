@@ -110,6 +110,11 @@ public class AppSetup implements PropertyChangeListener, IAxisMask {
    }
 
 
+   public File getIniFile() {
+      return iniFile;
+   }
+
+
    public int getNumberOfJoints() {
       return numJoints;
    }
@@ -152,6 +157,11 @@ public class AppSetup implements PropertyChangeListener, IAxisMask {
 
    public LengthUnit getUnit() {
       return unit;
+   }
+
+
+   public File getVarFile() {
+      return varFile;
    }
 
 
@@ -270,9 +280,9 @@ public class AppSetup implements PropertyChangeListener, IAxisMask {
 
 
    public void parseIniFile(String fileName) {
-      ConfigParser ifp     = new ConfigParser(this);
-      File         iniFile = new File(fileName);
+      ConfigParser ifp = new ConfigParser(this);
 
+      iniFile = new File(fileName);
       System.out.println("use INI-File: " + iniFile.getAbsolutePath());
       properties = ifp.parseIniFile(fileName);
       ifp.processDisplaySection(displaySettings, properties.get("DISPLAY"));
@@ -285,8 +295,7 @@ public class AppSetup implements PropertyChangeListener, IAxisMask {
          String varFileName = getProperty("RS274NGC", "PARAMETER_FILE");
 
          if (varFileName != null) {
-            File varFile = new File(iniFile.getParentFile(), varFileName);
-
+            varFile    = new File(iniFile.getParentFile(), varFileName);
             parameters = ifp.parseVarFile(varFile.getAbsolutePath());
             ifp.extractFixturesFromParameters(fixture, parameters);
          }
@@ -311,7 +320,7 @@ public class AppSetup implements PropertyChangeListener, IAxisMask {
 
    @Override
    public void propertyChange(PropertyChangeEvent e) {
-      if (e.getPropertyName().startsWith("joint_") && e.getPropertyName().endsWith("_homed")) {
+      if (e.getPropertyName().startsWith(ModelPrefix) && e.getPropertyName().endsWith(ModelPostfix)) {
          SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -577,9 +586,13 @@ public class AppSetup implements PropertyChangeListener, IAxisMask {
    private DisplaySettings                  displaySettings;
    private Fixtures                         fixture;
    private File                             toolTableFile;
+   private File                             iniFile;
+   private File                             varFile;
    private int[]                            joints2Axis;
    private Map<String, Map<String, String>> properties;
    private Map<Integer, Double>             parameters;
+   public static final String               ModelPrefix       = "joint_";
+   public static final String               ModelPostfix      = "_homed";
    public static final String               jointModelPattern = "joint_%d_homed";
    private static final String[]            listOfSignals     = { "joint_0_homed", "joint_1_homed",
          "joint_2_homed", "joint_3_homed", "joint_4_homed", "joint_5_homed", "joint_6_homed", "joint_7_homed",

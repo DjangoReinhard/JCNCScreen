@@ -57,6 +57,7 @@ import de.schwarzrot.logic.NotCondition;
 import de.schwarzrot.logic.OrCondition;
 import de.schwarzrot.logic.SmallerCondition;
 import de.schwarzrot.model.ValueModel;
+import de.schwarzrot.nml.BufferDescriptor;
 import de.schwarzrot.nml.InterpState;
 import de.schwarzrot.nml.TaskExecState;
 import de.schwarzrot.nml.TaskMode;
@@ -83,10 +84,10 @@ public abstract class AbstractMainPane extends JDesktopPane
       @SuppressWarnings("unchecked")
       @Override
       public void actionPerformed(ActionEvent arg0) {
-         if (status.getModel("taskState").getValue() == TaskState.EStop) {
+         if (status.getModel(LCStatus.MN_TaskState).getValue() == TaskState.EStop) {
             cmdWriter.clearEStop();
          } else {
-            switch ((TaskState) status.getModel("taskState").getValue()) {
+            switch ((TaskState) status.getModel(LCStatus.MN_TaskState).getValue()) {
                case EStop:
                   cmdWriter.clearEStop();
                   break;
@@ -97,7 +98,7 @@ public abstract class AbstractMainPane extends JDesktopPane
                case MachineOn:
                default:
                   cmdWriter.machinePowerOff();
-                  status.getModel("taskMode").setValue(TaskMode.TaskModeManual);
+                  status.getModel(LCStatus.MN_TaskMode).setValue(TaskMode.TaskModeManual);
                   appMode.setValue(ApplicationMode.AmMachineOff);
                   break;
             }
@@ -114,20 +115,20 @@ public abstract class AbstractMainPane extends JDesktopPane
    protected AbstractMainPane(CommandWriter cmdWriter, ErrorReader errorReader) {
       setLayout(new GridBagLayout());
       setOpaque(true);
-      setBackground(UITheme.getColor("Main:grid.color"));
+      setBackground(UITheme.getColor(UITheme.Main_grid_color));
       this.cmdWriter     = cmdWriter;
       this.errorReader   = errorReader;
       applicationButtons = new ButtonGroup();
       this.powerHandler  = new PowerHandler(LCStatus.getStatus(), cmdWriter);
-      appMode            = LCStatus.getStatus().getModel("applicationMode");
+      appMode            = LCStatus.getStatus().getModel(LCStatus.MN_ApplicationMode);
       absPosition        = LCStatus.getStatus().getModel("absPosition");
       appMode.addPropertyChangeListener(this);
-      if (LCStatus.getStatus().getModel("taskState").getValue() == TaskState.MachineOn) {
+      if (LCStatus.getStatus().getModel(LCStatus.MN_TaskState).getValue() == TaskState.MachineOn) {
          appMode.setValue(ApplicationMode.AmManual);
       } else {
          appMode.setValue(ApplicationMode.AmMachineOff);
       }
-      errorActive = LCStatus.getStatus().getModel("errorActive");
+      errorActive = LCStatus.getStatus().getModel(LCStatus.MN_ErrorActive);
    }
 
 
@@ -166,7 +167,7 @@ public abstract class AbstractMainPane extends JDesktopPane
 
    @Override
    public void propertyChange(PropertyChangeEvent evt) {
-      if ("applicationMode".compareTo(evt.getPropertyName()) == 0) {
+      if (LCStatus.MN_ApplicationMode.compareTo(evt.getPropertyName()) == 0) {
          ApplicationMode am = (ApplicationMode) evt.getNewValue();
 
          if (am != ApplicationMode.AmMessageLog)
@@ -179,7 +180,7 @@ public abstract class AbstractMainPane extends JDesktopPane
       JPanel buttonPane = new JPanel();
 
       setOpaque(true);
-      buttonPane.setBackground(UITheme.getColor("Toolbar:grid.color"));
+      buttonPane.setBackground(UITheme.getColor(UITheme.Toolbar_grid_color));
       buttonPane.setLayout(new BoxLayout(buttonPane, orientation));
       createToolbar2(buttonPane);
 
@@ -190,7 +191,7 @@ public abstract class AbstractMainPane extends JDesktopPane
    protected JComponent createInfoPart() {
       JPanel pane = new JPanel();
 
-      pane.setBackground(UITheme.getColor("Info:grid.color"));
+      pane.setBackground(UITheme.getColor(UITheme.Info_grid_color));
       pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 
       pane.add(new ToolInfoPane());
@@ -206,7 +207,7 @@ public abstract class AbstractMainPane extends JDesktopPane
 
       buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
       buttonPane.setOpaque(true);
-      buttonPane.setBackground(UITheme.getColor("Toolbar:grid.color"));
+      buttonPane.setBackground(UITheme.getColor(UITheme.Toolbar_grid_color));
       createToolbar1(buttonPane);
       createToolbar3(buttonPane);
       PowerButton pb = new PowerButton("images/SK_PowerOff.png", "images/SK_PowerOff_1.png",
@@ -223,14 +224,14 @@ public abstract class AbstractMainPane extends JDesktopPane
       JPanel pane = new JPanel(new SpringLayout());
 
       message = new JTextField();
-      message.setFont(UITheme.getFont("MessageLOG:message.font"));
-      message.setForeground(UITheme.getColor("MessageLOG:message.foreground"));
-      message.setBackground(UITheme.getColor("MessageLOG:message.background"));
+      message.setFont(UITheme.getFont(UITheme.MessageLOG_message_font));
+      message.setForeground(UITheme.getColor(UITheme.MessageLOG_message_foreground));
+      message.setBackground(UITheme.getColor(UITheme.MessageLOG_message_background));
       message.setEditable(false);
       message.setBorder(new EmptyBorder(0, 15, 0, 0));
       message.setText(" ");
       JButton btHistory = new ConditionButton(LCStatus.getStatus().lm("messages"),
-            new NotCondition<ApplicationMode>(LCStatus.getStatus().getModel("applicationMode"),
+            new NotCondition<ApplicationMode>(LCStatus.getStatus().getModel(LCStatus.MN_ApplicationMode),
                   ApplicationMode.AmMachineOff));
       btHistory.setActionCommand(ApplicationMode.AmMessageLog.name());
       btHistory.addActionListener(new ActionListener() {
@@ -264,11 +265,11 @@ public abstract class AbstractMainPane extends JDesktopPane
 
       sb = new SoftkeyButton("images/SK_AutoStart.png", "images/SK_AutoStart_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
-            new OrCondition(new GreaterCondition<Double>(status.getModel("DTG"), 0.0),
-                  new GreaterCondition<Integer>(status.getModel("interpState"),
+            new OrCondition(new GreaterCondition<Double>(status.getModel(LCStatus.MN_DTG), 0.0),
+                  new GreaterCondition<Integer>(status.getModel(LCStatus.MN_InterpState),
                         InterpState.Reading.getStateNum())));
       sb.addActionListener(new ActionListener() {
          @Override
@@ -306,9 +307,9 @@ public abstract class AbstractMainPane extends JDesktopPane
       buttonPane.add(sb);
 
       sb = new SoftkeyButton("images/SK_AutoPause.png", "images/SK_AutoPause_active.png",
-            new AndCondition(new GreaterCondition<Integer>(status.getModel("interpState"), 1),
+            new AndCondition(new GreaterCondition<Integer>(status.getModel(LCStatus.MN_InterpState), 1),
                   new EqualCondition<Boolean>(errorActive, false)),
-            new EqualCondition<Integer>(status.getModel("interpState"), 3));
+            new EqualCondition<Integer>(status.getModel(LCStatus.MN_InterpState), 3));
       sb.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent arg0) {
@@ -318,9 +319,9 @@ public abstract class AbstractMainPane extends JDesktopPane
       buttonPane.add(sb);
 
       sb = new SoftkeyButton("images/SK_AutoStop.png", "images/SK_AutoStop_active.png",
-            new AndCondition(new GreaterCondition<Integer>(status.getModel("interpState"), 1),
+            new AndCondition(new GreaterCondition<Integer>(status.getModel(LCStatus.MN_InterpState), 1),
                   new EqualCondition<Boolean>(errorActive, false)),
-            new SmallerCondition<Integer>(status.getModel("execState"),
+            new SmallerCondition<Integer>(status.getModel(LCStatus.MN_ExecState),
                   TaskExecState.TaskExecWait4Motion.getStateNum()));
       sb.addActionListener(new ActionListener() {
          @Override
@@ -334,11 +335,12 @@ public abstract class AbstractMainPane extends JDesktopPane
 
       sb = new SoftkeyButton("images/SK_Auto.png", "images/SK_Auto_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new AndCondition(new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmAuto),
-                  new EqualCondition<TaskMode>(status.getModel("taskMode"), TaskMode.TaskModeAuto)));
+                  new EqualCondition<TaskMode>(status.getModel(LCStatus.MN_TaskMode),
+                        TaskMode.TaskModeAuto)));
       sb.setActionCommand(ApplicationMode.AmAuto.name());
       sb.addActionListener(this);
       //      sb.setSelected(true);
@@ -347,9 +349,9 @@ public abstract class AbstractMainPane extends JDesktopPane
 
       sb = new SoftkeyButton("images/SK_Manual.png", "images/SK_Manual_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
-                  new SmallerCondition<Integer>(status.getModel("execState"),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
+                  new SmallerCondition<Integer>(status.getModel(LCStatus.MN_ExecState),
                         TaskExecState.TaskExecWait4Motion.getStateNum()),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmManual));
@@ -360,9 +362,9 @@ public abstract class AbstractMainPane extends JDesktopPane
 
       sb = new SoftkeyButton("images/SK_MDI.png", "images/SK_MDI_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
-                  new SmallerCondition<Integer>(status.getModel("execState"),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
+                  new SmallerCondition<Integer>(status.getModel(LCStatus.MN_ExecState),
                         TaskExecState.TaskExecWait4Motion.getStateNum()),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmMDI));
@@ -373,8 +375,8 @@ public abstract class AbstractMainPane extends JDesktopPane
 
       sb = new SoftkeyButton("images/SK_Edit.png", "images/SK_Edit_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new SmallerCondition<Integer>(status.getModel("execState"),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new SmallerCondition<Integer>(status.getModel(LCStatus.MN_ExecState),
                         TaskExecState.TaskExecWait4Motion.getStateNum()),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmEdit));
@@ -392,23 +394,25 @@ public abstract class AbstractMainPane extends JDesktopPane
       LCStatus       status = LCStatus.getStatus();
 
       AbstractButton sb     = new SoftkeyButton("images/SK_SingleStep.png", "images/SK_SingleStep_active.png",
-            new AndCondition(new EqualCondition<TaskMode>(status.getModel("taskMode"), TaskMode.TaskModeAuto),
+            new AndCondition(
+                  new EqualCondition<TaskMode>(status.getModel(LCStatus.MN_TaskMode), TaskMode.TaskModeAuto),
                   new EqualCondition<Boolean>(errorActive, false)),
-            new EqualCondition<Boolean>(status.getModel("singleStep"), true));
+            new EqualCondition<Boolean>(status.getModel(LCStatus.MN_SingleStep), true));
       sb.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent e) {
-            status.getModel("singleStep").setValue(!((Boolean) status.getModel("singleStep").getValue()));
+            status.getModel(LCStatus.MN_SingleStep)
+                  .setValue(!((Boolean) status.getModel(LCStatus.MN_SingleStep).getValue()));
          }
 
       });
       buttonPane.add(sb);
       sb = new SoftkeyButton("images/SK_Cool_Mist.png", "images/SK_Cool_Mist_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
-            new EqualCondition<Boolean>(status.getModel("coolMist"), true));
+            new EqualCondition<Boolean>(status.getModel(BufferDescriptor.CoolMist), true));
       sb.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent ae) {
@@ -423,10 +427,10 @@ public abstract class AbstractMainPane extends JDesktopPane
       buttonPane.add(sb);
       sb = new SoftkeyButton("images/SK_Cool_Flood.png", "images/SK_Cool_Flood_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
-            new EqualCondition<Boolean>(status.getModel("coolFlood"), true));
+            new EqualCondition<Boolean>(status.getModel(BufferDescriptor.CoolFlood), true));
       sb.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent ae) {
@@ -443,28 +447,29 @@ public abstract class AbstractMainPane extends JDesktopPane
       ButtonGroup bg = new ButtonGroup();
       sb = new SoftkeyButton("images/SK_Spindle_CW.png", "images/SK_Spindle_CW_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
-            new EqualCondition<Integer>(status.getModel("spindleDir"), 1));
+            new EqualCondition<Integer>(status.getModel(LCStatus.MN_SpindleDir), 1));
       sb.setActionCommand("startSpindleCW");
       sb.addActionListener(MachineControl.getInstance());
       buttonPane.add(sb);
       bg.add(sb);
       sb = new SoftkeyButton("images/SK_Spindle_Stop.png", "images/SK_Spindle_Stop_active.png",
-            new AndCondition(new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
+            new AndCondition(
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
                   new EqualCondition<Boolean>(errorActive, false)),
-            new EqualCondition<Integer>(status.getModel("spindleDir"), 0));
+            new EqualCondition<Integer>(status.getModel(LCStatus.MN_SpindleDir), 0));
       sb.setActionCommand("stopSpindle");
       sb.addActionListener(MachineControl.getInstance());
       buttonPane.add(sb);
       bg.add(sb);
       sb = new SoftkeyButton("images/SK_Spindle_CCW.png", "images/SK_Spindle_CCW_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
-            new EqualCondition<Integer>(status.getModel("spindleDir"), -1));
+            new EqualCondition<Integer>(status.getModel(LCStatus.MN_SpindleDir), -1));
       sb.setActionCommand("startSpindleCCW");
       sb.addActionListener(MachineControl.getInstance());
       buttonPane.add(sb);
@@ -479,8 +484,8 @@ public abstract class AbstractMainPane extends JDesktopPane
       LCStatus       status = LCStatus.getStatus();
       AbstractButton sb     = new SoftkeyButton("images/SK_Settings.png", "images/SK_Settings_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new SmallerCondition<Integer>(status.getModel("execState"),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new SmallerCondition<Integer>(status.getModel(LCStatus.MN_ExecState),
                         TaskExecState.TaskExecWait4Motion.getStateNum()),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmSettings));
@@ -490,13 +495,13 @@ public abstract class AbstractMainPane extends JDesktopPane
       buttonPane.add(sb);
       sb = new SoftkeyButton("images/SK_Touch.png", "images/SK_Touch_active.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
                   // TODO: remove when touch is
                   // available
                   new FalseCondition(),
-                  new SmallerCondition<Integer>(status.getModel("execState"),
+                  new SmallerCondition<Integer>(status.getModel(LCStatus.MN_ExecState),
                         TaskExecState.TaskExecWait4Motion.getStateNum()),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmTouch));
       sb.addActionListener(this);
@@ -509,13 +514,14 @@ public abstract class AbstractMainPane extends JDesktopPane
       SoftkeyButton sbPosRelative = new SoftkeyButton("images/SK_PosRelative.png",
             "images/SK_PosAbsolute.png",
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
                   new EqualCondition<Boolean>(errorActive, false) }),
             new EqualCondition<Boolean>(absPosition, true));
       sbPosRelative.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent ae) {
-            status.getModel("absPosition").setValue(!((Boolean) status.getModel("absPosition").getValue()));
+            status.getModel(LCStatus.MN_AbsPosition)
+                  .setValue(!((Boolean) status.getModel(LCStatus.MN_AbsPosition).getValue()));
          }
       });
       buttonPane.add(sbPosRelative);

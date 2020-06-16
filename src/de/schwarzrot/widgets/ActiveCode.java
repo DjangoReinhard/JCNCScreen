@@ -40,14 +40,14 @@ import de.schwarzrot.model.IValueClient;
 public class ActiveCode extends JLabel implements IValueClient {
    public ActiveCode() {
       super("-");
-      setFont(UITheme.getFont("ActiveCode:font"));
+      setFont(UITheme.getFont(UITheme.ActiveCode_font));
       Dimension s = calcMinSize();
 
       setPreferredSize(s);
       setMinimumSize(s);
       setOpaque(true);
-      setForeground(UITheme.getColor("ActiveCode:foreground"));
-      setBackground(UITheme.getColor("ActiveCode:background"));
+      setForeground(UITheme.getColor(UITheme.ActiveCode_foreground));
+      setBackground(UITheme.getColor(UITheme.ActiveCode_background));
       setHorizontalAlignment(JLabel.CENTER);
    }
 

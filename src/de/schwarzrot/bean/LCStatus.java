@@ -1,28 +1,28 @@
 package de.schwarzrot.bean;
-/* 
+/*
  * **************************************************************************
- * 
+ *
  *  file:       LCStatus.java
  *  project:    GUI for linuxcnc
  *  subproject: graphical application frontend
  *  purpose:    create a smart application, that assists in managing
- *              control of cnc-machines                           
+ *              control of cnc-machines
  *  created:    21.9.2019 by Django Reinhard
  *  copyright:  all rights reserved
- * 
- *  This program is free software: you can redistribute it and/or modify 
- *  it under the terms of the GNU General Public License as published by 
- *  the Free Software Foundation, either version 2 of the License, or 
- *  (at your option) any later version. 
- *   
- *  This program is distributed in the hope that it will be useful, 
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- *  GNU General Public License for more details. 
- *   
- *  You should have received a copy of the GNU General Public License 
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  * **************************************************************************
  */
 
@@ -42,6 +42,7 @@ import de.schwarzrot.model.GCodeInfo;
 import de.schwarzrot.model.SpeedInfo;
 import de.schwarzrot.model.ToolInfo;
 import de.schwarzrot.model.ValueModel;
+import de.schwarzrot.nml.BufferDescriptor;
 import de.schwarzrot.nml.TaskMode;
 import de.schwarzrot.nml.TaskState;
 import de.schwarzrot.util.PositionCalculator;
@@ -54,9 +55,9 @@ public class LCStatus {
    @SuppressWarnings("rawtypes")
    private LCStatus() {
       try {
-         messages = ResourceBundle.getBundle("LinuxCNCClient");
+         messages = ResourceBundle.getBundle(LinuxCNCClient.class.getSimpleName());
       } catch (Throwable t) {
-         messages = ResourceBundle.getBundle("LinuxCNCClient", new Locale("en", "EN"));
+         messages = ResourceBundle.getBundle(LinuxCNCClient.class.getSimpleName(), new Locale("en", "EN"));
       }
       positionCalculator = new PositionCalculator();
       distanceToGo       = new CanonPosition();
@@ -188,13 +189,13 @@ public class LCStatus {
 
    @SuppressWarnings("unchecked")
    public void setExecState(int execState) {
-      models.get("execState").setValue(execState);
+      models.get(MN_ExecState).setValue(execState);
    }
 
 
    @SuppressWarnings("unchecked")
    public void setInterpState(int state) {
-      models.get("interpState").setValue(state);
+      models.get(MN_InterpState).setValue(state);
    }
 
 
@@ -202,13 +203,13 @@ public class LCStatus {
    public void setTaskMode(int taskMode) {
       switch (taskMode) {
          case 1:
-            models.get("taskMode").setValue(TaskMode.TaskModeManual);
+            models.get(MN_TaskMode).setValue(TaskMode.TaskModeManual);
             break;
          case 2:
-            models.get("taskMode").setValue(TaskMode.TaskModeAuto);
+            models.get(MN_TaskMode).setValue(TaskMode.TaskModeAuto);
             break;
          case 3:
-            models.get("taskMode").setValue(TaskMode.TaskModeMDI);
+            models.get(MN_TaskMode).setValue(TaskMode.TaskModeMDI);
             break;
          default:
             throw new IllegalArgumentException("unknown/invalid task mode");
@@ -220,16 +221,16 @@ public class LCStatus {
    public void setTaskState(int taskState) {
       switch (taskState) {
          case 1:
-            models.get("taskState").setValue(TaskState.EStop);
+            models.get(MN_TaskState).setValue(TaskState.EStop);
             break;
          case 2:
-            models.get("taskState").setValue(TaskState.EStopReset);
+            models.get(MN_TaskState).setValue(TaskState.EStopReset);
             break;
          case 3:
-            models.get("taskState").setValue(TaskState.MachineOff);
+            models.get(MN_TaskState).setValue(TaskState.MachineOff);
             break;
          case 4:
-            models.get("taskState").setValue(TaskState.MachineOn);
+            models.get(MN_TaskState).setValue(TaskState.MachineOn);
             break;
          default:
             throw new IllegalArgumentException("unknown/invalid task state");
@@ -243,17 +244,17 @@ public class LCStatus {
 
 
    protected void setupModels() {
-      models.put("taskState", new ValueModel<TaskState>("taskState", TaskState.EStop));
-      models.put("taskMode", new ValueModel<TaskMode>("taskMode", TaskMode.TaskModeManual));
-      models.put("execState", new ValueModel<Integer>("execState", -1));
-      models.put("interpState", new ValueModel<Integer>("interpState", -1));
-      models.put("errorActive", new ValueModel<Boolean>("errorActive", false));
-      models.put("applicationMode",
-            new ValueModel<ApplicationMode>("applicationMode", ApplicationMode.AmMachineOff));
-      models.put("spindleDir", new ValueModel<Integer>("spindleDir", 0));
-      models.put("singleStep", new ValueModel<Boolean>("singleStep", false));
-      models.put("absPosition", new ValueModel<Boolean>("absPosition", false));
-      models.put("DTG", new ValueModel<Double>("DTG", 0.0));
+      models.put(MN_TaskState, new ValueModel<TaskState>(MN_TaskState, TaskState.EStop));
+      models.put(MN_TaskMode, new ValueModel<TaskMode>(MN_TaskMode, TaskMode.TaskModeManual));
+      models.put(MN_ExecState, new ValueModel<Integer>(MN_ExecState, -1));
+      models.put(MN_InterpState, new ValueModel<Integer>(MN_InterpState, -1));
+      models.put(MN_ErrorActive, new ValueModel<Boolean>(MN_ErrorActive, false));
+      models.put(MN_ApplicationMode,
+            new ValueModel<ApplicationMode>(MN_ApplicationMode, ApplicationMode.AmMachineOff));
+      models.put(MN_SpindleDir, new ValueModel<Integer>(MN_SpindleDir, 0));
+      models.put(MN_SingleStep, new ValueModel<Boolean>(MN_SingleStep, false));
+      models.put(MN_AbsPosition, new ValueModel<Boolean>(MN_AbsPosition, false));
+      models.put(MN_DTG, new ValueModel<Double>(MN_DTG, 0.0));
    }
 
 
@@ -277,5 +278,16 @@ public class LCStatus {
    private EventList<GCodeLine>    mdiHistory;
    @SuppressWarnings("rawtypes")
    private Map<String, ValueModel> models;
+   public static String            MN_TaskState       = BufferDescriptor.TaskState;
+   public static String            MN_ApplicationMode = "applicationMode";
+   public static String            MN_TaskMode        = BufferDescriptor.TaskMode;
+   public static String            MN_ExecState       = BufferDescriptor.ExecState;
+   public static String            MN_AllHomed        = "allHomed";
+   public static String            MN_ErrorActive     = "errorActive";
+   public static String            MN_InterpState     = BufferDescriptor.InterpState;
+   public static String            MN_SpindleDir      = BufferDescriptor.SpindleDir;
+   public static String            MN_SingleStep      = "singleStep";
+   public static String            MN_AbsPosition     = "absPosition";
+   public static String            MN_DTG             = "DTG";
    private static LCStatus         instance;
 }

@@ -54,7 +54,7 @@ public class MachineControl extends MouseAdapter
       this.cmdWriter = cmdWriter;
       jogSingleStep  = new ValueModel<Boolean>("jogSingleStep", false);
       rapidJog       = new ValueModel<Boolean>("rapidJog", false);
-      allHomed       = LCStatus.getStatus().getModel("allHomed");
+      allHomed       = LCStatus.getStatus().getModel(LCStatus.MN_AllHomed);
       increments     = LCStatus.getStatus().getSetup().getDisplaySettings().getIncrements();
    }
 
@@ -168,8 +168,8 @@ public class MachineControl extends MouseAdapter
          return;
       int su = e.getUnitsToScroll();
 
-      if ("feedOverride".compareTo(c.getName()) == 0 || "nomFeed".compareTo(c.getName()) == 0
-            || "curFeed".compareTo(c.getName()) == 0) {
+      if ("feedOverride".compareTo(c.getName()) == 0 || SpeedInfo.NominalFeed.compareTo(c.getName()) == 0
+            || SpeedInfo.CurFeed.compareTo(c.getName()) == 0) {
          double ff = si.getFeedFactor() / 100.0;
 
          if (su < 0)
@@ -230,10 +230,10 @@ public class MachineControl extends MouseAdapter
    }
 
 
-   private final CommandWriter cmdWriter;
-   private ValueModel<Boolean> allHomed;
-   private ValueModel<Boolean> jogSingleStep;
-   private ValueModel<Boolean> rapidJog;
-   private double[]            increments;
-   private static MachineControl   instance;
+   private final CommandWriter   cmdWriter;
+   private ValueModel<Boolean>   allHomed;
+   private ValueModel<Boolean>   jogSingleStep;
+   private ValueModel<Boolean>   rapidJog;
+   private double[]              increments;
+   private static MachineControl instance;
 }

@@ -41,6 +41,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -74,7 +76,7 @@ import layout.SpringUtilities;
 
 
 public class GCodeLister extends JPanel implements ListSelectionListener, IValueClient {
-   static class GCodeFileHandler implements IValueClient {
+   class GCodeFileHandler implements IValueClient {
       protected GCodeFileHandler(GCodeLister lister) {
          this.lister = lister;
       }
@@ -84,6 +86,9 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
       public void setValue(Object value) {
          if (value != null && value instanceof String) {
             gcodeFile = new File((String) value);
+
+            if (gcodeFile.getAbsolutePath().compareTo(fileName.getText()) == 0)
+               return;
 
             if (gcodeFile.exists() && gcodeFile.canRead()) {
                try {
@@ -111,21 +116,21 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
             boolean hasFocus, int row, int column) {
          if (table == null)
             return this;
-         Font  f = UITheme.getFont("GCode:number.font");
+         Font  f = UITheme.getFont(UITheme.GCode_number_font);
          Color cb, cf;
 
          if (f != null)
             setFont(f);
 
          if (isSelected) {
-            cb = UITheme.getColor("GCode:line.selected.background");
-            cf = UITheme.getColor("GCode:line.selected.foreground");
+            cb = UITheme.getColor(UITheme.GCode_line_selected_background);
+            cf = UITheme.getColor(UITheme.GCode_line_selected_foreground);
          } else if ((row % 2) == 0) {
-            cb = UITheme.getColor("GCode:line.altbackground");
-            cf = UITheme.getColor("GCode:number.foreground");
+            cb = UITheme.getColor(UITheme.GCode_line_altbackground);
+            cf = UITheme.getColor(UITheme.GCode_number_foreground);
          } else {
-            cb = UITheme.getColor("GCode:line.background");
-            cf = UITheme.getColor("GCode:number.foreground");
+            cb = UITheme.getColor(UITheme.GCode_line_background);
+            cf = UITheme.getColor(UITheme.GCode_number_foreground);
          }
          if (cf != null)
             setForeground(cf);
@@ -152,7 +157,7 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
 
    static class GCodeSourceRenderer extends JTextPane implements TableCellRenderer {
       public GCodeSourceRenderer() {
-         setDocument(new GCodeSource(UITheme.getStyles("GCode:styles")));
+         setDocument(new GCodeSource(UITheme.getStyles(UITheme.GCode_styles)));
          //         setForeground(settings.getGCodeForeground());
          //         setBackground(settings.getGCodeBackground());
          setEditable(false);
@@ -165,21 +170,21 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
          if (table == null) {
             return this;
          }
-         Font  f = UITheme.getFont("GCode:line.font");
+         Font  f = UITheme.getFont(UITheme.GCode_line_font);
          Color cb, cf;
 
          if (f != null)
             setFont(f);
 
          if (isSelected) {
-            cb = UITheme.getColor("GCode:line.selected.background");
-            cf = UITheme.getColor("GCode:line.selected.foreground");
+            cb = UITheme.getColor(UITheme.GCode_line_selected_background);
+            cf = UITheme.getColor(UITheme.GCode_line_selected_foreground);
          } else if ((row % 2) == 0) {
-            cb = UITheme.getColor("GCode:line.altbackground");
-            cf = UITheme.getColor("GCode:line.foreground");
+            cb = UITheme.getColor(UITheme.GCode_line_altbackground);
+            cf = UITheme.getColor(UITheme.GCode_line_foreground);
          } else {
-            cb = UITheme.getColor("GCode:line.background");
-            cf = UITheme.getColor("GCode:line.foreground");
+            cb = UITheme.getColor(UITheme.GCode_line_background);
+            cf = UITheme.getColor(UITheme.GCode_line_foreground);
          }
          if (cf != null)
             setForeground(cf);
@@ -204,13 +209,13 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
       DefaultEventTableModel<GCodeLine> lineTableModel = new DefaultEventTableModel<GCodeLine>(lines,
             new GCodeTableFormat());
       setOpaque(true);
-      setBackground(UITheme.getColor("GCode:line.background"));
+      setBackground(UITheme.getColor(UITheme.GCode_line_background));
       table = new JTable(lineTableModel);
-      table.setRowHeight(UITheme.getInt("GCode:row.height"));
-      table.setGridColor(UITheme.getColor("GCode:grid.color"));
+      table.setRowHeight(UITheme.getInt(UITheme.GCode_row_height));
+      table.setGridColor(UITheme.getColor(UITheme.GCode_grid_color));
       table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       table.getSelectionModel().addListSelectionListener(this);
-      table.setBackground(UITheme.getColor("GCode:line.background"));
+      table.setBackground(UITheme.getColor(UITheme.GCode_line_background));
       table.getColumnModel().getColumn(0).setCellRenderer(new GCodeLineNumberRenderer());
       table.getColumnModel().getColumn(1).setCellRenderer(new GCodeSourceRenderer());
       table.setFillsViewportHeight(true);
@@ -256,7 +261,7 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
    }
 
 
-   public void loadFile(String fileName) throws FileNotFoundException {
+   public synchronized void loadFile(String fileName) throws FileNotFoundException {
       File newFile = new File(fileName);
 
       if (newFile.exists() && newFile.canRead()) {
@@ -303,8 +308,12 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
    public void valueChanged(ListSelectionEvent e) {
       int selected = table.getSelectedRow();
 
-      if (selected >= 0)
+      if (selected >= 0) {
+         l.log(Level.INFO, "list selection changed to #" + selected);
          editField.setText(lines.get(selected).getLine());
+      } else {
+         l.log(Level.WARNING, "list selection changed to invalid selection: #" + selected);
+      }
    }
 
 
@@ -361,9 +370,9 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
             }
          }
       });
-      Font  f  = UITheme.getFont("GCode:edit.font");
-      Color cb = UITheme.getColor("GCode:edit.background");
-      Color cf = UITheme.getColor("GCode:edit.foreground");
+      Font  f  = UITheme.getFont(UITheme.GCode_edit_font);
+      Color cb = UITheme.getColor(UITheme.GCode_edit_background);
+      Color cf = UITheme.getColor(UITheme.GCode_edit_foreground);
 
       if (f != null)
          editField.setFont(f);
@@ -412,5 +421,9 @@ public class GCodeLister extends JPanel implements ListSelectionListener, IValue
    protected JViewport            viewPort;
    protected JTextField           editField;
    private TimeLabel              processTime;
+   private static Logger          l;
    private static final long      serialVersionUID = 1L;
+   static {
+      l = Logger.getLogger(GCodeLister.class.getName());
+   }
 }

@@ -63,13 +63,13 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
    private PaneStack(CommandWriter cmdWriter) {
       super(new CardLayout());
       this.cmdWriter = cmdWriter;
-      appMode        = LCStatus.getStatus().getModel("applicationMode");
+      appMode        = LCStatus.getStatus().getModel(LCStatus.MN_ApplicationMode);
       appMode.addPropertyChangeListener(this);
-      taskMode = LCStatus.getStatus().getModel("taskMode");
+      taskMode = LCStatus.getStatus().getModel(LCStatus.MN_TaskMode);
       taskMode.addPropertyChangeListener(this);
-      execState = LCStatus.getStatus().getModel("execState");
+      execState = LCStatus.getStatus().getModel(LCStatus.MN_ExecState);
       execState.addPropertyChangeListener(this);
-      allHomed = LCStatus.getStatus().getModel("allHomed");
+      allHomed = LCStatus.getStatus().getModel(LCStatus.MN_AllHomed);
       allHomed.addPropertyChangeListener(this);
       paneStack = (CardLayout) getLayout();
    }
@@ -160,12 +160,12 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
 
    @Override
    public void propertyChange(PropertyChangeEvent evt) {
-      if ("applicationMode".compareTo(evt.getPropertyName()) == 0) {
+      if (LCStatus.MN_ApplicationMode.compareTo(evt.getPropertyName()) == 0) {
          ApplicationMode am = (ApplicationMode) evt.getNewValue();
 
          validateAppMode(am);
          selectPane(am);
-      } else if ("taskMode".compareTo(evt.getPropertyName()) == 0) {
+      } else if (LCStatus.MN_TaskMode.compareTo(evt.getPropertyName()) == 0) {
          TaskMode tm = (TaskMode) evt.getNewValue();
 
          switch (tm) {
@@ -182,7 +182,7 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
                }
                break;
          }
-      } else if ("allHomed".compareTo(evt.getPropertyName()) == 0) {
+      } else if (LCStatus.MN_AllHomed.compareTo(evt.getPropertyName()) == 0) {
          if ((boolean) evt.getNewValue())
             cmdWriter.setTaskModeAuto();
       }
@@ -221,17 +221,19 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
    private void createUI(ErrorReader errorReader) {
       LCStatus            status      = LCStatus.getStatus();
       AppSetup            setup       = status.getSetup();
-      ValueModel<Boolean> errorActive = status.getModel("errorActive");
+      ValueModel<Boolean> errorActive = status.getModel(LCStatus.MN_ErrorActive);
 
-      fileManager    = new FileManager(LCStatus.getStatus().lm("NC-files"), UITheme.getFile("GCode:basedir"));
+      fileManager    = new FileManager(LCStatus.getStatus().lm("NC-files"),
+            UITheme.getFile(UITheme.GCode_basedir));
       gcodeLister    = new AutoGCodeLister(cmdWriter);
       //TODO:
       manualPane     = new JogPane(setup,
-            new AndCondition(new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), false)),
+            new AndCondition(
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), false)),
             new AndCondition(new ICondition[] {
-                  new EqualCondition<TaskState>(status.getModel("taskState"), TaskState.MachineOn),
-                  new EqualCondition<Boolean>(status.getModel("allHomed"), true),
+                  new EqualCondition<TaskState>(status.getModel(LCStatus.MN_TaskState), TaskState.MachineOn),
+                  new EqualCondition<Boolean>(status.getModel(LCStatus.MN_AllHomed), true),
                   new EqualCondition<Boolean>(errorActive, false),
                   new EqualCondition<ApplicationMode>(appMode, ApplicationMode.AmManual) }));
 
