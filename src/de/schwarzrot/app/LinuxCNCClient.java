@@ -225,7 +225,7 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       ISysTickStarter    stStarter = new ISysTickStarter() {
                                       @Override
                                       public void start() {
-                                         sysTick = new SysTick(new SysUpdater(statusReader), 40l);
+                                         sysTick = new SysTick(new SysUpdater(statusReader), 100l);
                                       }
                                    };
 

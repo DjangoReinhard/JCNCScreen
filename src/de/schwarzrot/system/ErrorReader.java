@@ -1,30 +1,31 @@
 package de.schwarzrot.system;
-/* 
+/*
  * **************************************************************************
- * 
+ *
  *  file:       ErrorReader.java
  *  project:    GUI for linuxcnc
  *  subproject: graphical application frontend
  *  purpose:    create a smart application, that assists in managing
- *              control of cnc-machines                           
+ *              control of cnc-machines
  *  created:    7.10.2019 by Django Reinhard
  *  copyright:  all rights reserved
- * 
- *  This program is free software: you can redistribute it and/or modify 
- *  it under the terms of the GNU General Public License as published by 
- *  the Free Software Foundation, either version 2 of the License, or 
- *  (at your option) any later version. 
- *   
- *  This program is distributed in the hope that it will be useful, 
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- *  GNU General Public License for more details. 
- *   
- *  You should have received a copy of the GNU General Public License 
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  * **************************************************************************
  */
+
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -35,15 +36,15 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import de.schwarzrot.model.ValueModel;
+
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
-import de.schwarzrot.model.ValueModel;
 
 
 public class ErrorReader implements ActionListener {
    public ErrorReader(List<SystemMessage> errorLog) {
-      this.errorLog            =
-                    GlazedListsSwing.swingThreadProxyList((EventList<SystemMessage>) errorLog);
+      this.errorLog            = GlazedListsSwing.swingThreadProxyList((EventList<SystemMessage>) errorLog);
       this.confirmButtonActive = false;
       init();
    }
@@ -52,6 +53,7 @@ public class ErrorReader implements ActionListener {
    @Override
    public void actionPerformed(ActionEvent arg0) {
       SwingUtilities.invokeLater(new Runnable() {
+         @Override
          public void run() {
             ActionListener[] als = btConfirmMessage.getActionListeners();
 
@@ -81,18 +83,18 @@ public class ErrorReader implements ActionListener {
 
    public void riseError(SystemMessage sm) {
       switch (sm.getType()) {
-      case NMLError:
-      case OperatorError:
-         flagError();
-         break;
-      case NMLText:
-      case OperatorText:
-         flagText();
-         break;
-      case NMLDisplay:
-      case OperatorDisplay:
-         flagDisplay();
-         break;
+         case NMLError:
+         case OperatorError:
+            flagError();
+            break;
+         case NMLText:
+         case OperatorText:
+            flagText();
+            break;
+         case NMLDisplay:
+         case OperatorDisplay:
+            flagDisplay();
+            break;
       }
       errorActive.setValue(true);
       errorLog.add(sm);
@@ -110,9 +112,6 @@ public class ErrorReader implements ActionListener {
       messageField     = tf;
       btConfirmMessage = button;
    }
-
-
-   private native int init();
 
 
    protected void activateConfirmButton() {
@@ -158,6 +157,11 @@ public class ErrorReader implements ActionListener {
       errorActive.setValue(false);
       messageField.setText(" ");
    }
+
+
+   private native int init();
+
+
    private ValueModel<Boolean> errorActive;
    private JTextField          messageField;
    private JButton             btConfirmMessage;
@@ -171,6 +175,7 @@ public class ErrorReader implements ActionListener {
    static {
       System.loadLibrary("linuxcncini");
       System.loadLibrary("nml");
+      System.loadLibrary("linuxcnchal");
       System.loadLibrary("LinuxCNC");
    }
 }

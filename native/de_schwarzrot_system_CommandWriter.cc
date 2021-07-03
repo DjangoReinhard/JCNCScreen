@@ -24,66 +24,17 @@
  *
  * **************************************************************************
  */
-/*
- * JNI implementation of a bridge between linuxcnc and java (ui)
- *
- * compile with:
-g++ -c -I. \
-    -Ilc/src/libnml/linklist \
-    -Ilc/src/libnml/cms \
-    -Ilc/src/libnml/rcs \
-    -Ilc/src/libnml/inifile \
-    -Ilc/src/libnml/os_intf \
-    -Ilc/src/libnml/nml \
-    -Ilc/src/libnml/buffer \
-    -Ilc/src/libnml/posemath \
-    -Ilc/src/rtapi \
-    -Ilc/src/hal \
-    -Ilc/src/emc/nml_intf \
-    -Ilc/src/emc/kinematics \
-    -Ilc/src/emc/tp \
-    -Ilc/src/emc/motion \
-    -Ilc/src/emc/ini \
-    -Ilc/src/emc/rs274ngc \
-    -Ilc/src/emc/sai \
-    -Ilc/src/emc/pythonplugin \
-    -Ilc/include \
-    -I/usr/include/python2.7 \
-    -I/usr/lib/jvm/java-8-openjdk-amd64/include \
-    -g -O2    -DULAPI  -g -Wall -Os -fwrapv -Woverloaded-virtual -fPIC -fno-strict-aliasing \
-    -MP -MD \
-    de_schwarzrot_status_StatusReader.cc \
-    -o jniLinuxCNC.o
-
- * then link as shared lib with:
-g++ -Llc/lib \
-    -Wl,-rpath,lc/lib \
-    -shared \
-    -o jniLinuxCNC.so \
-    jniLinuxCNC.o \
-    lc/lib/liblinuxcnc.a \
-    lc/lib/libnml.so.0 \
-    lc/lib/liblinuxcncini.so \
-    -L/usr/X11R6/lib \
-    -lm -lGL
- *
- */
 #define __STDC_FORMAT_MACROS
 
-#include <Python.h>
 #include "config.h"
 #include "rcs.hh"
 #include "emc.hh"
 #include "emc_nml.hh"
-#include "kinematics.h"
-#include "config.h"
-#include "inifile.hh"
 #include "timer.hh"
-#include "nml_oi.hh"
-#include "rcs_print.hh"
+#include <string.h>
 
 #include  <de_schwarzrot_system_CommandWriter.h>
-
+int emcDecode(NMLTYPE type, void *buffer, CMS * cms);
 
 /*
  * ini-file: /usr/local/src/linuxcnc-dev/configs/sim/axis/axis.ini
@@ -93,7 +44,6 @@ g++ -Llc/lib \
 
 
 struct CommandChannel {
-  PyObject_HEAD
   RCS_CMD_CHANNEL*     c;
   RCS_STAT_CHANNEL*    s;
   int                  serial;
@@ -101,24 +51,17 @@ struct CommandChannel {
 static CommandChannel cc = {0};
 
 
-static int sendCommand(CommandChannel* cc, RCS_CMD_MSG& cmd) {
-  /*
-  fprintf(stderr
-        , "                        \tmessage #%d (%s) of size %ld\n"
-        , cmd.type
-        , emc_symbol_lookup(cmd.type)
-        , cmd.size);
-  */
-  if (cc->c->write(&cmd)) return -1;
-  cc->serial = cmd.serial_number;
+static int sendCommand(RCS_CMD_MSG& cmd) {
+  if (cc.c->write(&cmd)) return -1;
+  cc.serial = cmd.serial_number;
 
   double start = etime();
 
   while (etime() - start < EMC_COMMAND_TIMEOUT) {
-        EMC_STAT* stat  = (EMC_STAT *)cc->s->get_address();
-        int serial_diff = stat->echo_serial_number - cc->serial;
+        EMC_STAT* stat  = (EMC_STAT *)cc.s->get_address();
+        int serial_diff = stat->echo_serial_number - cc.serial;
 
-        if (cc->s->peek() == EMC_STAT_TYPE && serial_diff >= 0) return 0;
+        if (cc.s->peek() == EMC_STAT_TYPE && serial_diff >= 0) return 0;
         esleep(EMC_COMMAND_DELAY);
         }
   return -1;
@@ -138,10 +81,71 @@ JNIEXPORT jint JNICALL Java_de_schwarzrot_system_CommandWriter_init(JNIEnv* env
                                                                   , jobject thisObject) {
   const char* nmlFile = EMC2_DEFAULT_NMLFILE;
 
-  cc.c = new RCS_CMD_CHANNEL(emcFormat,  "emcCommand", "xemc", nmlFile);
-  cc.s = new RCS_STAT_CHANNEL(emcFormat, "emcStatus",  "xemc", nmlFile);
-
+  cc.c = new RCS_CMD_CHANNEL(emcDecode,  "emcCommand", "xemc", nmlFile);
+  if (!cc.c->valid()) {
+     cc.c = NULL;
+     return -1;
+     }
+  cc.s = new RCS_STAT_CHANNEL(emcDecode, "emcStatus",  "xemc", nmlFile);
+  if (!cc.s->valid()) {
+     cc.s = NULL;
+     return -2;
+     }
   return 0;
+  }
+
+
+/*
+ * Class:     de_schwarzrot_system_CommandWriter
+ * Method:    jogStep
+ * Signature: (DD)V
+ */
+JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_jogStep(JNIEnv *env
+                                                                     , jobject thisObject
+                                                                     , jint    axis
+                                                                     , jdouble stepSize
+                                                                     , jdouble speed) {
+  EMC_JOG_INCR ji;
+
+  ji.joint_or_axis = axis;
+  ji.incr          = stepSize;
+  ji.vel           = speed;
+  ji.jjogmode      = 0;
+  sendCommand(ji);
+  }
+
+
+/*
+ * Class:     de_schwarzrot_system_CommandWriter
+ * Method:    jogStart
+ * Signature: (D)V
+ */
+JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_jogStart(JNIEnv *env
+                                                                      , jobject thisObject
+                                                                      , jint    axis
+                                                                      , jdouble speed) {
+  EMC_JOG_CONT jc;
+
+  jc.joint_or_axis = axis;
+  jc.vel           = speed;
+  jc.jjogmode      = 0;
+  sendCommand(jc);
+  }
+
+
+/*
+ * Class:     de_schwarzrot_system_CommandWriter
+ * Method:    jogStop
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_jogStop(JNIEnv *env
+                                                                     , jobject thisObject
+                                                                     , jint    axis) {
+  EMC_JOG_STOP js;
+
+  js.joint_or_axis = axis;
+  js.jjogmode      = 0;
+  sendCommand(js);
   }
 
 
@@ -156,7 +160,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_homeAxis(JNIEnv* 
   EMC_JOINT_HOME jh;
 
   jh.joint = jointNum;
-  sendCommand(&cc, jh);
+  sendCommand(jh);
   }
 
 
@@ -172,9 +176,9 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_loadTaskPlan(JNIE
   EMC_TASK_PLAN_OPEN  po;
   const char*         fileName = env->GetStringUTFChars(gcodeFile, NULL);
 
-  sendCommand(&cc, pc);
+  sendCommand(pc);
   strcpy(po.file, fileName);
-  sendCommand(&cc, po);
+  sendCommand(po);
   }
 
 
@@ -186,6 +190,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_loadTaskPlan(JNIE
 JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_loadToolTable(JNIEnv* env
                                                                            , jobject thisObject
                                                                            , jstring toolTableFile) {
+/*
   EMC_TOOL_LOAD_TOOL_TABLE ltt;
   const char*              fileName = NULL;
 
@@ -193,7 +198,8 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_loadToolTable(JNI
      fileName = env->GetStringUTFChars(toolTableFile, NULL);
      strcpy(ltt.file, fileName);
      }
-  sendCommand(&cc, ltt);
+  sendCommand(ltt);
+  */
   }
 
 
@@ -209,7 +215,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_sendMDICommand(JN
   const char*           cmd = env->GetStringUTFChars(command, NULL);
 
   strcpy(pe.command, cmd);
-  sendCommand(&cc, pe);
+  sendCommand(pe);
   }
 
 
@@ -237,37 +243,37 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setAuto(JNIEnv* e
 
          pr.line = line;
 //         fprintf(stderr, "cmdWriter.setAuto(run) - line: %d\n", line);
-         rv = sendCommand(&cc, pr);
+         rv = sendCommand(pr);
          } break;
     case 1: {
          EMC_TASK_PLAN_PAUSE pp;
 
 //         fputs("cmdWriter.setAuto(pause)\n", stderr);
-         rv = sendCommand(&cc, pp);
+         rv = sendCommand(pp);
          } break;
     case 2: {
          EMC_TASK_PLAN_RESUME pr;
 
 //         fputs("cmdWriter.setAuto(resume)\n", stderr);
-         rv = sendCommand(&cc, pr);
+         rv = sendCommand(pr);
          } break;
     case 3: {
          EMC_TASK_PLAN_STEP ps;
 
 //         fputs("cmdWriter.setAuto(step)\n", stderr);
-         rv = sendCommand(&cc, ps);
+         rv = sendCommand(ps);
          } break;
     case 4: {
          EMC_TASK_PLAN_REVERSE pr;
 
 //         fputs("cmdWriter.setAuto(reverse)\n", stderr);
-         rv = sendCommand(&cc, pr);
+         rv = sendCommand(pr);
          } break;
     case 5: {
          EMC_TASK_PLAN_FORWARD pf;
 
 //         fputs("cmdWriter.setAuto(forward)\n", stderr);
-         rv = sendCommand(&cc, pf);
+         rv = sendCommand(pf);
          } break;
     }
   if (rv) fputs("changing interpreters auto mode FAILED!", stderr);
@@ -286,7 +292,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setBlockDelete(JN
 
   if (enable) bd.state = 1;
   else        bd.state = 0;
-  sendCommand(&cc, bd);
+  sendCommand(bd);
   }
 
 
@@ -301,7 +307,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setFeedOverride(J
   EMC_TRAJ_SET_SCALE ss;
 
   ss.scale = rate;
-  sendCommand(&cc, ss);
+  sendCommand(ss);
   }
 
 
@@ -316,12 +322,12 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setFlood(JNIEnv* 
   if (enable) {
      EMC_COOLANT_FLOOD_ON fo;
 
-     sendCommand(&cc, fo);
+     sendCommand(fo);
      }
   else {
      EMC_COOLANT_FLOOD_OFF fo;
 
-     sendCommand(&cc, fo);
+     sendCommand(fo);
      }
   }
 
@@ -337,12 +343,12 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setMist(JNIEnv*  
   if (enable) {
      EMC_COOLANT_MIST_ON mo;
 
-     sendCommand(&cc, mo);
+     sendCommand(mo);
      }
   else {
      EMC_COOLANT_MIST_OFF mo;
 
-     sendCommand(&cc, mo);
+     sendCommand(mo);
      }
   }
 
@@ -358,7 +364,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setOptionalStop(J
   EMC_TASK_PLAN_SET_OPTIONAL_STOP os;
 
   os.state = enable;
-  sendCommand(&cc, os);
+  sendCommand(os);
   }
 
 
@@ -373,7 +379,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setRapidOverride(
   EMC_TRAJ_SET_RAPID_SCALE rs;
 
   rs.scale = rate;
-  sendCommand(&cc, rs);
+  sendCommand(rs);
   }
 
 
@@ -392,13 +398,13 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setSpindle(JNIEnv
 
      so.speed = direction * speed;
      so.spindle = 0;
-     sendCommand(&cc, so);
+     sendCommand(so);
      }
   else {
      EMC_SPINDLE_OFF so;
 
      so.spindle = 0;
-     sendCommand(&cc, so);
+     sendCommand(so);
      }
   }
 
@@ -415,7 +421,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setSpindleOverrid
 
   ss.spindle = 0;
   ss.scale = rate;
-  sendCommand(&cc, ss);
+  sendCommand(ss);
   }
 
 
@@ -430,7 +436,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setTaskMode(JNIEn
   EMC_TASK_SET_MODE sm;
 
   sm.mode = (EMC_TASK_MODE_ENUM)mode;
-  sendCommand(&cc, sm);
+  sendCommand(sm);
   }
 
 
@@ -445,7 +451,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setTaskState(JNIE
   EMC_TASK_SET_STATE ss;
 
   ss.state = (EMC_TASK_STATE_ENUM)state;
-  sendCommand(&cc, ss);
+  sendCommand(ss);
   }
 
 
@@ -458,7 +464,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_taskAbort(JNIEnv*
                                                                        , jobject thisObject) {
   EMC_TASK_ABORT ta;
 
-  sendCommand(&cc, ta);
+  sendCommand(ta);
   }
 
 #ifdef __cplusplus
