@@ -27,6 +27,12 @@ package de.schwarzrot.system;
  */
 
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
@@ -38,6 +44,7 @@ import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.Position;
 import de.schwarzrot.bean.ToolEntry;
 import de.schwarzrot.model.ActiveCodes;
+import de.schwarzrot.model.CanonPosition;
 import de.schwarzrot.model.SpeedInfo;
 import de.schwarzrot.model.ToolInfo;
 import de.schwarzrot.model.ValueModel;
@@ -61,13 +68,21 @@ public class StatusReader {
       this.g92O                    = new Position();
       //      this.si                      = status.getSpeedInfo();
       //      this.models                  = status.getValueModels();
-      statusBuffer                 = init();
-      statusBuffer.order(ByteOrder.LITTLE_ENDIAN);
-      status = LCStatus.getStatus();
-      //      checkBuffer();
-      readSetup();
-      update(); // at least once before timer start
-      this.initializationCompleted = true;
+      try {
+         socket       = new DatagramSocket(6421);
+         address      = InetAddress.getByName("localhost");
+         sendBuf      = new byte[1280];
+         sendBuffer   = ByteBuffer.wrap(sendBuf);
+         statusBuffer = init();
+         statusBuffer.order(ByteOrder.LITTLE_ENDIAN);
+         status = LCStatus.getStatus();
+         //      checkBuffer();
+         readSetup();
+         update(); // at least once before timer start
+         this.initializationCompleted = true;
+      } catch (SocketException | UnknownHostException e) {
+         e.printStackTrace();
+      }
    }
 
 
@@ -104,6 +119,7 @@ public class StatusReader {
       handleSpeed();
       handleStates();
       handleToolChange();
+      //      broadCastStatus();
       //      long end = System.currentTimeMillis();
       //
       //      l.log(Level.INFO, "update took " + (end - start) + "ms");
@@ -114,6 +130,26 @@ public class StatusReader {
       //      System.out.println(LCStatus.getStatus().getModel("execState"));
       //      System.out.println(LCStatus.getStatus().getModel("interpState"));
       //      System.out.println(LCStatus.getStatus().getModel("applicationMode"));
+   }
+
+
+   protected void broadCastStatus() {
+      if (socket == null)
+         return;
+
+      new Thread(new Runnable() {
+         @Override
+         public void run() {
+            updateSendBuf();
+            DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, 6421);
+
+            try {
+               socket.send(packet);
+            } catch (IOException e) {
+               e.printStackTrace();
+            }
+         }
+      }).start();
    }
 
 
@@ -414,7 +450,7 @@ public class StatusReader {
       e = bufDesc.get(BufferDescriptor.InterpState);
       status.setInterpState(statusBuffer.getInt(e.offset));
 
-      // status.dump();
+      //      status.dump();
       //      System.out.println(status.getModel("taskState"));
       //      System.out.println(status.getModel("taskMode"));
       //      System.out.println(status.getModel("execState"));
@@ -467,8 +503,8 @@ public class StatusReader {
 
       status.getSetup().setNumSpindles(numSpindles);
 
-      readToolsDefinitions();
-      handleToolChange();
+      //      readToolsDefinitions();
+      //      handleToolChange();
       handleSignals();
    }
 
@@ -521,6 +557,32 @@ public class StatusReader {
    }
 
 
+   protected void updateSendBuf() {
+      CanonPosition pos = status.getPositionCalculator().getPosition();
+      int           i   = 0;
+
+      sendBuffer.putDouble(0, pos.getX());
+      sendBuffer.putDouble(++i, pos.getY());
+      sendBuffer.putDouble(++i, pos.getZ());
+      sendBuffer.putDouble(++i, pos.getA());
+      sendBuffer.putDouble(++i, pos.getB());
+      sendBuffer.putDouble(++i, pos.getC());
+      sendBuffer.putDouble(++i, pos.getU());
+      sendBuffer.putDouble(++i, pos.getV());
+      sendBuffer.putDouble(++i, pos.getW());
+      pos = status.getDistanceToGo();
+      sendBuffer.putDouble(++i, pos.getX());
+      sendBuffer.putDouble(++i, pos.getY());
+      sendBuffer.putDouble(++i, pos.getZ());
+      sendBuffer.putDouble(++i, pos.getA());
+      sendBuffer.putDouble(++i, pos.getB());
+      sendBuffer.putDouble(++i, pos.getC());
+      sendBuffer.putDouble(++i, pos.getU());
+      sendBuffer.putDouble(++i, pos.getV());
+      sendBuffer.putDouble(++i, pos.getW());
+   }
+
+
    private void checkBuffer() {
       if (statusBuffer.hasArray())
          System.out.println("buffer has array");
@@ -563,6 +625,10 @@ public class StatusReader {
    private boolean                 initializationCompleted;
    private final IBufferDescriptor bufDesc;
    private final int               activeSpindle;
+   private DatagramSocket          socket;
+   private byte[]                  sendBuf;
+   private ByteBuffer              sendBuffer;
+   private InetAddress             address;
    private BufferEntry             e;
    private Position                p;
    private Position                g5xO;

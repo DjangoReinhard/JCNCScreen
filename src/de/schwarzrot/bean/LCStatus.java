@@ -212,7 +212,7 @@ public class LCStatus {
             models.get(MN_TaskMode).setValue(TaskMode.TaskModeMDI);
             break;
          default:
-            throw new IllegalArgumentException("unknown/invalid task mode");
+            throw new IllegalArgumentException("unknown/invalid task mode #" + taskMode);
       }
    }
 

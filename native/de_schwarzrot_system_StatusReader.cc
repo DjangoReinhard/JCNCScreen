@@ -26,65 +26,15 @@
  *
  * **************************************************************************
  */
-/*
- * JNI implementation of a bridge between linuxcnc and java (ui)
- *
- * compile with:
-g++ -c -I. \
-    -Ilc/src/libnml/linklist \
-    -Ilc/src/libnml/cms \
-    -Ilc/src/libnml/rcs \
-    -Ilc/src/libnml/inifile \
-    -Ilc/src/libnml/os_intf \
-    -Ilc/src/libnml/nml \
-    -Ilc/src/libnml/buffer \
-    -Ilc/src/libnml/posemath \
-    -Ilc/src/rtapi \
-    -Ilc/src/hal \
-    -Ilc/src/emc/nml_intf \
-    -Ilc/src/emc/kinematics \
-    -Ilc/src/emc/tp \
-    -Ilc/src/emc/motion \
-    -Ilc/src/emc/ini \
-    -Ilc/src/emc/rs274ngc \
-    -Ilc/src/emc/sai \
-    -Ilc/src/emc/pythonplugin \
-    -Ilc/include \
-    -I/usr/include/python2.7 \
-    -I/usr/lib/jvm/java-8-openjdk-amd64/include \
-    -g -O2    -DULAPI  -g -Wall -Os -fwrapv -Woverloaded-virtual -fPIC -fno-strict-aliasing \
-    -MP -MD \
-    de_schwarzrot_status_StatusReader.cc \
-    -o jniLinuxCNC.o
-
- * then link as shared lib with:
-g++ -Llc/lib \
-    -Wl,-rpath,lc/lib \
-    -shared \
-    -o jniLinuxCNC.so \
-    jniLinuxCNC.o \
-    lc/lib/liblinuxcnc.a \
-    lc/lib/libnml.so.0 \
-    lc/lib/liblinuxcncini.so \
-    -L/usr/X11R6/lib \
-    -lm -lGL
- *
- */
 #define __STDC_FORMAT_MACROS
 
-#include <Python.h>
 #include "config.h"
 #include "rcs.hh"
 #include "emc.hh"
 #include "emc_nml.hh"
-#include "kinematics.h"
-#include "config.h"
-#include "inifile.hh"
-#include "timer.hh"
-#include "nml_oi.hh"
-#include "rcs_print.hh"
 
 #include  <de_schwarzrot_system_StatusReader.h>
+int emcDecode(NMLTYPE type, void *buffer, CMS * cms);
 
 /*
  * ini-file: /usr/local/src/linuxcnc-dev/configs/sim/axis/axis.ini
@@ -92,32 +42,25 @@ g++ -Llc/lib \
 #define EMC_COMMAND_TIMEOUT 5.0  // how long to wait until timeout
 #define EMC_COMMAND_DELAY   0.01 // how long to sleep between checks
 
-
-struct StatusChannel {
-    PyObject_HEAD
-    RCS_STAT_CHANNEL    *c;
-    EMC_STAT             status;
-    };
-
-static StatusChannel  sc = {0};
-
-static int poll(StatusChannel *s) {
-    if (!s->c->valid()) return -1;
-    int rv = s->c->peek();
-
-    if (rv == EMC_STAT_TYPE) {
-       EMC_STAT *estat = static_cast<EMC_STAT*>(s->c->get_address());
-       memcpy(&s->status, estat, sizeof(EMC_STAT));
-
-       return 0;
-       }
-    return rv;
-    }
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+struct StatusChannel {
+  RCS_STAT_CHANNEL*    c;
+  EMC_STAT*            status;
+  };
+static StatusChannel  sc = {0};
+
+
+static int poll() {
+  if (!sc.c->valid()) return -1;
+  int rv = sc.c->peek();
+
+  if (!rv || rv == EMC_STAT_TYPE) return 0;
+  return rv;
+  }
 
 
 /*
@@ -127,28 +70,30 @@ extern "C" {
  */
 JNIEXPORT jobject JNICALL Java_de_schwarzrot_system_StatusReader_init(JNIEnv *env
                                                                     , jobject thisObject) {
-    const char*   nmlFile    = EMC2_DEFAULT_NMLFILE;
-    jobject       byteBuffer = env->NewDirectByteBuffer((void*)&sc.status, sizeof(EMC_STAT));
-    unsigned long bufSize    = env->GetDirectBufferCapacity(byteBuffer);
+  const char*   nmlFile    = EMC2_DEFAULT_NMLFILE;
 
-    if (bufSize < sizeof(EMC_STAT)) {
-       fprintf(stderr, "ERROR: byteBuffer is too small!!!");
-       }
-    sc.c = new RCS_STAT_CHANNEL(emcFormat, "emcStatus", "xemc", nmlFile);
+  sc.c = new RCS_STAT_CHANNEL(emcDecode, "emcStatus", "xemc", nmlFile);
+  if (sc.c->valid()) {
+     sc.status = static_cast<EMC_STAT*>(sc.c->get_address());
+     fprintf(stderr, "ok, wi got a status channel ...\n");
+     }
+  else {
+     fprintf(stderr, "OUPS, failed to create status channel!\n");
+     return NULL;
+     }
+  jobject       byteBuffer = env->NewDirectByteBuffer((void*)sc.status, sizeof(EMC_STAT));
+  unsigned long bufSize    = env->GetDirectBufferCapacity(byteBuffer);
 
-    if (sc.c) {
-       fprintf(stderr, "ok, wi got a status channel ...\n");
-       }
-    else {
-       fprintf(stderr, "OUPS, failed to create status channel!\n");
-       }
-    void *buf = env->GetDirectBufferAddress(byteBuffer);
+  if (bufSize < sizeof(EMC_STAT)) {
+     fprintf(stderr, "ERROR: byteBuffer is too small!!!");
+     }
+  void *buf = env->GetDirectBufferAddress(byteBuffer);
 
-    fprintf(stderr, "byteBuffer is located at 0x%lX\n", (unsigned long)buf);
-    fprintf(stderr, "byteBuffer is located at #%ld\n",  (unsigned long)buf);
+  fprintf(stderr, "byteBuffer is located at 0x%lX\n", (unsigned long)buf);
+  fprintf(stderr, "byteBuffer is located at #%ld\n",  (unsigned long)buf);
 
-    return byteBuffer;
-    }
+  return byteBuffer;
+  }
 
 /*
  * Class:     de_schwarzrot_status_StatusReader
@@ -159,10 +104,10 @@ JNIEXPORT jstring JNICALL Java_de_schwarzrot_system_StatusReader_getString(JNIEn
                                                                          , jobject thisObject
                                                                          , jint offset
                                                                          , jint length) {
-    std::string fileName = ((const char *)&sc.status) + offset;
+  std::string fileName = ((const char *)sc.status) + offset;
 
-    return env->NewStringUTF(fileName.c_str());
-    }
+  return env->NewStringUTF(fileName.c_str());
+  }
 
 
 /*
@@ -172,15 +117,11 @@ JNIEXPORT jstring JNICALL Java_de_schwarzrot_system_StatusReader_getString(JNIEn
  */
 JNIEXPORT void JNICALL Java_de_schwarzrot_system_StatusReader_readStatus(JNIEnv *env
                                                                        , jobject thisObject) {
-    int rv = poll(&sc);
-
-    if (rv) {
-       // ERROR: could not fetch status message
-       fprintf(stderr, "ERROR %d: could not fetch status message!\n", rv);
-       }
-    }
-
-
+  if (poll()) {
+     // ERROR: could not fetch status message
+     fprintf(stderr, "ERROR: could not fetch status message!\n");
+     }
+  }
 #ifdef __cplusplus
 }
 #endif

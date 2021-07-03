@@ -313,7 +313,7 @@ public class Preview3DCreator extends SimpleApplication
    //   INFORMATION AutoGCodeLister 05:23:37 load gcode file took: 1204ms
    @Override
    public void processGeomFile(Reader r) {
-      Thread.dumpStack();
+      //      Thread.dumpStack();
       long start = System.currentTimeMillis();
       this.enqueue(new AppRunner(this) {
          @Override

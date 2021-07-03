@@ -119,7 +119,7 @@ public class AutoGCodeLister extends GCodeLister {
 
    @Override
    public void loadFile(String fileName) throws FileNotFoundException {
-      Thread.dumpStack();
+      //      Thread.dumpStack();
       long start = System.currentTimeMillis();
       if (loading) {
          l.log(Level.SEVERE, "--- loadFile called, but loading is on the way ...");
@@ -287,8 +287,8 @@ public class AutoGCodeLister extends GCodeLister {
    private AppSetup          appSetup;
    private Preview3DCreator  app;
    private boolean           loading;
-   //   private String            rs274            = "/usr/local/src/linuxcnc-dev/bin/rs274";
-   private String            rs274            = "/usr/local/src/linuxcnc.beauty/bin/rs274";
+   private String            rs274            = "/usr/local/src/linuxcnc-dev/bin/rs274";
+   //   private String            rs274            = "/usr/local/src/linuxcnc.beauty/bin/rs274";
    private static Logger     l;
    private static final long serialVersionUID = 1L;
    static {

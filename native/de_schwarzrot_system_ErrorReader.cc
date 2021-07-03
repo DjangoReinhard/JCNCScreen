@@ -24,74 +24,20 @@
  *
  * **************************************************************************
  */
-/*
- * JNI implementation of a bridge between linuxcnc and java (ui)
- *
- * compile with:
-g++ -c -I. \
-    -Ilc/src/libnml/linklist \
-    -Ilc/src/libnml/cms \
-    -Ilc/src/libnml/rcs \
-    -Ilc/src/libnml/inifile \
-    -Ilc/src/libnml/os_intf \
-    -Ilc/src/libnml/nml \
-    -Ilc/src/libnml/buffer \
-    -Ilc/src/libnml/posemath \
-    -Ilc/src/rtapi \
-    -Ilc/src/hal \
-    -Ilc/src/emc/nml_intf \
-    -Ilc/src/emc/kinematics \
-    -Ilc/src/emc/tp \
-    -Ilc/src/emc/motion \
-    -Ilc/src/emc/ini \
-    -Ilc/src/emc/rs274ngc \
-    -Ilc/src/emc/sai \
-    -Ilc/src/emc/pythonplugin \
-    -Ilc/include \
-    -I/usr/include/python2.7 \
-    -I/usr/lib/jvm/java-8-openjdk-amd64/include \
-    -g -O2    -DULAPI  -g -Wall -Os -fwrapv -Woverloaded-virtual -fPIC -fno-strict-aliasing \
-    -MP -MD \
-    de_schwarzrot_status_StatusReader.cc \
-    -o jniLinuxCNC.o
-
- * then link as shared lib with:
-g++ -Llc/lib \
-    -Wl,-rpath,lc/lib \
-    -shared \
-    -o jniLinuxCNC.so \
-    jniLinuxCNC.o \
-    lc/lib/liblinuxcnc.a \
-    lc/lib/libnml.so.0 \
-    lc/lib/liblinuxcncini.so \
-    -L/usr/X11R6/lib \
-    -lm -lGL
- *
- */
 #define __STDC_FORMAT_MACROS
 
-#include <Python.h>
 #include "config.h"
 #include "rcs.hh"
 #include "emc.hh"
 #include "emc_nml.hh"
-#include "kinematics.h"
-#include "config.h"
-#include "inifile.hh"
-#include "timer.hh"
 #include "nml_oi.hh"
-#include "rcs_print.hh"
+#include <string.h>
 
 #include  <de_schwarzrot_system_ErrorReader.h>
+int emcDecode(NMLTYPE type, void *buffer, CMS * cms);
 
 
-struct ErrorChannel {
-  PyObject_HEAD
-  NML                *c;
-  };
-
-static ErrorChannel   ec = {0};
-
+static NML* ec;
 
 #ifdef __cplusplus
 extern "C" {
@@ -106,13 +52,15 @@ extern "C" {
  *            Lde/schwarzrot/system/SystemMessage/MessageType;
  */
 JNIEXPORT jobject JNICALL Java_de_schwarzrot_system_ErrorReader_fetchMessage(JNIEnv *env, jobject thisObject) {
-  if (!ec.c->valid()) {
+  if (!ec || !ec->valid()) {
      fprintf(stderr, "ERROR: error buffer is invalid!");
      return NULL;
      }
-  NMLTYPE type = ec.c->read();
-  if (type == 0) return NULL;
+  NMLTYPE type = ec->read();
+
+  if (!type) return NULL;
   char error_buffer[LINELEN];
+
   jclass clSysMsg  = env->FindClass("de/schwarzrot/system/SystemMessage");
   jclass clMsgType = env->FindClass("de/schwarzrot/system/SystemMessage$MessageType");
   jfieldID fEnumMsgType;
@@ -122,43 +70,43 @@ JNIEXPORT jobject JNICALL Java_de_schwarzrot_system_ErrorReader_fetchMessage(JNI
          fEnumMsgType = env->GetStaticFieldID(clMsgType
                                             , "OperatorError"
                                             , "Lde/schwarzrot/system/SystemMessage$MessageType;");
-         strncpy(error_buffer, ((EMC_OPERATOR_ERROR*)ec.c->get_address())->error, LINELEN-1);
+         strncpy(error_buffer, ((EMC_OPERATOR_ERROR*)ec->get_address())->error, LINELEN-1);
          } break;
     case EMC_OPERATOR_TEXT_TYPE: {
          fEnumMsgType = env->GetStaticFieldID(clMsgType
                                             , "OperatorText"
                                             , "Lde/schwarzrot/system/SystemMessage$MessageType;");
-         strncpy(error_buffer, ((EMC_OPERATOR_TEXT*)ec.c->get_address())->text, LINELEN-1);
+         strncpy(error_buffer, ((EMC_OPERATOR_TEXT*)ec->get_address())->text, LINELEN-1);
          } break;
     case EMC_OPERATOR_DISPLAY_TYPE: {
          fEnumMsgType = env->GetStaticFieldID(clMsgType
                                             , "OperatorDisplay"
                                             , "Lde/schwarzrot/system/SystemMessage$MessageType;");
-         strncpy(error_buffer, ((EMC_OPERATOR_DISPLAY*)ec.c->get_address())->display, LINELEN-1);
+         strncpy(error_buffer, ((EMC_OPERATOR_DISPLAY*)ec->get_address())->display, LINELEN-1);
          } break;
     case NML_ERROR_TYPE: {
          fEnumMsgType = env->GetStaticFieldID(clMsgType
                                             , "NMLError"
                                             , "Lde/schwarzrot/system/SystemMessage$MessageType;");
-         strncpy(error_buffer, ((NML_ERROR*)ec.c->get_address())->error, LINELEN-1);
+         strncpy(error_buffer, ((NML_ERROR*)ec->get_address())->error, LINELEN-1);
          } break;
     case NML_TEXT_TYPE: {
          fEnumMsgType = env->GetStaticFieldID(clMsgType
                                             , "NMLText"
                                             , "Lde/schwarzrot/system/SystemMessage$MessageType;");
-         strncpy(error_buffer, ((NML_TEXT*)ec.c->get_address())->text, LINELEN-1);
+         strncpy(error_buffer, ((NML_TEXT*)ec->get_address())->text, LINELEN-1);
          } break;
     case NML_DISPLAY_TYPE: {
          fEnumMsgType = env->GetStaticFieldID(clMsgType
                                             , "NMLDisplay"
                                             , "Lde/schwarzrot/system/SystemMessage$MessageType;");
-         strncpy(error_buffer, ((NML_DISPLAY*)ec.c->get_address())->display, LINELEN-1);
+         strncpy(error_buffer, ((NML_DISPLAY*)ec->get_address())->display, LINELEN-1);
          } break;
     default: {
          fEnumMsgType = env->GetStaticFieldID(clMsgType
                                             , "NMLError"
                                             , "Lde/schwarzrot/system/SystemMessage$MessageType;");
-         sprintf(error_buffer, "unrecognized error %" PRId32, type);
+         sprintf(error_buffer, "unrecognized error %d", type);
          } break;
     }
   error_buffer[LINELEN-1]  = 0;
@@ -185,14 +133,11 @@ JNIEXPORT jobject JNICALL Java_de_schwarzrot_system_ErrorReader_fetchMessage(JNI
  */
 JNIEXPORT jint JNICALL Java_de_schwarzrot_system_ErrorReader_init(JNIEnv *env, jobject thisObject) {
   const char* nmlFile = EMC2_DEFAULT_NMLFILE;
-  NML*        c       = new NML(emcFormat, "emcError", "xemc", nmlFile);
 
-  if (!c) {
+  if (!(ec = new NML(emcDecode, "emcError", "xemc", nmlFile))) {
      fprintf(stderr, "ERROR: new NML failed!");
      return -1;
      }
-  ec.c = c;
-
   return 0;
   }
 

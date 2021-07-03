@@ -26,8 +26,15 @@ package de.schwarzrot.nml;
  * **************************************************************************
  */
 
+
+import java.util.Set;
+
+
 public interface IBufferDescriptor {
    public BufferEntry get(String key);
+
+
+   public Set<String> keySet();
 
 
    public static final String AbsPosX               = "absPosX";
@@ -95,7 +102,7 @@ public interface IBufferDescriptor {
    public static final String ToolInSpindle         = "toolInSpindle";
    public static final String ToolOffsX             = "toolOffsX";
    public static final String ToolTable             = "toolTable";
-   public static final String Velocity              = "velocity";
+   public static final String VelocityT             = "velocityT";
    public static final String VelocityA             = "velocityA";
    public static final String VelocityJ             = "velocityJ";
 }

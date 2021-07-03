@@ -29,6 +29,7 @@ package de.schwarzrot.nml;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import de.schwarzrot.nml.BufferEntry.BufferEntryType;
 
@@ -40,6 +41,12 @@ public class BufferDescriptor implements IBufferDescriptor {
    @Override
    public BufferEntry get(String key) {
       return bufferEntries.get(key);
+   }
+
+
+   @Override
+   public Set<String> keySet() {
+      return bufferEntries.keySet();
    }
 
 
@@ -130,31 +137,23 @@ public class BufferDescriptor implements IBufferDescriptor {
       //      [  6704] spindle[0]scale
       //      [  6712] spindle[0]css_max
       //      [  6720] spindle[0]css_fak
-      //      [  6728] spindle[0]dir
-      //      [  6732] spindle[0]brake
-      //      [  6736] spindle[0]increasing
-      //      [  6740] spindle[0]enabled
-      //      [  6744] spindle[0]orient_state
-      //      [  6748] spindle[0]orient_fault
-      //      [  6752] spindle[0]override_enable
-      //      [  6753] spindle[0]homed
+      //        [  6732] spindle[0]dir
+      //        [  6736] spindle[0]brake
+      //        [  6740] spindle[0]increasing
+      //        [  6744] spindle[0]enabled
+      //        [  6748] spindle[0]orient_state
+      //        [  6752] spindle[0]orient_fault
+      //        [  6756] spindle[0]override_enable
+      //        [  6757] spindle[0]homed
       //      [  9808] pocket_prepped
       //      [  9812] tool_in_spindle
-      //      [  9816] tool_table
-      //      [122032] mist
-      //      [122036] flood
-      //      [122144] estop
-      //      [122256] lube
-      //      [122260] lube_level
-      //      [122264] debug
-
-      //      TASK_SET_STATE - size: 24, offset of state: 20
-      //      JOINT_HOME - size: 24, offset of joint: 20
-      //      TASK_PLAN_OPEN - size: 280, offset of file: 20
-      //      TASK_PLAN_RUN - size: 24, offset of line: 20
-      //      SPINDLE_STAT - size: 168, max. number of spindles: 8
-      //      ToolTable - size: 112, max. number of tool-entries: 1001
-      //      EmcPose - size: 72
+      //  ==  [  9816] tool_table ==
+      //      [ 10032] mist
+      //      [ 10036] flood
+      //      [ 10144] estop
+      //      [ 10256] lube
+      //      [ 10260] lube_level
+      //      [ 10264] debug
 
       bufferEntries = new HashMap<String, BufferEntry>();
 
@@ -246,22 +245,22 @@ public class BufferDescriptor implements IBufferDescriptor {
       bufferEntries.put(BufferDescriptor.SpindleScale,
             new BufferEntry(BufferDescriptor.SpindleScale, 6704, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.SpindleDir,
-            new BufferEntry(BufferDescriptor.SpindleDir, 6728, 1, BufferEntryType.Byte));
+            new BufferEntry(BufferDescriptor.SpindleDir, 6732, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.SpindleIncreasing,
-            new BufferEntry(BufferDescriptor.SpindleIncreasing, 6736, 1, BufferEntryType.Byte));
+            new BufferEntry(BufferDescriptor.SpindleIncreasing, 6740, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.SpindleOverrideEnable,
-            new BufferEntry(BufferDescriptor.SpindleOverrideEnable, 6752, 1, BufferEntryType.Byte));
+            new BufferEntry(BufferDescriptor.SpindleOverrideEnable, 6756, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.SpindleEnabled,
-            new BufferEntry(BufferDescriptor.SpindleEnabled, 6740, 1, BufferEntryType.Byte));
+            new BufferEntry(BufferDescriptor.SpindleEnabled, 6744, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.SpindleHomed,
-            new BufferEntry(BufferDescriptor.SpindleHomed, 6753, 1, BufferEntryType.Byte));
+            new BufferEntry(BufferDescriptor.SpindleHomed, 6757, 1, BufferEntryType.Byte));
 
       bufferEntries.put(BufferDescriptor.Feedrate,
             new BufferEntry(BufferDescriptor.Feedrate, 1464, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.Rapidrate,
             new BufferEntry(BufferDescriptor.Rapidrate, 1472, 1, BufferEntryType.Byte));
-      bufferEntries.put(BufferDescriptor.Velocity,
-            new BufferEntry(BufferDescriptor.Velocity, 1624, 1, BufferEntryType.Byte));
+      bufferEntries.put(BufferDescriptor.VelocityT,
+            new BufferEntry(BufferDescriptor.VelocityT, 1624, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.VelocityA,
             new BufferEntry(BufferDescriptor.VelocityA, 5496, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.VelocityJ,
@@ -272,8 +271,10 @@ public class BufferDescriptor implements IBufferDescriptor {
             new BufferEntry(BufferDescriptor.Max_velocity, 1640, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.Max_acceleration,
             new BufferEntry(BufferDescriptor.Max_acceleration, 1648, 1, BufferEntryType.Byte));
+      /*
       bufferEntries.put(BufferDescriptor.ToolTable,
             new BufferEntry(BufferDescriptor.ToolTable, 9816, 1, BufferEntryType.Byte));
+       */
       bufferEntries.put(BufferDescriptor.ToolInSpindle,
             new BufferEntry(BufferDescriptor.ToolInSpindle, 9812, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.PocketPrepared,
@@ -290,7 +291,7 @@ public class BufferDescriptor implements IBufferDescriptor {
       bufferEntries.put(BufferDescriptor.ProgramUnits,
             new BufferEntry(BufferDescriptor.ProgramUnits, 1144, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.Distance2Go,
-            new BufferEntry(BufferDescriptor.Distance2Go, 1752, 1, BufferEntryType.Byte));
+            new BufferEntry(BufferDescriptor.Distance2Go, 1744, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.ActiveSettings,
             new BufferEntry(BufferDescriptor.ActiveSettings, 1104, 3, BufferEntryType.Double));
 
@@ -304,14 +305,14 @@ public class BufferDescriptor implements IBufferDescriptor {
             new BufferEntry(BufferDescriptor.Feed_hold_enabled, 1834, 1, BufferEntryType.Byte));
 
       bufferEntries.put(BufferDescriptor.CoolMist,
-            new BufferEntry(BufferDescriptor.CoolMist, 122032, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.CoolMist, 10032, 1, BufferEntryType.Integer));
       bufferEntries.put(BufferDescriptor.CoolFlood,
-            new BufferEntry(BufferDescriptor.CoolFlood, 122036, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.CoolFlood, 10036, 1, BufferEntryType.Integer));
       bufferEntries.put(BufferDescriptor.Lube,
-            new BufferEntry(BufferDescriptor.Lube, 122256, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.Lube, 10256, 1, BufferEntryType.Integer));
       bufferEntries.put(BufferDescriptor.Estop,
-            new BufferEntry(BufferDescriptor.Estop, 122144, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.Estop, 10144, 1, BufferEntryType.Integer));
       bufferEntries.put(BufferDescriptor.Debug,
-            new BufferEntry(BufferDescriptor.Debug, 122264, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.Debug, 10264, 1, BufferEntryType.Integer));
    }
 }
