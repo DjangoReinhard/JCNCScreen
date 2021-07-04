@@ -41,7 +41,7 @@
             <src path = "${src.dir}"/>
             <classpath refid = "master-classpath"/>
         </javac>
-        <exec dir = "${native.dir}" executable = "./build.it"/>
+        <exec dir = "${native.dir}" executable = "make"/>
         <mkdir dir = "${build.dir}/images"/>
         <copy todir="${build.dir}">
             <fileset dir="${res.dir}"/>
