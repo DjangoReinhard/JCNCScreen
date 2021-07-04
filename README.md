@@ -28,14 +28,14 @@
 
 ## Build
 * All Projects must reside in parallel directories, i.e. like this:
-
+  ```
   /usr/local/src
              |-  JCNCScreen              (mandatory)
              |-  LCExportHandler         (mandatory)
              |-  LinuxCNCExportHandler   (optional)
              |-  CamBamExportHandler     (optional)
              +-  SRExportHandler         (optional)
-
+  ```
 * subproject _LCExportHandler_ should be build first.
   But before building it, _JCNCScreen_ should already have been downloaded.
   Dive into the projects directory and call
