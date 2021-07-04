@@ -6,6 +6,9 @@
 * _JCNCScreen_ contains a tool-manager with plugins for exporting tooltables for
   different applications. These Plugins are separate projects.
 
+* _JCNCScreen_ supports up to 9 axis. Screen controls reflect settings from
+  linuxcnc inifile.
+
 * _JCNCScreen_ is build with java-language and swing for gui, so building and
   installing might be different to usual linux packages.
 
@@ -16,20 +19,22 @@
 
 ## Screenshots
 [![screenshot](doc/LC_Test_thumb01.jpg)](doc/LC_Test01.jpg)
+
 [![screenshot](doc/LC_Jog_thumb01.jpg)](doc/LC_Jog01.jpg)
+
 [![screenshot](doc/LC_GCedit_thumb01.jpg)](doc/LC_GCedit01.jpg)
+
 [![screenshot](doc/LC_TT_thumb01.jpg)](doc/LC_TT01.jpg)
 
 ## Build
-All Projects must reside in parallel directories, i.e. like this:
+* All Projects must reside in parallel directories, i.e. like this:
 
-* /usr/share/src
-
-      -  JCNCScreen              (mandatory)
-      -  LCExportHandler         (mandatory)
-      -  LinuxCNCExportHandler   (optional)
-      -  CamBamExportHandler     (optional)
-      -  SRExportHandler         (optional)
+  /usr/local/src
+             |-  JCNCScreen              (mandatory)
+             |-  LCExportHandler         (mandatory)
+             |-  LinuxCNCExportHandler   (optional)
+             |-  CamBamExportHandler     (optional)
+             +-  SRExportHandler         (optional)
 
 * subproject _LCExportHandler_ should be build first.
   But before building it, _JCNCScreen_ should already have been downloaded.
@@ -76,7 +81,7 @@ All Projects must reside in parallel directories, i.e. like this:
   variable from DISPLAY section.
   Change it to JCNCScreen and you're done.
 
-  Inifile should look like this:
+  DISPLAY section of inifile should look like this:
   ```
   [DISPLAY]
   #DISPLAY = axis
