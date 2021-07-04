@@ -88,5 +88,9 @@
   DISPLAY = JCNCScreen
   ```
 
+## Usage
+* find a user manual in subdirectory **doc**
+
+
 Have fun!
 
