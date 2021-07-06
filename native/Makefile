@@ -36,7 +36,7 @@ CC_FLAGS=-I. \
  -I/usr/lib/jvm/java-11-openjdk-amd64/include \
  -I/usr/lib/jvm/java-11-openjdk-amd64/include/linux \
  -DULAPI -g -Wall -Os -fwrapv -Woverloaded-virtual \
- -D_GNU_SOURCE -Wno-psabi -std=gnu++11 \
+ -D_GNU_SOURCE -DTOOL_NML -Wno-psabi -std=gnu++11 \
  -fPIC -fno-strict-aliasing \
  -MP -MD
 

@@ -21,7 +21,6 @@
     <pathconvert property = "test.classpath" refid = "master-classpath" pathsep=":"/>
     <pathconvert property = "jar.classpath" refid = "master-classpath" pathsep = " "/>
 
-
     <target name = "info">
         <echo>build UI-application for LinuxCNC</echo>
         <echo>src-dir: ${src.dir}</echo>
@@ -50,11 +49,21 @@
     </target>
 
     <target name = "clean" description = "clean output directories">
-        <delete>
+        <delete failonerror="false">
             <fileset dir = "${build.dir}">
                 <include name = "**/*"/>
             </fileset>
+            <fileset dir = ".">
+                <include name = "${name}-bin.zip"/>
+            </fileset>
         </delete>
+        <exec dir = "${native.dir}" executable = "make">
+            <arg value="clean"/>
+        </exec>
+        <exec executable="/usr/bin/rm">
+            <arg value="-rf"/>
+            <arg value="${dist.dir}"/>
+        </exec>
     </target>
 
     <target name = "dist" depends="clean,build">
@@ -74,15 +83,22 @@
         </jar>
         <copy todir="${dist.dir}">
             <fileset file="${native.dir}/libLinuxCNC.so"/>
+            <fileset file="${lib.dir}/*.so"/>
             <fileset file="COPYING"/>
         </copy>
+        <!--
         <symlink link = "${dist.dir}/exHdr" resource = "../exHdr" overwrite = "true"/>
+        -->
+        <exec executable="bash" dir="${dist.dir}">
+            <arg value="-c"/>
+            <arg value="if [ -d &quot;../exHdr&quot; ]; then ln -s &quot;../exHdr&quot; ${dist.dir}/exHdr; fi"/>
+        </exec>
         <symlink link = "${dist.dir}/lib"   resource = "../lib" overwrite = "true"/>
-        <echo file = "${dist.dir}/misc/${name}">
-#!/bin/bash
+        <echo file = "${dist.dir}/misc/${name}">#!/bin/bash
 cd ${dist.dir}
-java -Djava.library.path=.:./lc/lib -jar ${name}.jar -base ./exHdr
-        </echo>
+java -Djava.library.path=.:./lc/lib -splash:lc/linuxcnc.gif -jar ${name}.jar -base ./exHdr
+</echo>
+        <chmod file="${dist.dir}/misc/${name}" perm="ugo+x"/>
         <zip destfile="${name}-bin.zip"
              basedir="${dist.dir}"
              update="true"/>
