@@ -67,10 +67,6 @@ static int sendCommand(RCS_CMD_MSG& cmd) {
   return -1;
   }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /*
  * Class:     de_schwarzrot_system_CommandWriter
@@ -467,6 +463,3 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_taskAbort(JNIEnv*
   sendCommand(ta);
   }
 
-#ifdef __cplusplus
-}
-#endif

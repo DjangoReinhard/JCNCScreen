@@ -42,10 +42,6 @@ int emcDecode(NMLTYPE type, void *buffer, CMS * cms);
 #define EMC_COMMAND_TIMEOUT 5.0  // how long to wait until timeout
 #define EMC_COMMAND_DELAY   0.01 // how long to sleep between checks
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 struct StatusChannel {
   RCS_STAT_CHANNEL*    c;
@@ -122,6 +118,4 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_StatusReader_readStatus(JNIEnv 
      fprintf(stderr, "ERROR: could not fetch status message!\n");
      }
   }
-#ifdef __cplusplus
-}
-#endif
+

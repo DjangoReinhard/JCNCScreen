@@ -471,6 +471,7 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       device = ge.getDefaultScreenDevice();
       UITheme.setupDefaults(themeName);
       String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+      File   cd          = new File(".");
 
       try {
          javax.swing.UIManager.setLookAndFeel(lookAndFeel);
@@ -488,6 +489,7 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       LCStatus.getStatus().checkLocale();
       DatabaseUtils dbUtils = new DatabaseUtils();
 
+      System.out.println("current directory: " + cd.getAbsolutePath());
       dbUtils.addTable(new ToolCatDBTable(true));
       dbUtils.addTable(new ToolDBTable());
       LCStatus.getStatus().setToolLibrary(new DBToolLibrary(dbUtils));
@@ -509,6 +511,14 @@ public class LinuxCNCClient extends JFrame implements Runnable {
          if (arg.startsWith("-") || arg.startsWith("/"))
             arg = args[i].substring(1);
 
+         if ("checkBuffer".compareToIgnoreCase(arg) == 0) {
+            String cbDir = ".";
+
+            if (args.length > i + 1)
+               cbDir = args[i + 1];
+            new de.schwarzrot.nml.CheckBufferDescriptor(cbDir).run();
+            System.exit(0);
+         }
          if ("portrait".compareToIgnoreCase(arg) == 0) {
             portraitMode = true;
          }

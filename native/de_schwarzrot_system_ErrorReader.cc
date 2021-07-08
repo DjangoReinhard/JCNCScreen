@@ -39,9 +39,6 @@ int emcDecode(NMLTYPE type, void *buffer, CMS * cms);
 
 static NML* ec;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * Class:     de_schwarzrot_system_ErrorReader
@@ -141,6 +138,3 @@ JNIEXPORT jint JNICALL Java_de_schwarzrot_system_ErrorReader_init(JNIEnv *env, j
   return 0;
   }
 
-#ifdef __cplusplus
-}
-#endif

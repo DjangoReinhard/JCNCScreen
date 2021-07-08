@@ -41,10 +41,11 @@ CC_FLAGS=-I. \
  -MP -MD
 
 
+# -lrt \
+
 LC_FLAGS = -L$(abspath lc/lib) \
  -Wl,-rpath,$(abspath lc/lib) \
  -Xlinker -Map=libLinuxCNC.map \
- -shared \
   $(abspath lc/lib/liblinuxcnc.a) \
   $(abspath lc/lib/liblinuxcncini.so) \
   $(abspath lc/lib/liblinuxcnchal.so) \
@@ -54,17 +55,20 @@ LC_FLAGS = -L$(abspath lc/lib) \
 GCC     = g++
 
 
-all: 	libLinuxCNC.so
+all: 	libLinuxCNC.so DumpBufDesc
 
 clean:
 	rm *.o
 	rm *.d
 	rm *.so
+	rm DumpBufDesc
 
 %.o : %.cc
 	$(GCC) -c $(CC_FLAGS) -o $@ $<
 
 libLinuxCNC.so: $(O_NML)
-	$(GCC) $(LC_FLAGS) -o $@ $^
+	$(GCC) -shared $(LC_FLAGS) -o $@ $^
 
+DumpBufDesc:	dumpBufDesc.o
+	$(GCC) $(LC_FLAGS) -o $@ $^
 

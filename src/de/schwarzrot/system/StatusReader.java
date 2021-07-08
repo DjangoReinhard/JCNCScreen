@@ -71,8 +71,8 @@ public class StatusReader {
       try {
          socket       = new DatagramSocket(6421);
          address      = InetAddress.getByName("localhost");
-         sendBuf      = new byte[1280];
-         sendBuffer   = ByteBuffer.wrap(sendBuf);
+//         sendBuf      = new byte[1280];
+//         sendBuffer   = ByteBuffer.wrap(sendBuf);
          statusBuffer = init();
          statusBuffer.order(ByteOrder.LITTLE_ENDIAN);
          status = LCStatus.getStatus();
@@ -137,6 +137,7 @@ public class StatusReader {
       if (socket == null)
          return;
 
+/*
       new Thread(new Runnable() {
          @Override
          public void run() {
@@ -150,6 +151,7 @@ public class StatusReader {
             }
          }
       }).start();
+ */
    }
 
 
@@ -503,8 +505,8 @@ public class StatusReader {
 
       status.getSetup().setNumSpindles(numSpindles);
 
-      //      readToolsDefinitions();
-      //      handleToolChange();
+      readToolsDefinitions();
+      handleToolChange();
       handleSignals();
    }
 
@@ -550,13 +552,14 @@ public class StatusReader {
          tools.add(tool);
       }
       tools.getReadWriteLock().writeLock().unlock();
-      // System.out.println("\n" + status.getSetup() + "\n");
-      //      for (ToolEntry te : tools) {
-      //         System.out.println("\ngot tool: " + te);
-      //      }
+      System.out.println("\n" + status.getSetup() + "\n");
+      for (ToolEntry te : tools) {
+         System.out.println("\ngot tool: " + te);
+      }
    }
 
 
+/*
    protected void updateSendBuf() {
       CanonPosition pos = status.getPositionCalculator().getPosition();
       int           i   = 0;
@@ -581,6 +584,7 @@ public class StatusReader {
       sendBuffer.putDouble(++i, pos.getV());
       sendBuffer.putDouble(++i, pos.getW());
    }
+ */
 
 
    private void checkBuffer() {
@@ -626,8 +630,8 @@ public class StatusReader {
    private final IBufferDescriptor bufDesc;
    private final int               activeSpindle;
    private DatagramSocket          socket;
-   private byte[]                  sendBuf;
-   private ByteBuffer              sendBuffer;
+//   private byte[]                  sendBuf;
+//   private ByteBuffer              sendBuffer;
    private InetAddress             address;
    private BufferEntry             e;
    private Position                p;

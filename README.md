@@ -36,13 +36,22 @@
              |-  CamBamExportHandler     (optional)
              +-  SRExportHandler         (optional)
   ```
-* subproject _LCExportHandler_ should be build first.
+* subproject _LCExportHandler_ should be build first. _LCExportHandler_ is a 
+  library containing interfaces and base classes used by export handlers and
+  _JCNCScreen_.
   But before building it, _JCNCScreen_ should already have been downloaded.
   Dive into the projects directory and call
   ```
   ant dist
   ```
-  That will build the library and copy it into the lib directory of _JCNCScreen_.
+  That will build the library and copy it into the **lib** directory of _JCNCScreen_.
+
+* Next step is to build _LinuxCNCExportHandler_.
+  Go to projects directory and call
+  ```
+  ant dist
+  ```
+  That will build the export handler and copy it to **exHdr** directory of _JCNCScreen_.
 
 * Next step is to build _JCNCScreen_.
   As already mentioned, _JCNCScreen_ consists of two parts, the java components

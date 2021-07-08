@@ -52,109 +52,6 @@ public class BufferDescriptor implements IBufferDescriptor {
 
    private static final Map<String, BufferEntry> bufferEntries;
    static {
-      //      [    20] echo_serial_number
-      //      [    20] echo_serial_number
-      //      [    24] state
-      //      [   212] task_mode
-      //      [   216] task_state
-      //      [   220] exec_state
-      //      [   224] interp_state
-      //      [   228] call_level
-      //      [   240] read_line
-      //      [   232] motion_line
-      //      [   236] current_line
-      //      [   247] file
-      //      [   502] command
-      //      [  1144] program_units
-      //      [  1148] interpreter_errcode
-      //      [   244] optional_stop
-      //      [   245] block_delete
-      //      [  1152] task_paused
-      //      [   246] input_timeout
-      //      [   912] rotation_xy
-      //      [  1160] delay_left
-      //      [  1168] queued_mdi_commands
-      //      [  1392] linear_units
-      //      [  1400] angular_units
-      //      [  1408] cycle_time
-      //      [  1416] joints
-      //      [  6592] spindle[0]
-      //      [  1428] axis_mask
-      //      [  1432] motion_mode
-      //      [  1436] enabled
-      //      [  1437] inpos
-      //      [  1440] queue
-      //      [  1444] active_queue
-      //      [  1448] queue_full
-      //      [  1452] id
-      //      [  1456] paused
-      //      [  1464] feedrate
-      //      [  1472] rapidrate
-      //      [  1624] velocityT
-      //      [  5496] velocityA
-      //      [  2104] velocityJ
-      //      [  1632] acceleration
-      //      [  1640] max_velocity
-      //      [  1648] max_acceleration
-      //      [  1728] probe_tripped
-      //      [  1729] probing
-      //      [  1732] probe_val
-      //      [  1736] kinematics_type
-      //      [  1740] motion_type
-      //      [  1744] distance_to_go
-      //      [  1824] current_vel
-      //      [  1832] feed_override_enabled
-      //      [  1833] adaptive_feed_enabled
-      //      [  1834] feed_hold_enabled
-      //      [   992] active_gcodes
-      //      [  1060] active_mcodes
-      //      [  1104] active_settings
-      //      [  1480] position
-      //      [  1552] actual_pos
-      //      [  1752] dtg
-      //      [   760] g5x_offset
-      //      [   840] g92_offset
-      //      [   920] tool_offset
-      //      [  2116] joint_x_enabled
-      //      [  2332] joint_y_enabled
-      //      [  2548] joint_z_enabled
-      //      [  2764] joint_a_enabled
-      //      [  2980] joint_b_enabled
-      //      [  3196] joint_c_enabled
-      //      [  3412] joint_u_enabled
-      //      [  3628] joint_v_enabled
-      //      [  3844] joint_w_enabled
-      //      [  2114] joint_x_homed
-      //      [  2330] joint_y_homed
-      //      [  2546] joint_z_homed
-      //      [  2762] joint_a_homed
-      //      [  2978] joint_b_homed
-      //      [  3194] joint_c_homed
-      //      [  3410] joint_u_homed
-      //      [  3626] joint_v_homed
-      //      [  3842] joint_w_homed
-      //      [  6696] spindle[0]speed
-      //      [  6704] spindle[0]scale
-      //      [  6712] spindle[0]css_max
-      //      [  6720] spindle[0]css_fak
-      //        [  6732] spindle[0]dir
-      //        [  6736] spindle[0]brake
-      //        [  6740] spindle[0]increasing
-      //        [  6744] spindle[0]enabled
-      //        [  6748] spindle[0]orient_state
-      //        [  6752] spindle[0]orient_fault
-      //        [  6756] spindle[0]override_enable
-      //        [  6757] spindle[0]homed
-      //      [  9808] pocket_prepped
-      //      [  9812] tool_in_spindle
-      //  ==  [  9816] tool_table ==
-      //      [ 10032] mist
-      //      [ 10036] flood
-      //      [ 10144] estop
-      //      [ 10256] lube
-      //      [ 10260] lube_level
-      //      [ 10264] debug
-
       bufferEntries = new HashMap<String, BufferEntry>();
 
       bufferEntries.put(BufferDescriptor.AbsPosX,
@@ -226,18 +123,6 @@ public class BufferDescriptor implements IBufferDescriptor {
       bufferEntries.put(BufferDescriptor.Joints,
             new BufferEntry(BufferDescriptor.Joints, 1416, 1, BufferEntryType.Byte));
 
-      //      [  6696] spindle[0]speed
-      //      [  6704] spindle[0]scale
-      //      [  6712] spindle[0]css_max
-      //      [  6720] spindle[0]css_fak
-      //      [  6728] spindle[0]dir
-      //      [  6732] spindle[0]brake
-      //      [  6736] spindle[0]increasing
-      //      [  6740] spindle[0]enabled
-      //      [  6744] spindle[0]orient_state
-      //      [  6748] spindle[0]orient_fault
-      //      [  6752] spindle[0]override_enable
-      //      [  6753] spindle[0]homed
       bufferEntries.put(BufferDescriptor.Spindles,
             new BufferEntry(BufferDescriptor.Spindles, 6592, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.SpindleSpeed,
@@ -271,10 +156,8 @@ public class BufferDescriptor implements IBufferDescriptor {
             new BufferEntry(BufferDescriptor.Max_velocity, 1640, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.Max_acceleration,
             new BufferEntry(BufferDescriptor.Max_acceleration, 1648, 1, BufferEntryType.Byte));
-      /*
       bufferEntries.put(BufferDescriptor.ToolTable,
             new BufferEntry(BufferDescriptor.ToolTable, 9816, 1, BufferEntryType.Byte));
-       */
       bufferEntries.put(BufferDescriptor.ToolInSpindle,
             new BufferEntry(BufferDescriptor.ToolInSpindle, 9812, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.PocketPrepared,
@@ -305,14 +188,14 @@ public class BufferDescriptor implements IBufferDescriptor {
             new BufferEntry(BufferDescriptor.Feed_hold_enabled, 1834, 1, BufferEntryType.Byte));
 
       bufferEntries.put(BufferDescriptor.CoolMist,
-            new BufferEntry(BufferDescriptor.CoolMist, 10032, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.CoolMist, 122032, 1, BufferEntryType.Integer));
       bufferEntries.put(BufferDescriptor.CoolFlood,
-            new BufferEntry(BufferDescriptor.CoolFlood, 10036, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.CoolFlood, 122036, 1, BufferEntryType.Integer));
       bufferEntries.put(BufferDescriptor.Lube,
-            new BufferEntry(BufferDescriptor.Lube, 10256, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.Lube, 122256, 1, BufferEntryType.Integer));
       bufferEntries.put(BufferDescriptor.Estop,
-            new BufferEntry(BufferDescriptor.Estop, 10144, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.Estop, 122144, 1, BufferEntryType.Integer));
       bufferEntries.put(BufferDescriptor.Debug,
-            new BufferEntry(BufferDescriptor.Debug, 10264, 1, BufferEntryType.Integer));
+            new BufferEntry(BufferDescriptor.Debug, 122264, 1, BufferEntryType.Integer));
    }
 }
