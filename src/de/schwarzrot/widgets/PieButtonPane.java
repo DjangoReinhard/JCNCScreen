@@ -60,29 +60,29 @@ public class PieButtonPane extends AbstractShapedPanel {
 
 
    protected void createComponents(JPanel p, ICondition condEnable) {
-      JButton       bt = new PieButton(negText, condEnable, 1);
+      JButton       bt = new PieButton(posText, condEnable, 1);
       MouseListener ml = MachineControl.getInstance();
 
       bt.addMouseListener(ml);
       p.add(bt, 1);
 
-      bt = new PieButton(negText, condEnable, 2);
+      bt = new PieButton(posText, condEnable, 2);
       bt.addMouseListener(ml);
       p.add(bt, 2);
 
-      bt = new PieButton(negText, condEnable, 3);
+      bt = new PieButton(posText, condEnable, 3);
       bt.addMouseListener(ml);
       p.add(bt, 3);
 
-      bt = new PieButton(posText, condEnable, 1);
+      bt = new PieButton(negText, condEnable, 1);
       bt.addMouseListener(ml);
       p.add(bt, -1);
 
-      bt = new PieButton(posText, condEnable, 2);
+      bt = new PieButton(negText, condEnable, 2);
       bt.addMouseListener(ml);
       p.add(bt, -2);
 
-      bt = new PieButton(posText, condEnable, 3);
+      bt = new PieButton(negText, condEnable, 3);
       bt.addMouseListener(ml);
       p.add(bt, -3);
    }

@@ -233,6 +233,7 @@ public abstract class AbstractMainPane extends JDesktopPane
       JButton btHistory = new ConditionButton(LCStatus.getStatus().lm("messages"),
             new NotCondition<ApplicationMode>(LCStatus.getStatus().getModel(LCStatus.MN_ApplicationMode),
                   ApplicationMode.AmMachineOff));
+      oldAppMode = appMode.getValue();
       btHistory.setActionCommand(ApplicationMode.AmMessageLog.name());
       btHistory.addActionListener(new ActionListener() {
          @Override

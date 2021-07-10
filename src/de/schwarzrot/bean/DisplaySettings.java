@@ -151,6 +151,7 @@ public class DisplaySettings {
       String       rawValue;
       double       value;
 
+      System.out.println("config-line: >>" + configLine + "<<");
       for (String s : parts) {
          unit = null;
          for (int i = 0; i < unitChars.length; ++i) {
@@ -192,12 +193,13 @@ public class DisplaySettings {
          }
       }
       Collections.sort(increments);
-      int size = Math.min(4, increments.size());
+      int mx   = increments.size();
+      int size = Math.min(3, mx);
 
       this.increments    = new double[size + 1];
       this.increments[0] = 0;
       for (int i = 0; i < size; ++i) {
-         this.increments[i + 1] = increments.get(i);
+         this.increments[i + 1] = increments.get(mx - size + i);
       }
 
       System.out.println("got these increments ...");

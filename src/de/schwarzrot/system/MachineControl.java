@@ -204,7 +204,7 @@ public class MachineControl extends MouseAdapter
    protected double getJogSpeed() {
       SpeedInfo si    = LCStatus.getStatus().getSpeedInfo();
 
-      double    feed  = si.getNominalFeed() / 60.0;
+      double    feed  = si.getJogSpeed() / 60.0;
       double    ff    = si.getFeedFactor() / 100.0;
       double    sf    = si.getRapidFactor() / 100.0;
       double    speed = si.getMaxSpeed() / 60.0;

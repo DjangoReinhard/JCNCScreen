@@ -29,8 +29,25 @@ package de.schwarzrot.model;
 
 import java.beans.PropertyChangeEvent;
 
+import de.schwarzrot.nml.LengthUnit;
+
 
 public class SpeedInfo extends AbstractModel {
+   public SpeedInfo(LengthUnit lu) {
+      switch (lu) {
+         case Inch:
+            jogSpeed = 39.37;
+            break;
+         case MM:
+            jogSpeed = 1000;
+            break;
+         case CM:
+            jogSpeed = 100;
+            break;
+      }
+   }
+
+
    public double getAccel() {
       return accel;
    }
@@ -43,6 +60,13 @@ public class SpeedInfo extends AbstractModel {
 
    public double getFeedFactor() {
       return feedFactor;
+   }
+
+
+   public double getJogSpeed() {
+      if (nomFeed == 0)
+         return jogSpeed;
+      return nomFeed;
    }
 
 
@@ -199,6 +223,7 @@ public class SpeedInfo extends AbstractModel {
    private double             spindleFactor;
    private double             spindleCurSpeed;
    private double             spindleNomSpeed;
+   private double             jogSpeed;
    public static final String Accel               = "accel";
    public static final String CurFeed             = "curFeed";
    public static final String FeedFactor          = "feedFactor";
