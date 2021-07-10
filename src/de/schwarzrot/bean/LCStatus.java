@@ -64,8 +64,8 @@ public class LCStatus {
       gcodeInfo          = new GCodeInfo();
       models             = new HashMap<String, ValueModel>();
       activeCodes        = new ActiveCodes();
-      speedInfo          = new SpeedInfo();
-      setup              = new AppSetup(this, true); // true: read tooltable from file, false: read tooltable from nml-status
+      setup              = new AppSetup(this, false); // true: read tooltable from file, false: read tooltable from nml-status
+      speedInfo          = new SpeedInfo(setup.getUnit());
       toolInfo           = new ToolInfo(setup.getTools());
       mdiHistory         = new BasicEventList<GCodeLine>();
       setupModels();

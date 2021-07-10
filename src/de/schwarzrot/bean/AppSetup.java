@@ -301,12 +301,12 @@ public class AppSetup implements PropertyChangeListener, IAxisMask {
          }
       }
 
-      if (processTooltableFile) {
-         // search for tool table file definition
-         if (properties.containsKey("EMCIO")) {
-            String toolDef = getProperty("EMCIO", "TOOL_TABLE");
-            toolTableFile = new File(iniFile.getParentFile(), toolDef);
+      // search for tool table file definition
+      if (properties.containsKey("EMCIO")) {
+         String toolDef = getProperty("EMCIO", "TOOL_TABLE");
+         toolTableFile = new File(iniFile.getParentFile(), toolDef);
 
+         if (processTooltableFile) {
             System.out.println("process tool file: " + toolTableFile.getAbsolutePath());
             ifp.processTools(toolTableFile.getAbsolutePath());
          }

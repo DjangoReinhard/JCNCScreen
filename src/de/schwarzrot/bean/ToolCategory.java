@@ -1,36 +1,38 @@
 package de.schwarzrot.bean;
-/* 
+/*
  * **************************************************************************
- * 
+ *
  *  file:       ToolCategory.java
  *  project:    GUI for linuxcnc
  *  subproject: graphical application frontend
  *  purpose:    create a smart application, that assists in managing
- *              control of cnc-machines                           
+ *              control of cnc-machines
  *  created:    10.11.2019 by Django Reinhard
  *  copyright:  all rights reserved
- * 
- *  This program is free software: you can redistribute it and/or modify 
- *  it under the terms of the GNU General Public License as published by 
- *  the Free Software Foundation, either version 2 of the License, or 
- *  (at your option) any later version. 
- *   
- *  This program is distributed in the hope that it will be useful, 
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- *  GNU General Public License for more details. 
- *   
- *  You should have received a copy of the GNU General Public License 
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  * **************************************************************************
  */
 
+
 import java.util.List;
+
+import de.schwarzrot.linuxcnc.data.CategoryInfo;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
-import de.schwarzrot.linuxcnc.data.CategoryInfo;
 
 
 public class ToolCategory {
@@ -92,7 +94,9 @@ public class ToolCategory {
       CategoryInfo ci = new CategoryInfo();
 
       ci.setProfile(profile.name());
-      if (getName() != null && !getName().isBlank()) ci.setName(getName());
+      ci.setType(profile.getProfile());
+      if (getName() != null && !getName().isBlank())
+         ci.setName(getName());
 
       return ci;
    }
@@ -106,7 +110,8 @@ public class ToolCategory {
          sb.append(" (");
       }
       sb.append(LCStatus.getStatus().lm(profile.name()));
-      if (name != null) sb.append(")");
+      if (name != null)
+         sb.append(")");
 
       return sb.toString();
    }
@@ -124,6 +129,7 @@ public class ToolCategory {
 
       return sb.toString();
    }
+
 
    private final ToolProfile         profile;
    private String                    name;

@@ -72,7 +72,11 @@ public class ToolTable extends JPanel implements ActionListener, ListSelectionLi
       sl             = new SortedList<ToolEntry>(tools);
       setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
       add(createUI(createTable(), createEditor()));
-      table.getSelectionModel().setSelectionInterval(0, 0);
+      try {
+         table.getSelectionModel().setSelectionInterval(0, 0);
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
    }
 
 
