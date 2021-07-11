@@ -123,8 +123,8 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       this.statusReader = new StatusReader(errorReader, new BufferDescriptor());
       this.cmdWriter    = new CommandWriter(errorLog, statusReader);
       this.errorActive  = LCStatus.getStatus().getModel("errorActive");
-      dialogParent      = this;
-      errorReader.setErrorSignal(errorActive);
+      this.errorReader.setErrorSignal(errorActive);
+      dialogParent = this;
       LCStatus.getStatus().setApp(this);
    }
 
@@ -185,8 +185,7 @@ public class LinuxCNCClient extends JFrame implements Runnable {
       jme3App.setGeoParser(new RS274Reader(true));
       exportHandlers = findExportHandlers(exportHandlerDir);
       paneStack      = PaneStack.getInstance(cmdWriter, errorReader);
-      ConfigHolder ch        = new ConfigHolder(getClass().getSimpleName(), errorLog);
-      File         gcodeFile = new File(LCStatus.getStatus().getGCodeInfo().getFileName());
+      ConfigHolder ch = new ConfigHolder(getClass().getSimpleName(), errorLog);
 
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -215,20 +214,21 @@ public class LinuxCNCClient extends JFrame implements Runnable {
          // TODO: test phase - remove it!
          this.setLocation(560, 30);
       }
+      final SplashScreen splash    = SplashScreen.getSplashScreen();
+
+      File               gcodeFile = new File(LCStatus.getStatus().getGCodeInfo().getFileName());
 
       // TODO:
       // initializeLC();
       if (gcodeFile.exists() && gcodeFile.canRead()) {
          loadFile(gcodeFile);
       }
-      final SplashScreen splash    = SplashScreen.getSplashScreen();
-      ISysTickStarter    stStarter = new ISysTickStarter() {
-                                      @Override
-                                      public void start() {
-                                         sysTick = new SysTick(new SysUpdater(statusReader), 100l);
-                                      }
-                                   };
-
+      ISysTickStarter stStarter = new ISysTickStarter() {
+         @Override
+         public void start() {
+            sysTick = new SysTick(new SysUpdater(statusReader), 100l);
+         }
+      };
       stStarter.start();
       if (fullScreen)
          SwingUtilities.invokeLater(new Runnable() {

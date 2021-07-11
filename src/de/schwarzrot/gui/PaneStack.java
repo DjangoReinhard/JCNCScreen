@@ -239,26 +239,25 @@ public class PaneStack extends JPanel implements HierarchyListener, PropertyChan
 
       messageLogPane = new MessageLogPane(errorReader.getLog());
       mdiPane        = new GCodeLister(cmdWriter, LCStatus.getStatus().getMDIHistory());
+      // // TODO
+      // wheelPane = new JLabel("Wheely? ... not yet!");
 
       // TODO
       touchPane      = new JLabel("touch? ... not yet!");
-
-      // // TODO
-      // wheelPane = new JLabel("Wheely? ... not yet!");
-      editGCodePane  = new GCodeEditor(cmdWriter);
-      settingsPane   = new AppSettingsPane(cmdWriter);
-
       BindUtils.bind("frontendLine", LCStatus.getStatus().getGCodeInfo(), gcodeLister);
       BindUtils.bind("fileName", LCStatus.getStatus().getGCodeInfo(), gcodeLister.getFileHandler());
 
       add(gcodeLister, ApplicationMode.AmAuto.name());
       add(mdiPane, ApplicationMode.AmMDI.name());
       add(manualPane, ApplicationMode.AmManual.name());
-      // add(wheelPane, ApplicationMode.AmWheel.name());
-      add(editGCodePane, ApplicationMode.AmEdit.name());
       add(touchPane, ApplicationMode.AmTouch.name());
-      add(settingsPane, ApplicationMode.AmSettings.name());
       add(messageLogPane, ApplicationMode.AmMessageLog.name());
+      // add(wheelPane, ApplicationMode.AmWheel.name());
+      editGCodePane = new GCodeEditor(cmdWriter);
+      settingsPane  = new AppSettingsPane(cmdWriter);
+
+      add(editGCodePane, ApplicationMode.AmEdit.name());
+      add(settingsPane, ApplicationMode.AmSettings.name());
       add(fileManager, ApplicationMode.AmFileManager.name());
       appMode.setValue(ApplicationMode.AmManual);
       selectPane(ApplicationMode.AmManual);

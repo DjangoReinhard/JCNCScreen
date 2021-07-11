@@ -50,7 +50,7 @@ static NML* ec;
  */
 JNIEXPORT jobject JNICALL Java_de_schwarzrot_system_ErrorReader_fetchMessage(JNIEnv *env, jobject thisObject) {
   if (!ec || !ec->valid()) {
-     fprintf(stderr, "ERROR: error buffer is invalid!");
+//     fprintf(stderr, "ERROR: error buffer is invalid!");
      return NULL;
      }
   NMLTYPE type = ec->read();
@@ -132,8 +132,12 @@ JNIEXPORT jint JNICALL Java_de_schwarzrot_system_ErrorReader_init(JNIEnv *env, j
   const char* nmlFile = EMC2_DEFAULT_NMLFILE;
 
   if (!(ec = new NML(emcDecode, "emcError", "xemc", nmlFile))) {
-     fprintf(stderr, "ERROR: new NML failed!");
+//     fprintf(stderr, "ERROR: new NML failed!");
      return -1;
+     }
+  if (ec->error_type) {
+//     fprintf(stderr, "ERROR creating error Channel: #%d\n", ec->error_type);
+     return -2;
      }
   return 0;
   }

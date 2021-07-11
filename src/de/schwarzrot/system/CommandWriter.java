@@ -248,6 +248,7 @@ public class CommandWriter {
 
    public void setFeedRate(double rate) {
       log.add(new SystemMessage(String.format(LCStatus.getStatus().lm("cmdFeedRateOverride"), rate)));
+      System.err.println(String.format(LCStatus.getStatus().lm("cmdFeedRateOverride"), rate));
       setFeedOverride(rate);
    }
 
@@ -264,6 +265,7 @@ public class CommandWriter {
 
    public void setRapidRate(double rate) {
       log.add(new SystemMessage(String.format(LCStatus.getStatus().lm("cmdRapidRateOverride"), rate)));
+      System.err.println(String.format(LCStatus.getStatus().lm("cmdRapidRateOverride"), rate));
       setRapidOverride(rate);
    }
 

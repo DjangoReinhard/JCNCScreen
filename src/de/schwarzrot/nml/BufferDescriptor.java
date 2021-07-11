@@ -51,6 +51,7 @@ public class BufferDescriptor implements IBufferDescriptor {
 
 
    private static final Map<String, BufferEntry> bufferEntries;
+   private static final boolean                  nmlHasToolTable = false;
    static {
       bufferEntries = new HashMap<String, BufferEntry>();
 
@@ -156,8 +157,6 @@ public class BufferDescriptor implements IBufferDescriptor {
             new BufferEntry(BufferDescriptor.Max_velocity, 1640, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.Max_acceleration,
             new BufferEntry(BufferDescriptor.Max_acceleration, 1648, 1, BufferEntryType.Byte));
-      bufferEntries.put(BufferDescriptor.ToolTable,
-            new BufferEntry(BufferDescriptor.ToolTable, 9816, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.ToolInSpindle,
             new BufferEntry(BufferDescriptor.ToolInSpindle, 9812, 1, BufferEntryType.Byte));
       bufferEntries.put(BufferDescriptor.PocketPrepared,
@@ -187,15 +186,31 @@ public class BufferDescriptor implements IBufferDescriptor {
       bufferEntries.put(BufferDescriptor.Feed_hold_enabled,
             new BufferEntry(BufferDescriptor.Feed_hold_enabled, 1834, 1, BufferEntryType.Byte));
 
-      bufferEntries.put(BufferDescriptor.CoolMist,
-            new BufferEntry(BufferDescriptor.CoolMist, 122032, 1, BufferEntryType.Integer));
-      bufferEntries.put(BufferDescriptor.CoolFlood,
-            new BufferEntry(BufferDescriptor.CoolFlood, 122036, 1, BufferEntryType.Integer));
-      bufferEntries.put(BufferDescriptor.Lube,
-            new BufferEntry(BufferDescriptor.Lube, 122256, 1, BufferEntryType.Integer));
-      bufferEntries.put(BufferDescriptor.Estop,
-            new BufferEntry(BufferDescriptor.Estop, 122144, 1, BufferEntryType.Integer));
-      bufferEntries.put(BufferDescriptor.Debug,
-            new BufferEntry(BufferDescriptor.Debug, 122264, 1, BufferEntryType.Integer));
+      if (nmlHasToolTable) {
+         bufferEntries.put(BufferDescriptor.ToolTable,
+               new BufferEntry(BufferDescriptor.ToolTable, 9816, 1, BufferEntryType.Byte));
+
+         bufferEntries.put(BufferDescriptor.CoolFlood,
+               new BufferEntry(BufferDescriptor.CoolFlood, 122036, 1, BufferEntryType.Integer));
+         bufferEntries.put(BufferDescriptor.CoolMist,
+               new BufferEntry(BufferDescriptor.CoolMist, 122032, 1, BufferEntryType.Integer));
+         bufferEntries.put(BufferDescriptor.Debug,
+               new BufferEntry(BufferDescriptor.Debug, 122264, 1, BufferEntryType.Integer));
+         bufferEntries.put(BufferDescriptor.Estop,
+               new BufferEntry(BufferDescriptor.Estop, 122144, 1, BufferEntryType.Integer));
+         bufferEntries.put(BufferDescriptor.Lube,
+               new BufferEntry(BufferDescriptor.Lube, 122256, 1, BufferEntryType.Integer));
+      } else {
+         bufferEntries.put(BufferDescriptor.CoolFlood,
+               new BufferEntry(BufferDescriptor.CoolFlood, 10036, 1, BufferEntryType.Integer));
+         bufferEntries.put(BufferDescriptor.CoolMist,
+               new BufferEntry(BufferDescriptor.CoolMist, 10032, 1, BufferEntryType.Integer));
+         bufferEntries.put(BufferDescriptor.Debug,
+               new BufferEntry(BufferDescriptor.Debug, 10264, 1, BufferEntryType.Integer));
+         bufferEntries.put(BufferDescriptor.Estop,
+               new BufferEntry(BufferDescriptor.Estop, 10144, 1, BufferEntryType.Integer));
+         bufferEntries.put(BufferDescriptor.Lube,
+               new BufferEntry(BufferDescriptor.Lube, 10256, 1, BufferEntryType.Integer));
+      }
    }
 }

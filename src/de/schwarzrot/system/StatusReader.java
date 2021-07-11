@@ -27,8 +27,6 @@ package de.schwarzrot.system;
  */
 
 
-import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -44,7 +42,6 @@ import de.schwarzrot.bean.LCStatus;
 import de.schwarzrot.bean.Position;
 import de.schwarzrot.bean.ToolEntry;
 import de.schwarzrot.model.ActiveCodes;
-import de.schwarzrot.model.CanonPosition;
 import de.schwarzrot.model.SpeedInfo;
 import de.schwarzrot.model.ToolInfo;
 import de.schwarzrot.model.ValueModel;
@@ -71,8 +68,8 @@ public class StatusReader {
       try {
          socket       = new DatagramSocket(6421);
          address      = InetAddress.getByName("localhost");
-//         sendBuf      = new byte[1280];
-//         sendBuffer   = ByteBuffer.wrap(sendBuf);
+         //         sendBuf      = new byte[1280];
+         //         sendBuffer   = ByteBuffer.wrap(sendBuf);
          statusBuffer = init();
          statusBuffer.order(ByteOrder.LITTLE_ENDIAN);
          status = LCStatus.getStatus();
@@ -137,13 +134,13 @@ public class StatusReader {
       if (socket == null)
          return;
 
-/*
+      /*
       new Thread(new Runnable() {
          @Override
          public void run() {
             updateSendBuf();
             DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, 6421);
-
+      
             try {
                socket.send(packet);
             } catch (IOException e) {
@@ -151,7 +148,7 @@ public class StatusReader {
             }
          }
       }).start();
- */
+       */
    }
 
 
@@ -505,7 +502,7 @@ public class StatusReader {
 
       status.getSetup().setNumSpindles(numSpindles);
 
-      readToolsDefinitions();
+      //      readToolsDefinitions();
       handleToolChange();
       handleSignals();
    }
@@ -558,12 +555,11 @@ public class StatusReader {
       }
    }
 
-
-/*
+   /*
    protected void updateSendBuf() {
       CanonPosition pos = status.getPositionCalculator().getPosition();
       int           i   = 0;
-
+   
       sendBuffer.putDouble(0, pos.getX());
       sendBuffer.putDouble(++i, pos.getY());
       sendBuffer.putDouble(++i, pos.getZ());
@@ -584,7 +580,7 @@ public class StatusReader {
       sendBuffer.putDouble(++i, pos.getV());
       sendBuffer.putDouble(++i, pos.getW());
    }
- */
+    */
 
 
    private void checkBuffer() {
@@ -630,8 +626,8 @@ public class StatusReader {
    private final IBufferDescriptor bufDesc;
    private final int               activeSpindle;
    private DatagramSocket          socket;
-//   private byte[]                  sendBuf;
-//   private ByteBuffer              sendBuffer;
+   //   private byte[]                  sendBuf;
+   //   private ByteBuffer              sendBuffer;
    private InetAddress             address;
    private BufferEntry             e;
    private Position                p;

@@ -31,6 +31,7 @@
 #include "emc.hh"
 #include "emc_nml.hh"
 #include "timer.hh"
+#include "modal_state.hh"
 #include <string.h>
 
 #include  <de_schwarzrot_system_CommandWriter.h>
@@ -39,31 +40,28 @@ int emcDecode(NMLTYPE type, void *buffer, CMS * cms);
 /*
  * ini-file: /usr/local/src/linuxcnc-dev/configs/sim/axis/axis.ini
  */
-#define EMC_COMMAND_TIMEOUT 5.0  // how long to wait until timeout
-#define EMC_COMMAND_DELAY   0.01 // how long to sleep between checks
+#define EMC_COMMAND_TIMEOUT 10.0  // how long to wait until timeout
+#define EMC_COMMAND_DELAY   0.1   // how long to sleep between checks
 
 
 struct CommandChannel {
   RCS_CMD_CHANNEL*     c;
   RCS_STAT_CHANNEL*    s;
-  int                  serial;
+  StateTag             t;
   };
 static CommandChannel cc = {0};
 
 
 static int sendCommand(RCS_CMD_MSG& cmd) {
   if (cc.c->write(&cmd)) return -1;
-  cc.serial = cmd.serial_number;
 
-  double start = etime();
+  for (double end = 0.0; end < EMC_COMMAND_TIMEOUT; end += EMC_COMMAND_DELAY) {
+      cc.s->peek();
+      EMC_STAT* stat  = (EMC_STAT *)cc.s->get_address();
 
-  while (etime() - start < EMC_COMMAND_TIMEOUT) {
-        EMC_STAT* stat  = (EMC_STAT *)cc.s->get_address();
-        int serial_diff = stat->echo_serial_number - cc.serial;
-
-        if (cc.s->peek() == EMC_STAT_TYPE && serial_diff >= 0) return 0;
-        esleep(EMC_COMMAND_DELAY);
-        }
+      if ((stat->echo_serial_number - cmd.serial_number) >= 0) return 0;
+      esleep(EMC_COMMAND_DELAY);
+      }
   return -1;
   }
 
@@ -272,7 +270,7 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setAuto(JNIEnv* e
          rv = sendCommand(pf);
          } break;
     }
-  if (rv) fputs("changing interpreters auto mode FAILED!", stderr);
+//  if (rv) fputs("changing interpreters auto mode FAILED!", stderr);
   }
 
 

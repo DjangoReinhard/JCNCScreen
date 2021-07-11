@@ -46,7 +46,10 @@ public class ErrorReader implements ActionListener {
    public ErrorReader(List<SystemMessage> errorLog) {
       this.errorLog            = GlazedListsSwing.swingThreadProxyList((EventList<SystemMessage>) errorLog);
       this.confirmButtonActive = false;
-      init();
+      if (init() < 0)
+         backendAvailable = false;
+      else
+         backendAvailable = true;
    }
 
 
@@ -78,6 +81,11 @@ public class ErrorReader implements ActionListener {
 
    public List<SystemMessage> getLog() {
       return errorLog;
+   }
+
+
+   public boolean isBackendAvailable() {
+      return backendAvailable;
    }
 
 
@@ -169,6 +177,7 @@ public class ErrorReader implements ActionListener {
    private String              oldActionCommand;
    private ActionListener[]    oldActionListeners;
    private boolean             confirmButtonActive;
+   private boolean             backendAvailable;
    private List<SystemMessage> errorLog;
    private static final String confirmText  = "Verstanden";
    private static final String clearMessage = " ";

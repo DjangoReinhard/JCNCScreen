@@ -146,8 +146,9 @@ static MemberDef StatusMembers[] = {
     {"toolInSpindle",  O(io.tool.toolInSpindle),
         "The tool number of the currently loaded tool, or 0 if no tool is loaded."
     },
+#ifdef TOOL_NML
     {"toolTable",      O(io.tool.toolTable)},
-
+#endif
 // EMC_COOLANT_STAT io.cooland
     {"coolMist",   O(io.coolant.mist)},
     {"coolFlood",  O(io.coolant.flood)},

@@ -33,15 +33,22 @@ public class CheckBufferDescriptor implements Runnable {
       readNativeDescription();
       //      tellDescriptor();
       checkDescriptors();
+      System.out.flush();
 
+      if (bufDesc.keySet().contains(BufferDescriptor.ToolTable)) {
+         System.err.println("\nNML-Status contains ToolTable!");
+      } else {
+         System.err.println("\nNML-Status has NO ToolTable!");
+      }
+      System.err.println("\tcheck >BufferDescriptor.nmlHasToolTable< is in sync"
+            + " with linuxcnc compile-switch TOOL_NML\n");
       if (errorKeys.size() > 0) {
          System.err.println("BufferDescriptor failed on these keys:");
          for (String k : errorKeys) {
-            System.err.println(k);
+            System.err.println("\t" + k);
          }
       } else {
-         System.out.println();
-         System.out.println("BufferDescriptor is upToDate");
+         System.err.println("BufferDescriptor is upToDate");
       }
    }
 

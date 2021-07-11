@@ -71,22 +71,22 @@ JNIEXPORT jobject JNICALL Java_de_schwarzrot_system_StatusReader_init(JNIEnv *en
   sc.c = new RCS_STAT_CHANNEL(emcDecode, "emcStatus", "xemc", nmlFile);
   if (sc.c->valid()) {
      sc.status = static_cast<EMC_STAT*>(sc.c->get_address());
-     fprintf(stderr, "ok, wi got a status channel ...\n");
+//     fprintf(stderr, "ok, wi got a status channel ...\n");
      }
   else {
-     fprintf(stderr, "OUPS, failed to create status channel!\n");
+//     fprintf(stderr, "OUPS, failed to create status channel!\n");
      return NULL;
      }
   jobject       byteBuffer = env->NewDirectByteBuffer((void*)sc.status, sizeof(EMC_STAT));
-  unsigned long bufSize    = env->GetDirectBufferCapacity(byteBuffer);
-
-  if (bufSize < sizeof(EMC_STAT)) {
-     fprintf(stderr, "ERROR: byteBuffer is too small!!!");
-     }
-  void *buf = env->GetDirectBufferAddress(byteBuffer);
-
-  fprintf(stderr, "byteBuffer is located at 0x%lX\n", (unsigned long)buf);
-  fprintf(stderr, "byteBuffer is located at #%ld\n",  (unsigned long)buf);
+//  unsigned long bufSize    = env->GetDirectBufferCapacity(byteBuffer);
+//
+//  if (bufSize < sizeof(EMC_STAT)) {
+//     fprintf(stderr, "ERROR: byteBuffer is too small!!!");
+//     }
+//  void *buf = env->GetDirectBufferAddress(byteBuffer);
+//
+//  fprintf(stderr, "byteBuffer is located at 0x%lX\n", (unsigned long)buf);
+//  fprintf(stderr, "byteBuffer is located at #%ld\n",  (unsigned long)buf);
 
   return byteBuffer;
   }
@@ -113,9 +113,10 @@ JNIEXPORT jstring JNICALL Java_de_schwarzrot_system_StatusReader_getString(JNIEn
  */
 JNIEXPORT void JNICALL Java_de_schwarzrot_system_StatusReader_readStatus(JNIEnv *env
                                                                        , jobject thisObject) {
-  if (poll()) {
+  poll();
+//  if (poll()) {
      // ERROR: could not fetch status message
-     fprintf(stderr, "ERROR: could not fetch status message!\n");
-     }
+//     fprintf(stderr, "ERROR: could not fetch status message!\n");
+//     }
   }
 
