@@ -7,6 +7,7 @@
  *  purpose:    send commands to linuxcnc backend
  *  created:    18.4.2020 by Django Reinhard
  *              followed code from linuxcnc
+ *              rewrite to minimize dependencies 10.7.2021
  *  copyright:  all rights reserved
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -24,43 +25,43 @@
  *
  * **************************************************************************
  */
-#define __STDC_FORMAT_MACROS
-
-#include "config.h"
-#include "rcs.hh"
-#include "emc.hh"
-#include "emc_nml.hh"
-#include "timer.hh"
-#include "modal_state.hh"
-#include <string.h>
-
+#include <stat_msg.hh>
+#include <cmd_msg.hh>
+#include <emc_nml.hh>
+#include <stdio.h>
+#include <cstring>
+#include <sys/time.h>
 #include  <de_schwarzrot_system_CommandWriter.h>
-int emcDecode(NMLTYPE type, void *buffer, CMS * cms);
-
-/*
- * ini-file: /usr/local/src/linuxcnc-dev/configs/sim/axis/axis.ini
- */
-#define EMC_COMMAND_TIMEOUT 10.0  // how long to wait until timeout
-#define EMC_COMMAND_DELAY   0.1   // how long to sleep between checks
 
 
-struct CommandChannel {
-  RCS_CMD_CHANNEL*     c;
-  RCS_STAT_CHANNEL*    s;
-  StateTag             t;
-  };
-static CommandChannel cc = {0};
+static RCS_CMD_CHANNEL*  cCmd;
+static RCS_STAT_CHANNEL* cStat;
+static EMC_STAT*         status;
 
 
-static int sendCommand(RCS_CMD_MSG& cmd) {
-  if (cc.c->write(&cmd)) return -1;
+#define EMC_COMMAND_TIMEOUT 5.0  // how long to wait until timeout
+#define EMC_COMMAND_DELAY   0.01 // seconds to sleep between checks
 
-  for (double end = 0.0; end < EMC_COMMAND_TIMEOUT; end += EMC_COMMAND_DELAY) {
-      cc.s->peek();
-      EMC_STAT* stat  = (EMC_STAT *)cc.s->get_address();
 
-      if ((stat->echo_serial_number - cmd.serial_number) >= 0) return 0;
-      esleep(EMC_COMMAND_DELAY);
+static void sleep(double s) {
+  struct timeval tv;
+
+  tv.tv_sec  = s;
+  tv.tv_usec = s * 1000000;
+  select (0, NULL, NULL, NULL, &tv);
+  }
+
+
+static int sendCommand(RCS_CMD_MSG& msg) {
+  if (cCmd->write(&msg)) return -1;
+
+  for (double end = 0.0
+     ; end < EMC_COMMAND_TIMEOUT
+     ; end += EMC_COMMAND_DELAY) {
+      cStat->peek();
+
+      if ((status->echo_serial_number - msg.serial_number) >= 0) return 0;
+      sleep(EMC_COMMAND_DELAY);
       }
   return -1;
   }
@@ -73,17 +74,24 @@ static int sendCommand(RCS_CMD_MSG& cmd) {
  */
 JNIEXPORT jint JNICALL Java_de_schwarzrot_system_CommandWriter_init(JNIEnv* env
                                                                   , jobject thisObject) {
-  const char* nmlFile = EMC2_DEFAULT_NMLFILE;
+  cCmd = new RCS_CMD_CHANNEL(emcFormat, "emcCommand", "xemc", EMC2_DEFAULT_NMLFILE);
+  if (!cCmd || !cCmd->valid()) {
+     delete cCmd;
+     cCmd = NULL;
 
-  cc.c = new RCS_CMD_CHANNEL(emcDecode,  "emcCommand", "xemc", nmlFile);
-  if (!cc.c->valid()) {
-     cc.c = NULL;
      return -1;
      }
-  cc.s = new RCS_STAT_CHANNEL(emcDecode, "emcStatus",  "xemc", nmlFile);
-  if (!cc.s->valid()) {
-     cc.s = NULL;
+  cStat = new RCS_STAT_CHANNEL(emcFormat, "emcStatus", "xemc", EMC2_DEFAULT_NMLFILE);
+  if (!cStat || !cStat->valid()) {
+     delete cCmd;
+     delete cStat;
+     cCmd  = NULL;
+     cStat = NULL;
+
      return -2;
+     }
+  else {
+     status = static_cast<EMC_STAT*>(cStat->get_address());
      }
   return 0;
   }

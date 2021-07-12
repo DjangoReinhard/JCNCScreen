@@ -7,6 +7,7 @@
  *  purpose:    read error messages and convert them into java elements
  *  created:    8.10.2019 by Django Reinhard
  *              followed code from linuxcnc
+ *              rewrite to minimize dependencies 10.7.2021
  *  copyright:  all rights reserved
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -24,17 +25,15 @@
  *
  * **************************************************************************
  */
-#define __STDC_FORMAT_MACROS
-
-#include "config.h"
-#include "rcs.hh"
-#include "emc.hh"
-#include "emc_nml.hh"
-#include "nml_oi.hh"
-#include <string.h>
+#include <stat_msg.hh>
+#include <cmd_msg.hh>
+#include <emc_nml.hh>
+#include <nml.hh>
+#include <nml_oi.hh>
+#include <stdio.h>
+#include <cstring>
 
 #include  <de_schwarzrot_system_ErrorReader.h>
-int emcDecode(NMLTYPE type, void *buffer, CMS * cms);
 
 
 static NML* ec;
@@ -131,8 +130,11 @@ JNIEXPORT jobject JNICALL Java_de_schwarzrot_system_ErrorReader_fetchMessage(JNI
 JNIEXPORT jint JNICALL Java_de_schwarzrot_system_ErrorReader_init(JNIEnv *env, jobject thisObject) {
   const char* nmlFile = EMC2_DEFAULT_NMLFILE;
 
-  if (!(ec = new NML(emcDecode, "emcError", "xemc", nmlFile))) {
-//     fprintf(stderr, "ERROR: new NML failed!");
+  ec = new NML(emcFormat, "emcError", "xemc", nmlFile);
+  if (!ec || !ec->valid()) {
+     delete ec;
+     ec = NULL;
+
      return -1;
      }
   if (ec->error_type) {

@@ -182,7 +182,7 @@ public class ErrorReader implements ActionListener {
    private static final String confirmText  = "Verstanden";
    private static final String clearMessage = " ";
    static {
-      System.loadLibrary("linuxcncini");
+      //      System.loadLibrary("linuxcncini");
       System.loadLibrary("nml");
       System.loadLibrary("linuxcnchal");
       System.loadLibrary("LinuxCNC");

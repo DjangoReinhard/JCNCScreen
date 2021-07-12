@@ -7,12 +7,7 @@ endif
 O_HAL   = de_schwarzrot_hal_ItemList.new.o
 O_NML   = de_schwarzrot_system_CommandWriter.o \
  de_schwarzrot_system_ErrorReader.o \
- de_schwarzrot_system_StatusReader.o \
- emcDecode.o
-O_LC    = lc/src/objects/libnml/buffer/*.o \
- lc/src/objects/libnml/rcs/*.o \
- lc/src/objects/libnml/cms/*.o \
- lc/src/objects/libnml/nml/*.o
+ de_schwarzrot_system_StatusReader.o
 INCLUDES=-I. \
  -I/usr/include/python2.7 \
  -I$(abspath lc/src) \
@@ -43,25 +38,22 @@ CC_FLAGS=$(INCLUDES) \
  -DULAPI -g -Wall -Os -fwrapv -Woverloaded-virtual \
  -D_GNU_SOURCE $(TOOL_NML_FLAG) -Wno-psabi -std=gnu++11 \
  -MP -MD
-
-# -fPIC -fno-strict-aliasing \
-# -lrt \
-
-LC_FLAGS = $(INCLUDE) \
- -DLOCALE_DIR=\"/usr/share/locale\" \
+LC_FLAGS = -DLOCALE_DIR=\"/usr/share/locale\" \
  -DPACKAGE=\"linuxcnc\" \
  $(TOOL_NML_FLAG) \
  -L$(abspath lc/lib) \
+  $(abspath lc/lib/libnml.so.0) \
  -Wl,-rpath,$(abspath lc/lib) \
  -Xlinker -Map=libLinuxCNC.map \
-  $(abspath lc/lib/liblinuxcnc.a) \
-  $(abspath lc/lib/liblinuxcncini.so.0) \
-  $(abspath lc/lib/libnml.so.0) \
-  $(abspath lc/lib/liblinuxcnchal.so.0) \
-  $(abspath lc/lib/libtooldata.so.0) \
  -L/usr/X11R6/lib -lm -lGL
 GCC = g++
-
+JLIBS = ../lib/derby.jar:../lib/derbyshared.jar:../lib/derbytools.jar:../lib/glazedlists-1.11.0.jar:../lib/jme3-core.jar:../lib/jme3-desktop.jar:../lib/jme3-lwjgl.jar:../lib/LCExportHandler.jar:../lib/lwjgl.jar:../lib/lwjgl-platform-natives-linux.jar
+LC_OBJS = $(abspath lc/src/objects/emc/nml_intf/emc.o) \
+ $(abspath lc/src/objects/emc/nml_intf/emcops.o) \
+ $(abspath lc/src/objects/emc/rs274ngc/modal_state.o) \
+ $(abspath lc/src/objects/emc/tooldata/tooldata_common.o) \
+ $(abspath lc/src/objects/emc/tooldata/tooldata_mmap.o) \
+ $(abspath lc/src/objects/emc/tooldata/tooldata_db.o)
 
 all: 	libLinuxCNC.so DumpBufDesc
 
@@ -71,12 +63,20 @@ clean:
 	rm *.so
 	rm DumpBufDesc
 
+headers:
+	javac -h . -cp .:../src:$(JLIBS) ../src/de/schwarzrot/system/CommandWriter.java
+	javac -h . -cp .:../src:$(JLIBS) ../src/de/schwarzrot/system/ErrorReader.java
+	javac -h . -cp .:../src:$(JLIBS) ../src/de/schwarzrot/system/StatusReader.java
+
 %.o : %.cc
 	$(GCC) -c $(CC_FLAGS) -o $@ $<
 
-libLinuxCNC.so: $(O_NML) $(abspath lc/src/objects/emc/rs274ngc/modal_state.o)
+libLinuxCNC.so: $(O_NML) $(LC_OBJS)
 	$(GCC) -shared $(LC_FLAGS) -o $@ $^
 
 DumpBufDesc:	dumpBufDesc.o
+	$(GCC) $(LC_FLAGS) -o $@ $^
+
+TestNML:	TestNML.o $(LC_OBJS)
 	$(GCC) $(LC_FLAGS) -o $@ $^
 

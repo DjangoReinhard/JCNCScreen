@@ -1,4 +1,6 @@
 package de.schwarzrot.system;
+
+
 /*
  * **************************************************************************
  *
@@ -25,8 +27,6 @@ package de.schwarzrot.system;
  *
  * **************************************************************************
  */
-
-
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -121,10 +121,10 @@ public class StatusReader {
       //
       //      l.log(Level.INFO, "update took " + (end - start) + "ms");
       //
-      //      System.out.println();
-      //      System.out.println(LCStatus.getStatus().getModel("taskState"));
-      //      System.out.println(LCStatus.getStatus().getModel("taskMode"));
-      //      System.out.println(LCStatus.getStatus().getModel("execState"));
+      // System.out.println();
+      // System.out.println(LCStatus.getStatus().getModel("taskState"));
+      // System.out.println(LCStatus.getStatus().getModel("taskMode"));
+      // System.out.println(LCStatus.getStatus().getModel("execState"));
       //      System.out.println(LCStatus.getStatus().getModel("interpState"));
       //      System.out.println(LCStatus.getStatus().getModel("applicationMode"));
    }
@@ -140,7 +140,7 @@ public class StatusReader {
          public void run() {
             updateSendBuf();
             DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, 6421);
-      
+
             try {
                socket.send(packet);
             } catch (IOException e) {
@@ -508,7 +508,7 @@ public class StatusReader {
    }
 
 
-   protected native final void readStatus();
+   protected native final int readStatus();
 
 
    protected void readToolsDefinitions() {
@@ -559,7 +559,7 @@ public class StatusReader {
    protected void updateSendBuf() {
       CanonPosition pos = status.getPositionCalculator().getPosition();
       int           i   = 0;
-   
+
       sendBuffer.putDouble(0, pos.getX());
       sendBuffer.putDouble(++i, pos.getY());
       sendBuffer.putDouble(++i, pos.getZ());
