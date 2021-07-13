@@ -11,27 +11,26 @@ O_NML   = de_schwarzrot_system_CommandWriter.o \
 INCLUDES=-I. \
  -I/usr/include/python2.7 \
  -I$(abspath lc/src) \
- -I$(abspath lc/src/include) \
- -I$(abspath lc/libnml/linklist) \
- -I$(abspath lc/libnml/cms) \
- -I$(abspath lc/libnml/rcs) \
- -I$(abspath lc/libnml/inifile) \
- -I$(abspath lc/libnml/os_intf) \
- -I$(abspath lc/libnml/nml) \
- -I$(abspath lc/libnml/buffer) \
- -I$(abspath lc/libnml/posemath) \
- -I$(abspath lc/rtapi) \
- -I$(abspath lc/hal) \
- -I$(abspath lc/emc/nml_intf) \
- -I$(abspath lc/emc/kinematics) \
- -I$(abspath lc/emc/tp) \
- -I$(abspath lc/emc/motion) \
- -I$(abspath lc/emc/ini) \
- -I$(abspath lc/emc/rs274ngc) \
- -I$(abspath lc/emc/sai) \
- -I$(abspath lc/emc/pythonplugin) \
- -I$(abspath lc/emc/tooldata) \
  -I$(abspath lc/include) \
+ -I$(abspath lc/src/libnml/linklist) \
+ -I$(abspath lc/src/libnml/cms) \
+ -I$(abspath lc/src/libnml/rcs) \
+ -I$(abspath lc/src/libnml/inifile) \
+ -I$(abspath lc/src/libnml/os_intf) \
+ -I$(abspath lc/src/libnml/nml) \
+ -I$(abspath lc/src/libnml/buffer) \
+ -I$(abspath lc/src/libnml/posemath) \
+ -I$(abspath lc/src/rtapi) \
+ -I$(abspath lc/src/hal) \
+ -I$(abspath lc/src/emc/nml_intf) \
+ -I$(abspath lc/src/emc/kinematics) \
+ -I$(abspath lc/src/emc/tp) \
+ -I$(abspath lc/src/emc/motion) \
+ -I$(abspath lc/src/emc/ini) \
+ -I$(abspath lc/src/emc/rs274ngc) \
+ -I$(abspath lc/src/emc/sai) \
+ -I$(abspath lc/src/emc/pythonplugin) \
+ -I$(abspath lc/src/emc/tooldata) \
  -I/usr/lib/jvm/java-11-openjdk-amd64/include \
  -I/usr/lib/jvm/java-11-openjdk-amd64/include/linux
 CC_FLAGS=$(INCLUDES) \
