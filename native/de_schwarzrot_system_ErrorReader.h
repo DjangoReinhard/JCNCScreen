@@ -9,18 +9,18 @@ extern "C" {
 #endif
 /*
  * Class:     de_schwarzrot_system_ErrorReader
- * Method:    init
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_de_schwarzrot_system_ErrorReader_init
-  (JNIEnv *, jobject);
-
-/*
- * Class:     de_schwarzrot_system_ErrorReader
  * Method:    fetchMessage
  * Signature: ()Lde/schwarzrot/system/SystemMessage;
  */
 JNIEXPORT jobject JNICALL Java_de_schwarzrot_system_ErrorReader_fetchMessage
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     de_schwarzrot_system_ErrorReader
+ * Method:    init
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_de_schwarzrot_system_ErrorReader_init
   (JNIEnv *, jobject);
 
 #ifdef __cplusplus

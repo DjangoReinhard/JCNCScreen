@@ -18,9 +18,9 @@ JNIEXPORT jstring JNICALL Java_de_schwarzrot_system_StatusReader_getString
 /*
  * Class:     de_schwarzrot_system_StatusReader
  * Method:    readStatus
- * Signature: ()V
+ * Signature: ()I
  */
-JNIEXPORT void JNICALL Java_de_schwarzrot_system_StatusReader_readStatus
+JNIEXPORT jint JNICALL Java_de_schwarzrot_system_StatusReader_readStatus
   (JNIEnv *, jobject);
 
 /*

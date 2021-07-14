@@ -25,6 +25,30 @@ JNIEXPORT jint JNICALL Java_de_schwarzrot_system_CommandWriter_init
 
 /*
  * Class:     de_schwarzrot_system_CommandWriter
+ * Method:    jogStart
+ * Signature: (ID)V
+ */
+JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_jogStart
+  (JNIEnv *, jobject, jint, jdouble);
+
+/*
+ * Class:     de_schwarzrot_system_CommandWriter
+ * Method:    jogStep
+ * Signature: (IDD)V
+ */
+JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_jogStep
+  (JNIEnv *, jobject, jint, jdouble, jdouble);
+
+/*
+ * Class:     de_schwarzrot_system_CommandWriter
+ * Method:    jogStop
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_jogStop
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     de_schwarzrot_system_CommandWriter
  * Method:    loadTaskPlan
  * Signature: (Ljava/lang/String;)V
  */
@@ -73,14 +97,6 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setFeedOverride
 
 /*
  * Class:     de_schwarzrot_system_CommandWriter
- * Method:    setFixture
- * Signature: (IDDDDDDDDD)V
- */
-JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setFixture
-  (JNIEnv *, jobject, jint, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble);
-
-/*
- * Class:     de_schwarzrot_system_CommandWriter
  * Method:    setFlood
  * Signature: (Z)V
  */
@@ -94,14 +110,6 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setFlood
  */
 JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setMist
   (JNIEnv *, jobject, jboolean);
-
-/*
- * Class:     de_schwarzrot_system_CommandWriter
- * Method:    setOffset
- * Signature: (DDDDDDDDD)V
- */
-JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setOffset
-  (JNIEnv *, jobject, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble);
 
 /*
  * Class:     de_schwarzrot_system_CommandWriter
@@ -158,22 +166,6 @@ JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_setTaskState
  */
 JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_taskAbort
   (JNIEnv *, jobject);
-
-/*
- * Class:     de_schwarzrot_system_CommandWriter
- * Method:    updatePosition
- * Signature: (Lde/schwarzrot/model/CanonPosition;)V
- */
-JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_updatePosition
-  (JNIEnv *, jobject, jobject);
-
-/*
- * Class:     de_schwarzrot_system_CommandWriter
- * Method:    updateToolSettings
- * Signature: (Lde/schwarzrot/bean/ToolEntry;)V
- */
-JNIEXPORT void JNICALL Java_de_schwarzrot_system_CommandWriter_updateToolSettings
-  (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus
 }
